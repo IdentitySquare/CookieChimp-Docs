@@ -1,0 +1,59 @@
+---
+title: "Consent Callbacks & Events"
+description: "Run code after callbacks and events are triggered."
+---
+
+## Script Management Methods
+
+There are two primary methods for managing scripts:
+
+- Through `<script>` [tag attributes](/block-scripts-cookies/script-attributes).
+- Using callbacks and events.
+
+## Code Examples
+
+The `cc:onConsent` event can be used to execute code based on user consent.
+
+```javascript
+window.addEventListener("cc:onConsent", function (event) {
+  if (CookieConsent.acceptedCategory("analytics")) {
+    // "analytics" category enabled
+  }
+
+  if (CookieConsent.acceptedService("Google Analytics", "analytics")) {
+    // "Google Analytics" service enabled
+  }
+});
+```
+
+The `cc:onChange` event can be used to execute code when the user changes their consent.
+
+```javascript
+window.addEventListener("cc:onChange", function (event) {
+  var detail = event.detail;
+
+  /**
+   * detail.cookie
+   * detail.changedCategories
+   * detail.changedServices
+   */
+
+  if (detail.changedCategories.includes("analytics")) {
+    if (CookieConsent.acceptedCategory("analytics")) {
+      // "analytics" category was just enabled
+    } else {
+      // "analytics" category was just disabled
+    }
+
+    if (detail.changedServices["analytics"].includes("Google Analytics")) {
+      if (CookieConsent.acceptedService("Google Analytics", "analytics")) {
+        // "Google Analytics" service was just enabled
+      } else {
+        // "Google Analytics" service was just disabled
+      }
+    }
+  }
+});
+```
+
+<Info>[View all available callbacks & events ›](/callback-events)</Info>

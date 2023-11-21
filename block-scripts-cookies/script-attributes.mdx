@@ -1,0 +1,60 @@
+---
+title: "Block Script Tags"
+description: "Only enable scripts when a user has given consent."
+---
+
+## Script Management Methods
+
+There are two primary methods for managing scripts:
+
+- Through `<script>` tag attributes.
+- Using [callbacks and events](/block-scripts-cookies/callbacks-events).
+
+## Script Attributes and Usage
+
+Control your scripts using these attributes:
+
+- `data-category`: Assigns the script to a consent category. You can find the ID of each category from your CookieChimp dashboard.
+- `data-service` (optional): Name of the company, service or a group of scripts. Can be used to disable a single service in a category while leaving others enabled - or the other way around.
+- `data-type` (optional): Defines a custom script type.
+- `data-src` (optional): Can be used instead of `src` for validation purposes.
+
+## Code Examples
+
+```html
+<script>
+  // Always executed
+</script>
+
+<script type="text/plain" data-category="analytics">
+  // Executed when the "analytics" category is enabled
+</script>
+
+<script
+  type="text/plain"
+  data-category="analytics"
+  data-service="Google Analytics"
+>
+  // Executed when "Google Analytics" service is enabled
+</script>
+
+<!-- Script loads when "Google Analytics" service is enabled -->
+<script
+  type="text/plain"
+  data-src="https://www.googletagmanager.com/gtag/js?id=TAG_ID"
+  data-category="analytics"
+  data-service="Google Analytics"
+></script>
+```
+
+<Tip>
+  You can also run scripts when a category or service is disabled (if it was
+  previously enabled) by prepending the '!' character to the name.
+
+```html
+<script type="text/plain" data-category="!analytics">
+  // Executed when the "analytics category is disabled
+</script>
+```
+
+</Tip>

@@ -1,0 +1,73 @@
+---
+title: "Installation"
+description: "Add CookieChimp CMP to your website in under 5 minutes"
+icon: "code"
+---
+
+## Step 1: Sign Up
+
+- **Create an Account**: Sign up at [CookieChimp.com](https://cookiechimp.com/signup).
+- **Configure**: Access your dashboard to set up your cookie consent preferences.
+
+## Step 2: Integration
+
+Choose the integration method suitable for your platform:
+
+### HTML
+
+Add your website's CookieChimp JS snippet in the `<head>` tag of your HTML:
+
+```html
+<script src="https://cookiechimp.com/widget/abc123.js"></script>
+```
+
+    <Info>You need to replace `abc123` with your website's unique CookieChimp ID.</Info>
+
+### WordPress
+
+Install the CookieChimp plugin from the [WordPress plugin](#) and configure it in your dashboard.
+
+### Shopify
+
+Add the CookieChimp [Shopify app](#) and set it up in your Shopify admin.
+
+## Step 3: Customization and Testing
+
+- [Customize the appearance](#) and settings of the cookie consent widget from your CookieChimp dashboard.
+- Test to ensure it functions correctly on your site.
+- CookieChimp will automatically start scanning for [cookies on your website](#). You can view these in your CookieChimp dashboard and organize them.
+
+  {" "}
+
+  <Tip>
+    If you have [CookieChimp AI copilot](/ai) enabled, CookieChimp will
+    automatically fill in the missing information & categorize these cookies for
+    you.
+  </Tip>
+
+## Step 4: Block Scripts/Cookies
+
+To ensure compliance with GDPR regulations, it's crucial not only to display a consent banner but also to actively block all non-essential scripts and cookies until the user has given explicit consent.
+For comprehensive instructions on how to effectively manage and block scripts and cookies, please refer to our [Scripts Management Section](/block-scripts-cookies/script-attributes).
+
+## Manual Modal Trigger
+
+To allow users to manage their cookie preferences at any time, add a button with the data attribute `data-cc="show-preferencesModal"`:
+
+```html
+<button type="button" data-cc="show-preferencesModal">
+  Manage cookie preferences
+</button>
+```
+
+## Troubleshooting
+
+- If the widget doesn't display, ensure there are no conflicts with other scripts or styles on your website.
+- Clear your browser cache and cookies, then reload the website.
+
+## Need Help?
+
+<Note>
+  If you encounter any issues or require further assistance, please reach out to
+  us at [support@cookiechimp.com](mailto:support@cookiechimp.com).
+</Note>

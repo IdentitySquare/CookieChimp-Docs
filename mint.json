@@ -1,32 +1,33 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "CookieChimp Docs",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
   "favicon": "/favicon.png",
   "colors": {
-    "primary": "#9563FF",
-    "light": "#AE87FF",
-    "dark": "#0D001D",
+    "primary": "#e46a44",
+    "light": "#e46a44",
+    "dark": "#e46a44",
     "background": {
-      "dark": "#090014"
+      "light": "#faf8f6",
+      "dark": "#161616"
     },
     "anchors": {
       "from": "#FF7F57",
-      "to": "#9563FF"
+      "to": "#e46a44"
     }
   },
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:support@cookiechimp.com"
     }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Get Started",
+    "url": "https://cookiechimp.com"
   },
   "tabs": [
     {
@@ -54,15 +55,33 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["introduction", "quickstart", "development"]
+      "pages": [
+        "overview",
+        "installation",
+        "ai",
+        {
+          "group": "Block Scripts & Cookies",
+          "pages": [
+            "block-scripts-cookies/script-attributes",
+            "block-scripts-cookies/callbacks-events"
+          ],
+          "icon": "traffic-cone"
+        }
+      ]
     },
     {
-      "group": "Essentials",
-      "pages": ["essentials/markdown", "essentials/code", "essentials/images", "essentials/settings", "essentials/navigation"]
+      "group": "Advanced",
+      "pages": [
+        "custom-css",
+        "callbacks-events",
+        "block-iframes"
+      ]
     },
     {
       "group": "API Documentation",
-      "pages": ["api-reference/authentication"]
+      "pages": [
+        "api-reference/authentication"
+      ]
     },
     {
       "group": "Endpoint Examples",
@@ -75,8 +94,7 @@
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "twitter": "https://twitter.com/danielpaulme",
+    "github": "https://github.com/IdentitySquare/CookieChimp-Docs"
   }
 }

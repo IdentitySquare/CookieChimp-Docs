@@ -1,0 +1,278 @@
+---
+title: "Callback & Events"
+description: "Customise the user's experience programmatically."
+---
+
+# Event Broadcasts
+
+<Info>
+  You can use this to read user's consent to cookie categories and services.
+  View our docs on [Consent Callbacks & Events
+  ›](/block-scripts-cookies/callbacks-events)
+</Info>
+
+## Consent Callbacks
+
+### `cc:onFirstConsent`
+
+Triggered the first time user expresses their choice of consent (accept/reject).
+
+```js
+window.addEventListener("cc:onFirstConsent", function (event) {
+  var detail = event.detail;
+  // detail.cookie
+
+  // do something
+});
+```
+
+### `cc:onConsent`
+
+This event is triggered the very first time the user expresses their choice of consent — just like `onFirstConsent` — but also on every subsequent page load.
+
+```js
+window.addEventListener("cc:onConsent", function (event) {
+  var detail = event.detail;
+  // detail.cookie
+
+  // do something
+});
+```
+
+### `cc:onChange`
+
+This event is triggered when the user modifies their preferences and only if consent has already been provided.
+
+```js
+window.addEventListener("cc:onChange", function (event) {
+  var detail = event.detail;
+  /**
+   * detail.cookie
+   * detail.changedCategories
+   * detail.changedServices
+   */
+
+  // do something
+});
+```
+
+## Modal Callbacks
+
+### `cc:onModalShow`
+
+The consent modal is visible.
+
+```js
+window.addEventListener("cc:onModalShow", function (event) {
+  var detail = event.detail;
+  /**
+   * detail.modalName
+   */
+
+  // do something
+});
+```
+
+### `cc:onModalHide`
+
+The consent modal is hidden.
+
+```js
+window.addEventListener("cc:onModalHide", function (event) {
+  var detail = event.detail;
+  /**
+   * detail.modalName
+   */
+
+  // do something
+});
+```
+
+### `cc:onModalReady`
+
+The consent modal is created and appended to the DOM.
+
+```js
+window.addEventListener("cc:onModalReady", function (event) {
+  var detail = event.detail;
+  /**
+   * detail.modalName
+   */
+
+  // do something
+});
+```
+
+# Actions
+
+### `show`
+
+Shows the consent banner. If consent was previously expressed, the consent modal will not be generated; you'll have to pass the argument `true` to generate it on the fly.
+
+```js
+CookieConsent.show();
+
+// show modal (if it doesn't exist, create it)
+CookieConsent.show(true);
+```
+
+### `hide`
+
+Hides the consent banner.
+
+```js
+CookieConsent.hide();
+```
+
+### `showPreferences`
+
+Shows the preferences modal.
+
+```js
+CookieConsent.showPreferences();
+```
+
+### `hidePreferences`
+
+Hides the preferences modal.
+
+```js
+CookieConsent.hidePreferences();
+```
+
+### `acceptCategory`
+
+Programmatically accept or reject a cookie category.
+
+```js
+// accept all categories
+CookieConsent.acceptCategory("all");
+
+// reject all (accept only categories marked as readOnly/necessary)
+CookieConsent.acceptCategory([]);
+
+// accept currently selected categories inside the preferences modal
+CookieConsent.acceptCategory();
+
+// accept only the "analytics" category
+CookieConsent.acceptCategory("analytics");
+
+// accept only these 2 categories
+CookieConsent.acceptCategory(["analytics", "marketing"]);
+
+// accept all categories except the "analytics" category
+CookieConsent.acceptCategory("all", ["analytics"]);
+
+// accept all categories except these 2
+CookieConsent.acceptCategory("all", ["analytics", "marketing"]);
+```
+
+### `acceptedCategory`
+
+Returns `true` if the specified category was accepted, otherwise `false`.
+
+```javascript
+if (CookieConsent.acceptedCategory("analytics")) {
+  // "analytics" category was accepted
+} else {
+  // not accepted
+}
+```
+
+### `acceptService`
+
+Accepts or rejects services.
+
+```javascript
+// accept all services in the 'analytics' category
+CookieConsent.acceptService("all", "analytics");
+
+// reject all services
+CookieConsent.acceptService([], "analytics");
+
+// accept only specified service and reject all the others
+CookieConsent.acceptService("Google Analytics", "analytics");
+
+// accept only these 2 services and reject all the others
+CookieConsent.acceptService(["service1", "service2"], "analytics");
+```
+
+### `acceptedService`
+
+Returns `true` if the specified service was accepted, otherwise `false`.
+
+```javascript
+if (CookieConsent.acceptedService("Google Analytics", "analytics")) {
+  // "Google Analytics" service was accepted
+} else {
+  // not accepted
+}
+```
+
+### `validConsent`
+
+Returns `true` if consent is valid.
+
+Consent is **NOT** valid when at least one of following situations occurs:
+
+- consent is missing (e.g. user has not yet made a choice)
+- CookieChimp's cookie does not exist/has expired
+- CookieChimp's cookie is structurally not valid (e.g. empty)
+
+```javascript
+if (CookieConsent.validConsent()) {
+  // consent is valid
+} else {
+  // consent is not valid
+}
+```
+
+### `getUserPreferences`
+
+Returns user's preferences of accepted/rejected categories and services.
+
+Type: `function(): object`
+
+```typescript
+function(): {
+    acceptType: string,
+    acceptedCategories: string[],
+    rejectedCategories: string[],
+    acceptedServices: {[category: string]: string[]}
+    rejectedServices: {[category: string]: string[]}
+}
+```
+
+Possible acceptType values:
+
+- `'all'`
+- `'custom'`
+- `'necessary'`
+
+```javascript
+var preferences = CookieConsent.getUserPreferences();
+
+if (preferences.acceptType === "all") {
+  console.log("Everything has been accepted!");
+}
+
+if (preferences.acceptedCategories.includes("analytics")) {
+  console.log("The analytics category was accepted!");
+}
+```
+
+### `reset`
+
+Resets CookieConsent by dropping all internal pointers and config. You can pass the argument `true` to delete CookieChimp's cookie which holds the user's consent & preferences. The user will be prompted again to express their consent.
+
+<Warning>
+  Once this method is called, CookieChimp won't be functional on the page. The
+  webpage needs to be fully reloaded to re-initialise CookieChimp.
+</Warning>
+
+```js
+CookieConsent.reset(true);
+
+// Reload the page
+window.location.reload();
+```
