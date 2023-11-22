@@ -33,25 +33,17 @@
     {
       "name": "API Reference",
       "url": "api-reference"
-    }
-  ],
-  "anchors": [
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
     },
     {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "name": "Guides",
+      "url": "guides"
     },
     {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "name": "Changelog",
+      "url": "changelog"
     }
   ],
+  "anchors": [],
   "navigation": [
     {
       "group": "Get Started",
@@ -72,9 +64,14 @@
     {
       "group": "Advanced",
       "pages": [
+        "identify-users",
+        "cookie-scanning",
+        "cookie-list-embed",
         "custom-css",
         "callbacks-events",
-        "block-iframes"
+        "block-iframes",
+        "single-page-apps",
+        "headless-platform"
       ]
     },
     {
