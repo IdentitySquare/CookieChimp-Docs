@@ -10,7 +10,7 @@
   "feedback": {
     "suggestEdit": true,
     "raiseIssue": true,
-    "raiseIssue": true
+    "thumbsRating": true
   },
   "favicon": "/favicon.png",
   "colors": {
