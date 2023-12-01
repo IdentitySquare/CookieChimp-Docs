@@ -8,8 +8,8 @@
   },
   "isWhiteLabeled": true,
   "feedback": {
-    "suggestEdit": true,
-    "raiseIssue": true,
+    "suggestEdit": false,
+    "raiseIssue": false,
     "thumbsRating": true
   },
   "favicon": "/favicon.png",
