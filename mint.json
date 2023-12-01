@@ -38,11 +38,11 @@
   "tabs": [
     {
       "name": "API Reference",
-      "url": "api-reference"
+      "url": "docs/api-reference"
     },
     {
       "name": "Guides",
-      "url": "guides"
+      "url": "docs/guides"
     }
   ],
   "anchors": [],
@@ -50,14 +50,14 @@
     {
       "group": "Get Started",
       "pages": [
-        "overview",
-        "installation",
-        "ai",
+        "docs/overview",
+        "docs/installation",
+        "docs/ai",
         {
           "group": "Block Scripts & Cookies",
           "pages": [
-            "block-scripts-cookies/script-attributes",
-            "block-scripts-cookies/callbacks-events"
+            "docs/block-scripts-cookies/script-attributes",
+            "docs/block-scripts-cookies/callbacks-events"
           ],
           "icon": "traffic-cone"
         }
@@ -66,30 +66,30 @@
     {
       "group": "Advanced",
       "pages": [
-        "advanced/cookie-scanning",
-        "advanced/wildcard-cookies",
-        "advanced/cookie-list-embed",
-        "advanced/custom-css",
-        "advanced/callbacks-events",
-        "advanced/identify-users",
-        "advanced/block-iframes",
-        "advanced/single-page-apps",
-        "advanced/headless-platform"
+        "docs/advanced/cookie-scanning",
+        "docs/advanced/wildcard-cookies",
+        "docs/advanced/cookie-list-embed",
+        "docs/advanced/custom-css",
+        "docs/advanced/callbacks-events",
+        "docs/advanced/identify-users",
+        "docs/advanced/block-iframes",
+        "docs/advanced/single-page-apps",
+        "docs/advanced/headless-platform"
       ]
     },
     {
       "group": "API Documentation",
       "pages": [
-        "api-reference/authentication"
+        "docs/api-reference/authentication"
       ]
     },
     {
       "group": "Endpoint Examples",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/update",
-        "api-reference/endpoint/delete"
+        "docs/api-reference/endpoint/get",
+        "docs/api-reference/endpoint/create",
+        "docs/api-reference/endpoint/update",
+        "docs/api-reference/endpoint/delete"
       ]
     }
   ],
