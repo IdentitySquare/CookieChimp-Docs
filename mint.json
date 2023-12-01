@@ -1,9 +1,16 @@
 {
   "$schema": "https://mintlify.com/schema.json",
   "name": "CookieChimp Docs",
+  "basePath": "/",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
+  },
+  "isWhiteLabeled": true,
+  "feedback": {
+    "suggestEdit": true,
+    "raiseIssue": true,
+    "raiseIssue": true
   },
   "favicon": "/favicon.png",
   "colors": {
@@ -37,10 +44,6 @@
     {
       "name": "Guides",
       "url": "guides"
-    },
-    {
-      "name": "Changelog",
-      "url": "changelog"
     }
   ],
   "anchors": [],
@@ -64,14 +67,15 @@
     {
       "group": "Advanced",
       "pages": [
-        "identify-users",
-        "cookie-scanning",
-        "cookie-list-embed",
-        "custom-css",
-        "callbacks-events",
-        "block-iframes",
-        "single-page-apps",
-        "headless-platform"
+        "advanced/cookie-scanning",
+        "advanced/wildcard-cookies",
+        "advanced/cookie-list-embed",
+        "advanced/custom-css",
+        "advanced/callbacks-events",
+        "advanced/identify-users",
+        "advanced/block-iframes",
+        "advanced/single-page-apps",
+        "advanced/headless-platform"
       ]
     },
     {
