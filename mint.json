@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/schema.json",
   "name": "CookieChimp Docs",
-  "basePath": "/",
+  "basePath": "/docs",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
