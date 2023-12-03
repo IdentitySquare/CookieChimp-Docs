@@ -1,0 +1,24 @@
+---
+title: "Identify Users"
+description: "Set User's ID to match cookie consent records with your database."
+---
+
+Identify consent records stored on CookieChimp with your application's user IDs. This allows you to search for consent records and cookies set on each session.
+
+Add the following code to your HTML page, replacing `your_user_ID_123` with your user's ID. Add this as high up in the `<head>` as possible. This code needs to have executed before CookieChimp loads.
+
+```html
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    userId: "your_user_ID_123", // Replace with your generated ID
+  });
+</script>
+```
+
+<Note>
+  **Don't use any Personal Identifiable Information (PII) as the user ID.** It's
+  best to use a unique ID that you can match with your database. If you use an
+  email address, IP address or any other personal information, CookieChimp will
+  discard this information and no user ID will be set.
+</Note>

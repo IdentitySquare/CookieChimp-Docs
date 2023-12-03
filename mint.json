@@ -9,7 +9,7 @@
   "feedback": {
     "suggestEdit": false,
     "raiseIssue": false,
-    "thumbsRating": true
+    "thumbsRating": false
   },
   "favicon": "/favicon.png",
   "colors": {
@@ -60,19 +60,38 @@
             "docs/block-scripts-cookies/callbacks-events"
           ],
           "icon": "traffic-cone"
-        }
+        },
+        "docs/features/invite-team"
       ]
     },
     {
-      "group": "Advanced",
+      "group": "Record & Manage Consent",
       "pages": [
-        "docs/advanced/cookie-scanning",
-        "docs/advanced/wildcard-cookies",
-        "docs/advanced/cookie-list-embed",
+        "docs/features/ui-customization",
+        "docs/features/identify-users",
+        "docs/features/block-iframes",
+        "docs/features/consent-records"
+      ]
+    },
+    {
+      "group": "Scan & Organise Cookies",
+      "pages": [
+        "docs/features/cookie-scanning",
+        "docs/features/cookie-categories",
+        "docs/features/wildcard-cookies",
+        "docs/features/cookie-list-embed"
+      ]
+    },
+    {
+      "group": "Advanced Customization",
+      "pages": [
         "docs/advanced/custom-css",
-        "docs/advanced/callbacks-events",
-        "docs/advanced/identify-users",
-        "docs/advanced/block-iframes",
+        "docs/advanced/callbacks-events"
+      ]
+    },
+    {
+      "group": "Advanced Usage",
+      "pages": [
         "docs/advanced/single-page-apps",
         "docs/advanced/headless-platform"
       ]
@@ -96,5 +115,10 @@
   "footerSocials": {
     "twitter": "https://twitter.com/danielpaulme",
     "github": "https://github.com/IdentitySquare/CookieChimp-Docs"
+  },
+  "analytics": {
+    "pirsch": {
+      "id": "Vr5YSZNge2WlBW5CxGvi7U2UDRBNPCka"
+    }
   }
 }

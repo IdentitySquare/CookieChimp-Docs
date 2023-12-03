@@ -2,3 +2,152 @@
 title: "Custom CSS"
 description: "Customize the look and feel of the CookieChimp banner & modal."
 ---
+
+CookieChimp's dashboard allows you to customize the look and feel of the banner and modal. However, if you want to go beyond the options provided, you can use custom CSS.
+
+## Color Schemes
+
+The widget includes light and dark themes. Enable dark mode by adding `cc--darkmode` class to the HTML element.
+
+You can also enabled auto dark mode by in the CookieChimp dashboard. This will automatically enable dark mode when the user's device is set to dark mode.
+
+## CSS Variable Customization
+
+Develop your own theme by modifying/overriding CSS variables.
+
+```css
+:root {
+  --cc-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
+
+  --cc-modal-border-radius: 0.5rem;
+  --cc-btn-border-radius: 0.4rem;
+
+  --cc-modal-transition-duration: 0.25s;
+  --cc-modal-margin: 1rem;
+
+  --cc-link-color: var(--cc-btn-primary-bg);
+  --cc-z-index: 2147483647;
+
+  --cc-bg: #ffffff;
+  --cc-primary-color: #2c2f31;
+  --cc-secondary-color: #5e6266;
+
+  --cc-btn-primary-bg: #30363c;
+  --cc-btn-primary-color: #ffffff;
+  --cc-btn-primary-border-color: var(--cc-btn-primary-bg);
+  --cc-btn-primary-hover-bg: #000000;
+  --cc-btn-primary-hover-color: #ffffff;
+  --cc-btn-primary-hover-border-color: var(--cc-btn-primary-hover-bg);
+
+  --cc-btn-secondary-bg: #eaeff2;
+  --cc-btn-secondary-color: var(--cc-primary-color);
+  --cc-btn-secondary-border-color: var(--cc-btn-secondary-bg);
+  --cc-btn-secondary-hover-bg: #d4dae0;
+  --cc-btn-secondary-hover-color: #000000;
+  --cc-btn-secondary-hover-border-color: #d4dae0;
+
+  --cc-separator-border-color: #f0f4f7;
+
+  --cc-toggle-on-bg: var(--cc-btn-primary-bg);
+  --cc-toggle-off-bg: #667481;
+  --cc-toggle-on-knob-bg: #ffffff;
+  --cc-toggle-off-knob-bg: var(--cc-toggle-on-knob-bg);
+
+  --cc-toggle-enabled-icon-color: var(--cc-bg); // yes (v tick)
+  --cc-toggle-disabled-icon-color: var(--cc-bg); // no (x tick)
+
+  --cc-toggle-readonly-bg: #d5dee2;
+  --cc-toggle-readonly-knob-bg: #fff;
+  --cc-toggle-readonly-knob-icon-color: var(--cc-toggle-readonly-bg);
+
+  --cc-section-category-border: var(--cc-cookie-category-block-bg);
+
+  --cc-cookie-category-block-bg: #f0f4f7;
+  --cc-cookie-category-block-border: #f0f4f7;
+  --cc-cookie-category-block-hover-bg: #e9eff4;
+  --cc-cookie-category-block-hover-border: #e9eff4;
+  --cc-cookie-category-expanded-block-bg: transparent;
+  --cc-cookie-category-expanded-block-hover-bg: #dee4e9;
+
+  --cc-overlay-bg: rgba(0, 0, 0, 0.65);
+  --cc-webkit-scrollbar-bg: var(--cc-section-category-border);
+  --cc-webkit-scrollbar-hover-bg: var(--cc-btn-primary-hover-bg);
+
+  --cc-footer-bg: var(--cc-btn-secondary-bg);
+  --cc-footer-color: var(--cc-secondary-color);
+  --cc-footer-border-color: #e4eaed;
+}
+
+/** Light color-scheme **/
+.cc--darkmode {
+  --cc-bg: #161a1c;
+  --cc-primary-color: #ebf3f6;
+  --cc-secondary-color: #aebbc5;
+
+  --cc-btn-primary-bg: #c2d0e0;
+  --cc-btn-primary-color: var(--cc-bg);
+  --cc-btn-primary-border-color: var(--cc-btn-primary-bg);
+  --cc-btn-primary-hover-bg: #98a7b6;
+  --cc-btn-primary-hover-color: #000000;
+  --cc-btn-primary-hover-border-color: var(--cc-btn-primary-hover-bg);
+
+  --cc-btn-secondary-bg: #242c31;
+  --cc-btn-secondary-color: var(--cc-primary-color);
+  --cc-btn-secondary-border-color: var(--cc-btn-secondary-bg);
+  --cc-btn-secondary-hover-bg: #353d43;
+  --cc-btn-secondary-hover-color: #ffffff;
+  --cc-btn-secondary-hover-border-color: var(--cc-btn-secondary-hover-bg);
+
+  --cc-separator-border-color: #222a30;
+
+  --cc-toggle-on-bg: var(--cc-btn-primary-bg);
+  --cc-toggle-off-bg: #525f6b;
+  --cc-toggle-on-knob-bg: var(--cc-btn-primary-color);
+  --cc-toggle-off-knob-bg: var(--cc-btn-primary-color);
+
+  --cc-toggle-enabled-icon-color: var(--cc-btn-primary-color); // yes (v tick)
+  --cc-toggle-disabled-icon-color: var(--cc-btn-primary-color); // no (x tick)
+
+  --cc-toggle-readonly-bg: #343e45;
+  --cc-toggle-readonly-knob-bg: #5f6b72;
+  --cc-toggle-readonly-knob-icon-color: var(--cc-toggle-readonly-bg);
+
+  --cc-section-category-border: #1e2428;
+
+  --cc-cookie-category-block-bg: #1e2428;
+  --cc-cookie-category-block-border: var(--cc-section-category-border);
+  --cc-cookie-category-block-hover-bg: #242c31;
+  --cc-cookie-category-block-hover-border: #232a2f;
+  --cc-cookie-category-expanded-block-bg: transparent;
+  --cc-cookie-category-expanded-block-hover-bg: var(--cc-toggle-readonly-bg);
+
+  --cc-overlay-bg: rgba(0, 0, 0, 0.65);
+  --cc-webkit-scrollbar-bg: var(--cc-section-category-border);
+  --cc-webkit-scrollbar-hover-bg: var(--cc-btn-primary-hover-bg);
+
+  --cc-footer-bg: #0c0e0f;
+  --cc-footer-color: var(--cc-secondary-color);
+  --cc-footer-border-color: #060809;
+
+  #cc-main {
+    color-scheme: dark;
+  }
+}
+```
+
+<Tip>
+  You can also customise very specific elements by using inspect element in your
+  browser and copying the CSS selector to override the styles.
+</Tip>
+
+## Disable transitions
+
+You can disable all transitions simply by setting the transition duration to 0:
+
+```css
+#cc-main {
+  --cc-modal-transition-duration: 0;
+}
+```
