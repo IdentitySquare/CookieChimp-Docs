@@ -92,7 +92,6 @@
     {
       "group": "Advanced Usage",
       "pages": [
-        "docs/advanced/single-page-apps",
         "docs/advanced/headless-platform"
       ]
     },
