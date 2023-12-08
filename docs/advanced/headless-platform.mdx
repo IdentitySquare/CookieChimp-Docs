@@ -3,13 +3,17 @@ title: "Headless Platform"
 description: "Use CookieChimp with your own custom UI."
 ---
 
-[CookieChimp's API](/docs/api-reference) is the backbone of our headless consent management solution. It allows you to perform all consent-related actions programmatically, providing the flexibility to create a completely custom UI.
+<Snippet file="beta-access.mdx" />
+
+Our [API](/docs/api-reference) allows you to perform all consent-related actions programmatically, providing the flexibility to create a completely custom UI.
 
 Refer to our comprehensive [API Reference](/docs/api-reference) for a detailed list of available endpoints, request/response formats, and examples.
 
 ## Disabling CookieChimp's UI
 
 You can disable our JS widget by simply not adding our script to your website. This will prevent CookieChimp from showing the consent banner and the consent management interface.
+
+If you would like to disable the consent banner but still show the consent management interface, you can update this in your account setting to not automatically show the consent banner. You can then use our [API](/docs/api-reference) to show the consent management interface when the user clicks on a button or link. This would still require you to add our script to your website.
 
 ## Building Your Custom UI
 
@@ -36,6 +40,8 @@ fetch("https://cookiechimp.com/api/consent", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     account_id: "abc123",
+    user_id: "123",
+
     visitor_action: "consent",
     url: "https://www.example.com",
 
