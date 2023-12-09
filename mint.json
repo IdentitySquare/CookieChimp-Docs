@@ -102,57 +102,10 @@
       ]
     },
     {
-      "group": "Cookie Categories",
-      "pages": [
-        "docs/api-reference/cookie-categories/list-cookie-categories",
-        "docs/api-reference/cookie-categories/create-cookie-category",
-        "docs/api-reference/cookie-categories/get-cookie-category",
-        "docs/api-reference/cookie-categories/update-cookie-category",
-        "docs/api-reference/cookie-categories/delete-cookie-category"
-      ]
-    },
-    {
-      "group": "Cookies",
-      "pages": [
-        "docs/api-reference/cookies/list-cookies",
-        "docs/api-reference/cookies/create-cookie",
-        "docs/api-reference/cookies/get-cookie",
-        "docs/api-reference/cookies/update-cookie",
-        "docs/api-reference/cookies/delete-cookie"
-      ]
-    },
-    {
-      "group": "Sessions",
-      "pages": [
-        "docs/api-reference/sessions/list-sessions",
-        "docs/api-reference/sessions/get-session"
-      ]
-    },
-    {
-      "group": "Pageviews",
-      "pages": [
-        "docs/api-reference/pageviews/list-pageviews",
-        "docs/api-reference/pageviews/get-pageview"
-      ]
-    },
-    {
-      "group": "Consents",
-      "pages": [
-        "docs/api-reference/consents/list-consents",
-        "docs/api-reference/consents/get-consent"
-      ]
-    },
-    {
-      "group": "AI Actions",
-      "pages": [
-        "docs/api-reference/ai-actions/list-ai-actions",
-        "docs/api-reference/ai-actions/get-ai-action"
-      ]
-    },
-    {
       "group": "Account",
       "pages": [
-        "docs/api-reference/account/get-account"
+        "docs/api-reference/account/get-account",
+        "docs/api-reference/account/update-account"
       ]
     },
     {
@@ -172,6 +125,54 @@
         "docs/api-reference/account-invitations/get-account-invitation",
         "docs/api-reference/account-invitations/update-account-invitation",
         "docs/api-reference/account-invitations/delete-account-invitation"
+      ]
+    },
+    {
+      "group": "AI Actions",
+      "pages": [
+        "docs/api-reference/ai-actions/list-ai-actions",
+        "docs/api-reference/ai-actions/get-ai-action"
+      ]
+    },
+    {
+      "group": "Cookies",
+      "pages": [
+        "docs/api-reference/cookies/list-cookies",
+        "docs/api-reference/cookies/create-cookie",
+        "docs/api-reference/cookies/get-cookie",
+        "docs/api-reference/cookies/update-cookie",
+        "docs/api-reference/cookies/delete-cookie"
+      ]
+    },
+    {
+      "group": "Cookie Categories",
+      "pages": [
+        "docs/api-reference/cookie-categories/list-cookie-categories",
+        "docs/api-reference/cookie-categories/create-cookie-category",
+        "docs/api-reference/cookie-categories/get-cookie-category",
+        "docs/api-reference/cookie-categories/update-cookie-category",
+        "docs/api-reference/cookie-categories/delete-cookie-category"
+      ]
+    },
+    {
+      "group": "Consents",
+      "pages": [
+        "docs/api-reference/consents/list-consents",
+        "docs/api-reference/consents/get-consent"
+      ]
+    },
+    {
+      "group": "Pageviews",
+      "pages": [
+        "docs/api-reference/pageviews/list-pageviews",
+        "docs/api-reference/pageviews/get-pageview"
+      ]
+    },
+    {
+      "group": "Sessions",
+      "pages": [
+        "docs/api-reference/sessions/list-sessions",
+        "docs/api-reference/sessions/get-session"
       ]
     }
   ],

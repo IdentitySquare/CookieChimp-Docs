@@ -86,6 +86,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CookieCategory"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     put:
       summary: Update cookie category
       description: Update cookie category by ID
@@ -108,6 +114,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CookieCategory"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       summary: Delete cookie category
       description: Delete cookie category by ID
@@ -123,6 +135,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CookieCategory"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # cookie endpoints - GET, POST, PUT, DELETE
   /cookies:
@@ -208,6 +226,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cookie"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     put:
       summary: Update cookie
       description: Update cookie by ID
@@ -230,6 +254,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cookie"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       summary: Delete cookie
       description: Delete cookie by ID
@@ -245,6 +275,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cookie"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # sessions endpoints - index & GET
   /sessions:
@@ -303,6 +339,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Session"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # pageviews endpoints - index & GET
   /pageviews:
@@ -356,7 +398,6 @@ paths:
                   pagination:
                     type: object
                     $ref: "#/components/schemas/Pagination"
-
         default:
           description: unexpected error
           content:
@@ -380,6 +421,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Pageview"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # consents endpoints - index & GET
   /consents:
@@ -444,12 +491,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Consent"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # AI actions endpoints - index & GET
   /ai-actions:
     get:
       summary: List AI actions
-      description: List all AI actions
+      description: Audit log of all actions performed by the AI
       operationId: listAIActions
       tags:
         - AI Actions
@@ -512,6 +565,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AIAction"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # account - get your own account
   /account:
@@ -528,6 +587,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    # update your own account
+    put:
+      summary: Update account
+      description: Update your own account
+      operationId: updateAccount
+      tags:
+        - Account
+      requestBody:
+        description: Account to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountWrite"
+      responses:
+        "200":
+          description: Updated account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # account user endpoints
   /account-users:
@@ -581,6 +674,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccountUser"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     put:
       summary: Update account user
       description: Update account user by ID
@@ -607,6 +706,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccountUser"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       summary: Delete account user
       description: Delete account user by ID
@@ -622,6 +727,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccountUser"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # account invitation endpoints
   /account-invitations:
@@ -669,14 +780,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                role:
-                  type: string
-                  enum: [admin, member]
+              $ref: "#/components/schemas/AccountInvitationCreate"
       responses:
         "201":
           description: Created account invitation
@@ -708,6 +812,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccountInvitation"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     put:
       summary: Update account invitation
       description: Update account invitation by ID
@@ -722,11 +832,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                role:
-                  type: string
-                  enum: [admin, member]
+              $ref: "#/components/schemas/AccountInvitationUpdate"
       responses:
         "200":
           description: Updated account invitation
@@ -734,6 +840,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccountInvitation"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       summary: Delete account invitation
       description: Delete account invitation by ID
@@ -749,6 +861,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccountInvitation"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   securitySchemes:
@@ -865,16 +983,6 @@ components:
           description: ID of the cookie category
       required:
         - name
-      example:
-        name: "user-pref-cookie"
-        description: "Tracks user preferences."
-        company_name: "Example Company Name"
-        domain: "www.example.com"
-        duration: "1 year"
-        partitioned: false
-        path: "/"
-        same_site: "Lax"
-        cookie_category_id: "cat1"
 
     Cookie:
       type: object
@@ -942,10 +1050,6 @@ components:
         - name
         - description
         - required
-      example:
-        name: "Essential"
-        description: "Cookies essential for website functionality"
-        required: true
 
     CookieCategory:
       type: object
@@ -1163,8 +1267,12 @@ components:
     AIAction:
       type: object
       properties:
+        id:
+          type: string
+          description: Unique identifier for the AI action
         cookie_id:
           type: string
+          description: ID of the cookie that the AI action is associated with
         type:
           type: string
           enum:
@@ -1175,61 +1283,114 @@ components:
           type: object
           additionalProperties: true
       example:
-        cookie_id: "cookie789"
+        cookie_id: "example_uuid"
         type: "autofill"
         metadata:
-          description: "Tracks shopping cart items."
-          company: "Online Shop"
-          domain: "onlineshop.com"
+          description: "Tracks user activities."
+          company: "Example Company"
+          domain: "example.com"
           duration: "Session"
 
-    AccountUser:
+    AccountUserWrite:
       type: object
       properties:
-        id:
-          type: string
-        email:
-          type: string
-          format: email
         role:
           type: string
           enum: [admin, member]
+          description: Role of the account user
+      required:
+        - role
+
+    AccountUser:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AccountUserWrite"
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account user
+        email:
+          type: string
+          format: email
+          description: Email address of the account user
         created_at:
           type: string
           format: date-time
+          description: Date and time when the account user was created
         updated_at:
           type: string
           format: date-time
+          description: Date and time when the account user was last updated
       example:
         id: "accuser123"
-        email: "admin@cookiechimp.com"
+        email: "admin@example.com"
         role: "admin"
         created_at: "2023-01-05T10:15:30Z"
         updated_at: "2023-01-15T11:20:45Z"
 
+    AccountInvitationCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the user the invitation is for
+        email:
+          type: string
+          format: email
+          description: Email address of the user
+        role:
+          type: string
+          enum: [admin, member]
+          description: Role of the user when they accept the invitation
+      required:
+        - name
+        - email
+        - role
+
+    AccountInvitationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the user the invitation is for
+        role:
+          type: string
+          enum: [admin, member]
+          description: Role of the user when they accept the invitation
+      required:
+        - name
+        - role
+
     AccountInvitation:
       type: object
+      allOf:
+        - $ref: "#/components/schemas/AccountInvitationCreate"
       properties:
         id:
           type: string
         email:
           type: string
           format: email
-        role:
-          type: string
-          enum: [admin, member]
+          description: Email address of the user
         invited_by_type:
           type: string
           description: Type of entity that created the invitation (account_user or API)
         invited_by_id:
           type: string
           nullable: true
+          description: ID of the user who created the invitation
         created_at:
           type: string
           format: date-time
+          description: Date and time when the invitation was created
         updated_at:
           type: string
           format: date-time
+          description: Date and time when the invitation was last updated
+        deleted_at:
+          type: string
+          format: date-time
+          description: Date and time when the invitation was cancelled
       example:
         id: "inv123"
         email: "newmember@cookiechimp.com"
@@ -1238,28 +1399,22 @@ components:
         created_at: "2023-01-25T09:30:20Z"
         updated_at: "2023-01-25T09:30:20Z"
 
-    Account:
+    AccountWrite:
       type: object
       properties:
-        id:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
         domain:
           type: string
+          description: Domain of the account. e.g. example.com
         industry:
           type: string
+          description: Industry of the account
         description:
           type: string
+          description: Information about what the website does. This is used for AI features to tune it for the industry.
         support_email:
           type: string
           format: email
-        owner_account_user_id:
-          type: string
+          description: Support email address for the account. This is shown to users on the consent banner.
         ai_features:
           type: object
           properties:
@@ -1269,14 +1424,46 @@ components:
               type: boolean
             auto_approve:
               type: boolean
+      required:
+        - domain
+        - support_email
       example:
-        id: "account001"
+        domain: "example.com"
+        industry: "Technology"
+        description: "A platform for showing examples."
+        support_email: "you@example.com"
+        ai_features:
+          autofill: true
+          auto_categorise: true
+          auto_approve: false
+
+    Account:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AccountWrite"
+      properties:
+        site_id:
+          type: string
+          description: Unique CookieChimp site identifier for the account
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the account was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the account was last updated
+        owner_account_user_id:
+          type: string
+          description: ID of the account user that owns the account
+      example:
+        site_id: "abc123"
         created_at: "2022-12-20T18:45:00Z"
         updated_at: "2023-01-10T19:00:00Z"
-        domain: "cookiechimp.com"
+        domain: "example.com"
         industry: "Technology"
-        description: "A platform for managing cookie consents."
-        support_email: "support@cookiechimp.com"
+        description: "A platform for showing examples."
+        support_email: "support@example.com"
         owner_account_user_id: "accuser123"
         ai_features:
           autofill: true
