@@ -102,86 +102,76 @@
       ]
     },
     {
-      "group": "Endpoint Examples",
-      "pages": [
-        "docs/api-reference/endpoint/get",
-        "docs/api-reference/endpoint/create",
-        "docs/api-reference/endpoint/update",
-        "docs/api-reference/endpoint/delete"
-      ]
-    },
-
-    {
       "group": "Cookie Categories",
       "pages": [
-        "api-reference/cookie-categories/list-cookie-categories",
-        "api-reference/cookie-categories/create-cookie-category",
-        "api-reference/cookie-categories/get-cookie-category",
-        "api-reference/cookie-categories/update-cookie-category",
-        "api-reference/cookie-categories/delete-cookie-category"
+        "docs/api-reference/cookie-categories/list-cookie-categories",
+        "docs/api-reference/cookie-categories/create-cookie-category",
+        "docs/api-reference/cookie-categories/get-cookie-category",
+        "docs/api-reference/cookie-categories/update-cookie-category",
+        "docs/api-reference/cookie-categories/delete-cookie-category"
       ]
     },
     {
       "group": "Cookies",
       "pages": [
-        "api-reference/cookies/list-cookies",
-        "api-reference/cookies/create-cookie",
-        "api-reference/cookies/get-cookie",
-        "api-reference/cookies/update-cookie",
-        "api-reference/cookies/delete-cookie"
+        "docs/api-reference/cookies/list-cookies",
+        "docs/api-reference/cookies/create-cookie",
+        "docs/api-reference/cookies/get-cookie",
+        "docs/api-reference/cookies/update-cookie",
+        "docs/api-reference/cookies/delete-cookie"
       ]
     },
     {
       "group": "Sessions",
       "pages": [
-        "api-reference/sessions/list-sessions",
-        "api-reference/sessions/get-session"
+        "docs/api-reference/sessions/list-sessions",
+        "docs/api-reference/sessions/get-session"
       ]
     },
     {
       "group": "Pageviews",
       "pages": [
-        "api-reference/pageviews/list-pageviews",
-        "api-reference/pageviews/get-pageview"
+        "docs/api-reference/pageviews/list-pageviews",
+        "docs/api-reference/pageviews/get-pageview"
       ]
     },
     {
       "group": "Consents",
       "pages": [
-        "api-reference/consents/list-consents",
-        "api-reference/consents/get-consent"
+        "docs/api-reference/consents/list-consents",
+        "docs/api-reference/consents/get-consent"
       ]
     },
     {
       "group": "AI Actions",
       "pages": [
-        "api-reference/ai-actions/list-ai-actions",
-        "api-reference/ai-actions/get-ai-action"
+        "docs/api-reference/ai-actions/list-ai-actions",
+        "docs/api-reference/ai-actions/get-ai-action"
       ]
     },
     {
       "group": "Account",
       "pages": [
-        "api-reference/account/get-account"
+        "docs/api-reference/account/get-account"
       ]
     },
     {
       "group": "Account Users",
       "pages": [
-        "api-reference/account-users/list-account-users",
-        "api-reference/account-users/get-account-user",
-        "api-reference/account-users/update-account-user",
-        "api-reference/account-users/delete-account-user"
+        "docs/api-reference/account-users/list-account-users",
+        "docs/api-reference/account-users/get-account-user",
+        "docs/api-reference/account-users/update-account-user",
+        "docs/api-reference/account-users/delete-account-user"
       ]
     },
     {
       "group": "Account Invitations",
       "pages": [
-        "api-reference/account-invitations/list-account-invitations",
-        "api-reference/account-invitations/create-account-invitation",
-        "api-reference/account-invitations/get-account-invitation",
-        "api-reference/account-invitations/update-account-invitation",
-        "api-reference/account-invitations/delete-account-invitation"
+        "docs/api-reference/account-invitations/list-account-invitations",
+        "docs/api-reference/account-invitations/create-account-invitation",
+        "docs/api-reference/account-invitations/get-account-invitation",
+        "docs/api-reference/account-invitations/update-account-invitation",
+        "docs/api-reference/account-invitations/delete-account-invitation"
       ]
     }
   ],
