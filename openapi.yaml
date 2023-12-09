@@ -1,0 +1,1474 @@
+openapi: 3.1.0
+info:
+  title: CookieChimp API
+  description: API for managing cookie consents
+  version: 1.0.0
+
+servers:
+  - url: "https://cookiechimp.com/api"
+
+paths:
+  # cookie category endpoints - GET, POST, PUT, DELETE
+  /cookie-categories:
+    get:
+      summary: List cookie categories
+      description: List all cookie categories
+      operationId: listCookieCategories
+      tags:
+        - Cookie Categories
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+      responses:
+        "200":
+          description: List of cookie categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CookieCategory"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Create cookie category
+      description: Create a new cookie category
+      operationId: createCookieCategory
+      tags:
+        - Cookie Categories
+      requestBody:
+        description: Cookie category to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CookieCategoryWrite"
+      responses:
+        "201":
+          description: Created cookie category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookieCategory"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /cookie-categories/{id}:
+    get:
+      summary: Get cookie category
+      description: Get cookie category by ID
+      operationId: getCookieCategory
+      tags:
+        - Cookie Categories
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Cookie category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookieCategory"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update cookie category
+      description: Update cookie category by ID
+      operationId: updateCookieCategory
+      tags:
+        - Cookie Categories
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Cookie category to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CookieCategoryWrite"
+      responses:
+        "200":
+          description: Updated cookie category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookieCategory"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete cookie category
+      description: Delete cookie category by ID
+      operationId: deleteCookieCategory
+      tags:
+        - Cookie Categories
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Cookie category deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookieCategory"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # cookie endpoints - GET, POST, PUT, DELETE
+  /cookies:
+    get:
+      summary: List cookies
+      description: List all cookies
+      operationId: listCookies
+      tags:
+        - Cookies
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+        - name: category_id
+          in: query
+          description: ID of the cookie category to filter by
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of cookies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Cookie"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Create cookie
+      description: Create a new cookie
+      operationId: createCookie
+      tags:
+        - Cookies
+      requestBody:
+        description: Cookie to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CookieWrite"
+      responses:
+        "201":
+          description: Created cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cookie"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /cookies/{id}:
+    get:
+      summary: Get cookie
+      description: Get cookie by ID
+      operationId: getCookie
+      tags:
+        - Cookies
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cookie"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update cookie
+      description: Update cookie by ID
+      operationId: updateCookie
+      tags:
+        - Cookies
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Cookie to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CookieWrite"
+      responses:
+        "200":
+          description: Updated cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cookie"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete cookie
+      description: Delete cookie by ID
+      operationId: deleteCookie
+      tags:
+        - Cookies
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Cookie deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cookie"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # sessions endpoints - index & GET
+  /sessions:
+    get:
+      summary: List sessions
+      description: List all sessions
+      operationId: listSessions
+      tags:
+        - Sessions
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+        - name: user_id
+          in: query
+          description: ID of the user to filter by
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SessionIndex"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /sessions/{id}:
+    get:
+      summary: Get session
+      description: Get session by ID
+      operationId: getSession
+      tags:
+        - Sessions
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # pageviews endpoints - index & GET
+  /pageviews:
+    get:
+      summary: List pageviews
+      description: List all pageviews
+      operationId: listPageviews
+      tags:
+        - Pageviews
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+        - name: session_id
+          in: query
+          description: ID of the session to filter by
+          required: false
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: ID of the user to filter by
+          required: false
+          schema:
+            type: string
+        - name: consent_id
+          in: query
+          description: ID of the consent to filter by
+          required: false
+          schema:
+            type: string
+        - name: url
+          in: query
+          description: URL of the pageview to filter by
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of pageviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Pageview"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /pageviews/{id}:
+    get:
+      summary: Get pageview
+      description: Get pageview by ID
+      operationId: getPageview
+      tags:
+        - Pageviews
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Pageview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pageview"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # consents endpoints - index & GET
+  /consents:
+    get:
+      summary: List consents
+      description: List all consents
+      operationId: listConsents
+      tags:
+        - Consents
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+        - name: session_id
+          in: query
+          description: ID of the session to filter by
+          required: false
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: ID of the user to filter by
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of consents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Consent"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /consents/{id}:
+    get:
+      summary: Get consent
+      description: Get consent by ID
+      operationId: getConsent
+      tags:
+        - Consents
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Consent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consent"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # AI actions endpoints - index & GET
+  /ai-actions:
+    get:
+      summary: List AI actions
+      description: Audit log of all actions performed by the AI
+      operationId: listAIActions
+      tags:
+        - AI Actions
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+        - name: cookie_id
+          in: query
+          description: ID of the cookie to filter by
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Type of the AI action to filter by
+          required: false
+          schema:
+            type: string
+            enum:
+              - autofill
+              - auto_categorisation
+              - auto_approved
+      responses:
+        "200":
+          description: List of AI actions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AIAction"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /ai-actions/{id}:
+    get:
+      summary: Get AI action
+      description: Get AI action by ID
+      operationId: getAIAction
+      tags:
+        - AI Actions
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: AI action
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIAction"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # account - get your own account
+  /account:
+    get:
+      summary: Get account
+      description: Get your own account
+      operationId: getAccount
+      tags:
+        - Account
+      responses:
+        "200":
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    # update your own account
+    put:
+      summary: Update account
+      description: Update your own account
+      operationId: updateAccount
+      tags:
+        - Account
+      requestBody:
+        description: Account to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountWrite"
+      responses:
+        "200":
+          description: Updated account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # account user endpoints
+  /account-users:
+    get:
+      summary: List account users
+      description: List all account users
+      operationId: listAccountUsers
+      tags:
+        - Account Users
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+      responses:
+        "200":
+          description: List of account users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AccountUser"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # get, update, delete account user
+  /account-users/{id}:
+    get:
+      summary: Get account user
+      description: Get account user by ID
+      operationId: getAccountUser
+      tags:
+        - Account Users
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Account user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountUser"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update account user
+      description: Update account user by ID
+      operationId: updateAccountUser
+      tags:
+        - Account Users
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Account user to update
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [admin, member]
+      responses:
+        "200":
+          description: Updated account user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountUser"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete account user
+      description: Delete account user by ID
+      operationId: deleteAccountUser
+      tags:
+        - Account Users
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Account user deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountUser"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # account invitation endpoints
+  /account-invitations:
+    get:
+      summary: List account invitations
+      description: List all account invitations
+      operationId: listAccountInvitations
+      tags:
+        - Account Invitations
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/order"
+      responses:
+        "200":
+          description: List of account invitations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AccountInvitation"
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/Pagination"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create account invitation
+      description: Create a new account invitation
+      operationId: createAccountInvitation
+      tags:
+        - Account Invitations
+      requestBody:
+        description: Account invitation to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountInvitationCreate"
+      responses:
+        "201":
+          description: Created account invitation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountInvitation"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # edit, update, delete account invitation
+  /account-invitations/{id}:
+    get:
+      summary: Get account invitation
+      description: Get account invitation by ID
+      operationId: getAccountInvitation
+      tags:
+        - Account Invitations
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Account invitation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountInvitation"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update account invitation
+      description: Update account invitation by ID
+      operationId: updateAccountInvitation
+      tags:
+        - Account Invitations
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Account invitation to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountInvitationUpdate"
+      responses:
+        "200":
+          description: Updated account invitation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountInvitation"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete account invitation
+      description: Delete account invitation by ID
+      operationId: deleteAccountInvitation
+      tags:
+        - Account Invitations
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Account invitation deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountInvitation"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+
+  parameters:
+    id:
+      name: id
+      in: path
+      description: ID of the resource
+      required: true
+      schema:
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: Number of resources to return
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    offset:
+      name: offset
+      in: query
+      description: Number of resources to skip
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    sort:
+      name: sort
+      in: query
+      description: Field to sort by
+      required: false
+      schema:
+        type: string
+    order:
+      name: order
+      in: query
+      description: Sort order
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
+      example:
+        error:
+          code: 400
+          message: "Invalid request"
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of resources
+        limit:
+          type: integer
+          description: Number of resources to return
+        offset:
+          type: integer
+          description: Number of resources to skip
+      example:
+        total: 100
+        limit: 20
+        offset: 0
+
+    CookieWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the cookie
+        description:
+          type: string
+          description: Description of the cookie that is displayed to users
+        company_name:
+          type: string
+          description: Name of the company that owns the cookie
+        domain:
+          type: string
+          description: Domain of the cookie
+        duration:
+          type: string
+          description: Duration of the cookie
+        partitioned:
+          type: boolean
+          description: Whether the cookie is partitioned
+        path:
+          type: string
+          description: Path of the cookie
+        same_site:
+          type: string
+          description: SameSite attribute of the cookie
+        cookie_category_id:
+          type: string
+          description: ID of the cookie category
+      required:
+        - name
+
+    Cookie:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CookieWrite"
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Unique identifier for the cookie
+        last_seen_at:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          type: string
+          enum: [draft, processing, in_review, finalised]
+          default: draft
+          readOnly: true
+        approved_by_type:
+          type: string
+          nullable: true
+          readOnly: true
+        approved_by_id:
+          type: string
+          nullable: true
+          readOnly: true
+        wildcard_cookie_id:
+          type: string
+          nullable: true
+          readOnly: true
+        is_wildcard_cookie:
+          type: boolean
+          readOnly: true
+      example:
+        company_name: "Example Company Name"
+        description: "Tracks user preferences."
+        domain: "www.example.com"
+        duration: "1 year"
+        last_seen_at: "2023-03-23T12:34:56Z"
+        name: "user-pref-cookie"
+        partitioned: false
+        path: "/"
+        same_site: "Lax"
+        cookie_category_id: "cat1"
+        status: "finalised"
+        approved_by_type: "AI"
+        wildcard_cookie_id: null
+        id: "user-pref-cookie"
+        is_wildcard_cookie: false
+
+    CookieCategoryWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the cookie category that is displayed to users
+        description:
+          type: string
+          description: Description of the cookie category that is displayed to users
+        required:
+          type: boolean
+          description: Whether the cookie category is required for the website to function
+      required:
+        - name
+        - description
+        - required
+
+    CookieCategory:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CookieCategoryWrite"
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Unique identifier for the cookie category
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date and time when the cookie category was created
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Date and time when the cookie category was last updated
+      example:
+        id: "essential"
+        name: "Essential"
+        description: "Cookies essential for website functionality"
+        required: true
+        created_at: "2023-01-01T00:00:00Z"
+        updated_at: "2023-01-02T00:00:00Z"
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the session
+        user_id:
+          type: string
+          description: ID of the user set by your website
+          nullable: true
+        pageviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Pageview"
+          description: List of pageviews in the session
+        consents:
+          type: array
+          items:
+            $ref: "#/components/schemas/Consent"
+          description: List of consents in the session
+        first_seen_at:
+          type: string
+          format: date-time
+          description: Date and time when the session was first seen
+        last_seen_at:
+          type: string
+          format: date-time
+          description: Date and time when the session was last seen
+      example:
+        id: "sess123"
+        user_id: "user456"
+        pageviews:
+          - id: "pageview789"
+            session_id: "sess123"
+            url: "https://www.example.com/products"
+            consent_id: null
+            active_cookies:
+              - essential-cookie-1
+            created_at: "2023-01-20T12:45:30Z"
+          - id: "pageview890"
+            session_id: "sess123"
+            url: "https://www.example.com/products/123"
+            consent_id: consent321
+            active_cookies:
+              - essential-cookie-1
+              - cookie1
+              - cookie2
+            created_at: "2023-01-20T12:50:00Z"
+        consents:
+          - id: "consent321"
+            session_id: "sess123"
+            user_id: "user456"
+            user_preferences:
+              accept_type: "all"
+              accepted_categories: ["cat1", "cat2"]
+              rejected_categories: ["cat3", "cat4"]
+              accepted_services: { "company1": ["cookie1", "cookie2"] }
+              rejected_services: {}
+            created_at: "2023-01-20T12:46:30Z"
+        first_seen_at: "2023-01-20T12:45:30Z"
+        last_seen_at: "2023-01-20T12:50:00Z"
+
+    SessionIndex:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the session
+        user_id:
+          type: string
+          description: ID of the user set by your website
+          nullable: true
+        first_seen_at:
+          type: string
+          format: date-time
+          description: Date and time when the session was first seen
+        last_seen_at:
+          type: string
+          format: date-time
+          description: Date and time when the session was last seen
+      example:
+        id: "sess123"
+        user_id: "user456"
+        first_seen_at: "2023-01-20T12:45:30Z"
+        last_seen_at: "2023-01-20T12:50:00Z"
+
+    Pageview:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the pageview
+        session_id:
+          type: string
+          description: ID of the session
+        url:
+          type: string
+          format: uri
+          description: URL of the pageview
+        consent_id:
+          type: string
+          nullable: true
+          description: If the user has given consent, the ID of the consent that is associated with the pageview
+        active_cookies:
+          type: array
+          items:
+            type: string
+          description: List of active cookies in the pageview
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the pageview was created
+      example:
+        id: "pageview890"
+        session_id: "sess123"
+        url: "https://www.example.com/products/123"
+        consent_id: consent321
+        active_cookies:
+          - essential-cookie-1
+          - cookie1
+          - cookie2
+        created_at: "2023-01-20T12:50:00Z"
+
+    Consent:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the consent
+        session_id:
+          type: string
+          description: ID of the session
+        user_id:
+          type: string
+          description: ID of the user set by your website
+        user_preferences:
+          # looks something like this:
+          # acceptType: string,
+          # acceptedCategories: string[],
+          # rejectedCategories: string[],
+          # acceptedServices: {[category: string]: string[]}
+          # rejectedServices: {[category: string]: string[]}
+
+          # Possible acceptType values: 'all', 'custom', 'necessary'
+
+          type: object
+          properties:
+            accept_type:
+              type: string
+              enum: [all, custom, necessary]
+            accepted_categories:
+              type: array
+              items:
+                type: string
+            rejected_categories:
+              type: array
+              items:
+                type: string
+            accepted_services:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            rejected_services:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the consent was created
+      example:
+        id: "consent321"
+        session_id: "sess123"
+        user_id: "user456"
+        user_preferences:
+          accept_type: "all"
+          accepted_categories: ["cat1", "cat2"]
+          rejected_categories: ["cat3", "cat4"]
+          accepted_services: { "company1": ["cookie1", "cookie2"] }
+          rejected_services: {}
+        created_at: "2023-01-20T12:46:30Z"
+
+    AIAction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the AI action
+        cookie_id:
+          type: string
+          description: ID of the cookie that the AI action is associated with
+        type:
+          type: string
+          enum:
+            - autofill
+            - auto_categorisation
+            - auto_approved
+        metadata:
+          type: object
+          additionalProperties: true
+      example:
+        cookie_id: "example_uuid"
+        type: "autofill"
+        metadata:
+          description: "Tracks user activities."
+          company: "Example Company"
+          domain: "example.com"
+          duration: "Session"
+
+    AccountUserWrite:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [admin, member]
+          description: Role of the account user
+      required:
+        - role
+
+    AccountUser:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AccountUserWrite"
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account user
+        email:
+          type: string
+          format: email
+          description: Email address of the account user
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the account user was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the account user was last updated
+      example:
+        id: "accuser123"
+        email: "admin@example.com"
+        role: "admin"
+        created_at: "2023-01-05T10:15:30Z"
+        updated_at: "2023-01-15T11:20:45Z"
+
+    AccountInvitationCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the user the invitation is for
+        email:
+          type: string
+          format: email
+          description: Email address of the user
+        role:
+          type: string
+          enum: [admin, member]
+          description: Role of the user when they accept the invitation
+      required:
+        - name
+        - email
+        - role
+
+    AccountInvitationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the user the invitation is for
+        role:
+          type: string
+          enum: [admin, member]
+          description: Role of the user when they accept the invitation
+      required:
+        - name
+        - role
+
+    AccountInvitation:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AccountInvitationCreate"
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+          description: Email address of the user
+        invited_by_type:
+          type: string
+          description: Type of entity that created the invitation (account_user or API)
+        invited_by_id:
+          type: string
+          nullable: true
+          description: ID of the user who created the invitation
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the invitation was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the invitation was last updated
+        deleted_at:
+          type: string
+          format: date-time
+          description: Date and time when the invitation was cancelled
+      example:
+        id: "inv123"
+        email: "newmember@cookiechimp.com"
+        role: "member"
+        invited_by_type: "API"
+        created_at: "2023-01-25T09:30:20Z"
+        updated_at: "2023-01-25T09:30:20Z"
+
+    AccountWrite:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: Domain of the account. e.g. example.com
+        industry:
+          type: string
+          description: Industry of the account
+        description:
+          type: string
+          description: Information about what the website does. This is used for AI features to tune it for the industry.
+        support_email:
+          type: string
+          format: email
+          description: Support email address for the account. This is shown to users on the consent banner.
+        ai_features:
+          type: object
+          properties:
+            autofill:
+              type: boolean
+            auto_categorise:
+              type: boolean
+            auto_approve:
+              type: boolean
+      required:
+        - domain
+        - support_email
+      example:
+        domain: "example.com"
+        industry: "Technology"
+        description: "A platform for showing examples."
+        support_email: "you@example.com"
+        ai_features:
+          autofill: true
+          auto_categorise: true
+          auto_approve: false
+
+    Account:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AccountWrite"
+      properties:
+        site_id:
+          type: string
+          description: Unique CookieChimp site identifier for the account
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the account was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the account was last updated
+        owner_account_user_id:
+          type: string
+          description: ID of the account user that owns the account
+      example:
+        site_id: "abc123"
+        created_at: "2022-12-20T18:45:00Z"
+        updated_at: "2023-01-10T19:00:00Z"
+        domain: "example.com"
+        industry: "Technology"
+        description: "A platform for showing examples."
+        support_email: "support@example.com"
+        owner_account_user_id: "accuser123"
+        ai_features:
+          autofill: true
+          auto_categorise: true
+          auto_approve: false
+
+security:
+  - api_key: []

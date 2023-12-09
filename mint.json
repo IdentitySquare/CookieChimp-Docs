@@ -39,10 +39,6 @@
     {
       "name": "API Reference",
       "url": "docs/api-reference"
-    },
-    {
-      "name": "Guides",
-      "url": "docs/guides"
     }
   ],
   "anchors": [],
@@ -102,12 +98,77 @@
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Account",
       "pages": [
-        "docs/api-reference/endpoint/get",
-        "docs/api-reference/endpoint/create",
-        "docs/api-reference/endpoint/update",
-        "docs/api-reference/endpoint/delete"
+        "docs/api-reference/account/get-account",
+        "docs/api-reference/account/update-account"
+      ]
+    },
+    {
+      "group": "Account Users",
+      "pages": [
+        "docs/api-reference/account-users/list-account-users",
+        "docs/api-reference/account-users/get-account-user",
+        "docs/api-reference/account-users/update-account-user",
+        "docs/api-reference/account-users/delete-account-user"
+      ]
+    },
+    {
+      "group": "Account Invitations",
+      "pages": [
+        "docs/api-reference/account-invitations/list-account-invitations",
+        "docs/api-reference/account-invitations/create-account-invitation",
+        "docs/api-reference/account-invitations/get-account-invitation",
+        "docs/api-reference/account-invitations/update-account-invitation",
+        "docs/api-reference/account-invitations/delete-account-invitation"
+      ]
+    },
+    {
+      "group": "AI Actions",
+      "pages": [
+        "docs/api-reference/ai-actions/list-ai-actions",
+        "docs/api-reference/ai-actions/get-ai-action"
+      ]
+    },
+    {
+      "group": "Cookies",
+      "pages": [
+        "docs/api-reference/cookies/list-cookies",
+        "docs/api-reference/cookies/create-cookie",
+        "docs/api-reference/cookies/get-cookie",
+        "docs/api-reference/cookies/update-cookie",
+        "docs/api-reference/cookies/delete-cookie"
+      ]
+    },
+    {
+      "group": "Cookie Categories",
+      "pages": [
+        "docs/api-reference/cookie-categories/list-cookie-categories",
+        "docs/api-reference/cookie-categories/create-cookie-category",
+        "docs/api-reference/cookie-categories/get-cookie-category",
+        "docs/api-reference/cookie-categories/update-cookie-category",
+        "docs/api-reference/cookie-categories/delete-cookie-category"
+      ]
+    },
+    {
+      "group": "Consents",
+      "pages": [
+        "docs/api-reference/consents/list-consents",
+        "docs/api-reference/consents/get-consent"
+      ]
+    },
+    {
+      "group": "Pageviews",
+      "pages": [
+        "docs/api-reference/pageviews/list-pageviews",
+        "docs/api-reference/pageviews/get-pageview"
+      ]
+    },
+    {
+      "group": "Sessions",
+      "pages": [
+        "docs/api-reference/sessions/list-sessions",
+        "docs/api-reference/sessions/get-session"
       ]
     }
   ],
@@ -119,5 +180,6 @@
     "pirsch": {
       "id": "Vr5YSZNge2WlBW5CxGvi7U2UDRBNPCka"
     }
-  }
+  },
+  "openapi": ["/openapi.yml"]
 }
