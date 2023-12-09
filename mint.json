@@ -109,6 +109,80 @@
         "docs/api-reference/endpoint/update",
         "docs/api-reference/endpoint/delete"
       ]
+    },
+
+    {
+      "group": "Cookie Categories",
+      "pages": [
+        "api-reference/cookie-categories/list-cookie-categories",
+        "api-reference/cookie-categories/create-cookie-category",
+        "api-reference/cookie-categories/get-cookie-category",
+        "api-reference/cookie-categories/update-cookie-category",
+        "api-reference/cookie-categories/delete-cookie-category"
+      ]
+    },
+    {
+      "group": "Cookies",
+      "pages": [
+        "api-reference/cookies/list-cookies",
+        "api-reference/cookies/create-cookie",
+        "api-reference/cookies/get-cookie",
+        "api-reference/cookies/update-cookie",
+        "api-reference/cookies/delete-cookie"
+      ]
+    },
+    {
+      "group": "Sessions",
+      "pages": [
+        "api-reference/sessions/list-sessions",
+        "api-reference/sessions/get-session"
+      ]
+    },
+    {
+      "group": "Pageviews",
+      "pages": [
+        "api-reference/pageviews/list-pageviews",
+        "api-reference/pageviews/get-pageview"
+      ]
+    },
+    {
+      "group": "Consents",
+      "pages": [
+        "api-reference/consents/list-consents",
+        "api-reference/consents/get-consent"
+      ]
+    },
+    {
+      "group": "AI Actions",
+      "pages": [
+        "api-reference/ai-actions/list-ai-actions",
+        "api-reference/ai-actions/get-ai-action"
+      ]
+    },
+    {
+      "group": "Account",
+      "pages": [
+        "api-reference/account/get-account"
+      ]
+    },
+    {
+      "group": "Account Users",
+      "pages": [
+        "api-reference/account-users/list-account-users",
+        "api-reference/account-users/get-account-user",
+        "api-reference/account-users/update-account-user",
+        "api-reference/account-users/delete-account-user"
+      ]
+    },
+    {
+      "group": "Account Invitations",
+      "pages": [
+        "api-reference/account-invitations/list-account-invitations",
+        "api-reference/account-invitations/create-account-invitation",
+        "api-reference/account-invitations/get-account-invitation",
+        "api-reference/account-invitations/update-account-invitation",
+        "api-reference/account-invitations/delete-account-invitation"
+      ]
     }
   ],
   "footerSocials": {
@@ -119,5 +193,6 @@
     "pirsch": {
       "id": "Vr5YSZNge2WlBW5CxGvi7U2UDRBNPCka"
     }
-  }
+  },
+  "openapi": ["/openapi.yml"]
 }
