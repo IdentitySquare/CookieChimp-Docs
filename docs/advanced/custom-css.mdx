@@ -16,6 +16,7 @@ You can also enabled auto dark mode by in the CookieChimp dashboard. This will a
 Develop your own theme by modifying/overriding CSS variables.
 
 ```css
+/** Default color-scheme **/
 :root {
   --cc-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
@@ -80,7 +81,7 @@ Develop your own theme by modifying/overriding CSS variables.
   --cc-footer-border-color: #e4eaed;
 }
 
-/** Light color-scheme **/
+/** Dark mode color-scheme **/
 .cc--darkmode {
   --cc-bg: #161a1c;
   --cc-primary-color: #ebf3f6;
@@ -130,10 +131,10 @@ Develop your own theme by modifying/overriding CSS variables.
   --cc-footer-bg: #0c0e0f;
   --cc-footer-color: var(--cc-secondary-color);
   --cc-footer-border-color: #060809;
+}
 
-  #cc-main {
-    color-scheme: dark;
-  }
+.cc--darkmode #cc-main {
+  color-scheme: dark;
 }
 ```
 
