@@ -13,16 +13,16 @@
   },
   "favicon": "/favicon.png",
   "colors": {
-    "primary": "#e46a44",
-    "light": "#e46a44",
-    "dark": "#e46a44",
+    "primary": "#2b5cf2",
+    "light": "#2b5cf2",
+    "dark": "#2b5cf2",
     "background": {
-      "light": "#faf8f6",
+      "light": "#fafbfc",
       "dark": "#161616"
     },
     "anchors": {
-      "from": "#FF7F57",
-      "to": "#e46a44"
+      "from": "#3362f3",
+      "to": "#2b5cf2"
     }
   },
   "topbarLinks": [
