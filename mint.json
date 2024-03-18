@@ -13,16 +13,16 @@
   },
   "favicon": "/favicon.png",
   "colors": {
-    "primary": "#2b5cf2",
-    "light": "#2b5cf2",
-    "dark": "#2b5cf2",
+    "primary": "#385be9",
+    "light": "#3f79f6",
+    "dark": "#385be9",
     "background": {
       "light": "#fafbfc",
-      "dark": "#161616"
+      "dark": "#1e1e1e"
     },
     "anchors": {
       "from": "#3362f3",
-      "to": "#2b5cf2"
+      "to": "#385be9"
     }
   },
   "topbarLinks": [
@@ -33,7 +33,7 @@
   ],
   "topbarCtaButton": {
     "name": "Get Started",
-    "url": "https://cookiechimp.com"
+    "url": "https://cookiechimp.com/users/sign_up"
   },
   "tabs": [
     {
