@@ -27,12 +27,12 @@
   },
   "topbarLinks": [
     {
-      "name": "Support",
-      "url": "mailto:support@cookiechimp.com"
+      "name": "Sign in",
+      "url": "https://cookiechimp.com/users/sign_in"
     }
   ],
   "topbarCtaButton": {
-    "name": "Get Started",
+    "name": "Sign Up",
     "url": "https://cookiechimp.com/users/sign_up"
   },
   "tabs": [
