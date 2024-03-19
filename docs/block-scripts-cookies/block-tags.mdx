@@ -1,0 +1,50 @@
+---
+title: "Block tags with Google Tag Manager"
+description: "Only fire tags when a user has given consent"
+---
+
+## Step 1: Enable Google Consent Mode
+
+Navigate to "Consent Features" from the sidebar and enable the Google Consent Mode toggle.
+
+<img src="/images/google-tag-manager/enable-gcm.png" alt="Enable GCM" />
+
+## Step 2: Setup Cookie Categories
+
+GTM supports 7 different consent types. CookieChimp maps these Google consent types into the following categories:
+
+| CookieChimp Category ID | Google Consent Type                          |
+| ----------------------- | -------------------------------------------- |
+| essential               | functionality_storage, security_storage      |
+| marketing               | ad_storage, ad_user_data, ad_personalization |
+| analytics               | analytics_storage                            |
+| personalization         | personalization_storage                      |
+
+These categories are setup by default.
+When a user opts-in to a CookieChimp category, the linked Google consent type will change from 'denied' to 'granted' and vice versa.
+
+## Step 3: Set up Google Tag
+
+- **Sign in to your Google Tag Manager account and add a new tag.**
+  <img src="/images/google-tag-manager/add-new-tag.png" alt="Add new tag" />
+
+- **Choose the type of tag you want to create.**
+  <img src="/images/google-tag-manager/choose-tag.png" alt="Choose tag" />
+
+- **Add any additional consent checks for the tag to fire.**
+
+  Go to "Advanced Settings" > "Consent Settings".  
+  Check the "Require additional consent for tag to fire" button and add any additional consent checks.
+  <img src="/images/google-tag-manager/consent-settings.png" alt="Consent Settings" />
+
+- **Add a custom trigger.**
+  <img src="/images/google-tag-manager/add-trigger.png" alt="Add Trigger" />
+
+  Choose "Custom Event"
+  <img src="/images/google-tag-manager/choose-trigger.png" alt="Choose Custom Event" />
+
+  Set up the custom trigger with event name "cookie_consent_update" and save the tag.  
+  This ensures that the tag gets enabled/disabled when consent is granted/denied.
+  <img src="/images/google-tag-manager/create-custom-trigger.png" alt="Create custom trigger" />
+
+This tag is now set up and will only fire when the required consent is granted.
