@@ -155,6 +155,7 @@
       "group": "Consents",
       "pages": [
         "docs/api-reference/consents/list-consents",
+        "docs/api-reference/consents/create-consent",
         "docs/api-reference/consents/get-consent"
       ]
     },
