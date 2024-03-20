@@ -53,6 +53,7 @@
           "group": "Block Scripts & Cookies",
           "pages": [
             "docs/block-scripts-cookies/script-attributes",
+            "docs/block-scripts-cookies/block-tags",
             "docs/block-scripts-cookies/callbacks-events"
           ],
           "icon": "traffic-cone"
