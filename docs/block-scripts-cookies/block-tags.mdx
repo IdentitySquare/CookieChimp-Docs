@@ -11,7 +11,7 @@ Navigate to "Consent Features" from the sidebar and enable the Google Consent Mo
 
 ## Step 2: Setup Cookie Categories
 
-GTM supports 7 different consent types. CookieChimp maps these Google consent types into the following categories:
+GTM supports 7 different default consent types. CookieChimp maps these Google consent types into the following categories:
 
 | CookieChimp Category ID | Google Consent Type                          |
 | ----------------------- | -------------------------------------------- |
@@ -21,7 +21,10 @@ GTM supports 7 different consent types. CookieChimp maps these Google consent ty
 | personalization         | personalization_storage                      |
 
 These categories are setup by default.
-When a user opts-in to a consent category, the linked Google consent type will change from 'denied' to 'granted' and vice versa.
+When a user opts-in to a consent category or a Google service in the category is consented to, the linked Google consent type will change from 'denied' to 'granted' and vice versa.
+
+Apart from the default 7 consent types, we will also send the consent state of your services to Google.  
+e.g. When a user consents to a service named "Hotjar", the consent for this service is updated as 'granted'.
 
 ## Step 3: Set up Google Tag
 
@@ -36,6 +39,7 @@ When a user opts-in to a consent category, the linked Google consent type will c
 - **Add any additional consent checks for the tag to fire.**
 
   Navigate to "Advanced Settings" > "Consent Settings". Check the "Require additional consent for tag to fire" button and add any additional consent checks from the dropdown of options.
+  This can be a service name as added on the platform.
 
   <img
     src="/images/google-tag-manager/consent-settings.png"
