@@ -1,7 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
   "name": "CookieChimp Docs",
-  "description": "CookieChimp is a privacy management platform that helps you to comply with GDPR, CCPA, and other privacy regulations.",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
