@@ -1267,9 +1267,9 @@ components:
         - $ref: "#/components/schemas/GroupCreate"
       example:
         id: "abc123"
-        name: "Demo Group"
+        name: "Example Ltd"
         external_id: "ABC_123"
-        type: "reseller"
+        partner: "partner_one"
         max_pageviews_per_month: 500000
 
     Session:
