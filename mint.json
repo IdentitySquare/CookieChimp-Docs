@@ -160,6 +160,15 @@
       ]
     },
     {
+      "group": "Groups",
+      "pages": [
+        "docs/api-reference/groups/list-groups",
+        "docs/api-reference/groups/get-group",
+        "docs/api-reference/groups/create-group",
+        "docs/api-reference/groups/update-group"
+      ]
+    },
+    {
       "group": "Pageviews",
       "pages": [
         "docs/api-reference/pageviews/list-pageviews",
