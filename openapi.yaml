@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: CookieChimp API
-  description: API for managing cookie consents
-  version: 1.0.0
+  description: API for CookieChimp.com
+  version: 1.0.1
 
 servers:
   - url: "https://cookiechimp.com/api/v1"
@@ -1085,10 +1085,10 @@ components:
         page:
           type: integer
           description: Current page
-        prev: 
+        prev:
           type: integer
           description: Previous page number
-        next: 
+        next:
           type: integer
           description: Next page number
       example:
