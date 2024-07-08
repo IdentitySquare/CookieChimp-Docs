@@ -294,7 +294,7 @@ paths:
         - $ref: "#/components/parameters/page"
       responses:
         "200":
-          description: List of cookie categories
+          description: List of groups
           content:
             application/json:
               schema:
@@ -685,54 +685,30 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   # account - get your own account
-  /account:
+  /accounts:
     get:
-      summary: Get account
-      description: Get your own account
-      operationId: getAccount
+      summary: List accounts
+      description: List all accounts
+      operationId: listAccounts
       tags:
         - Account
+      parameters:
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
-          description: Account
+          description: List of accounts
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Account"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-    # update your own account
-    put:
-      summary: Update account
-      description: Update your own account
-      operationId: updateAccount
-      tags:
-        - Account
-      requestBody:
-        description: Account to update
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AccountWrite"
-      responses:
-        "200":
-          description: Updated account
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Account"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                type: object
+                properties:
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/AccountPagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Account"
 
   # account user endpoints
   /account-users:
@@ -1069,6 +1045,35 @@ components:
         total: 100
         limit: 20
         offset: 0
+
+    AccountPagination:
+      type: object
+      properties:
+        prev_url:
+          type: string
+          description: Path to get previous page
+        next_url:
+          type: string
+          description: Path to get next page
+        count:
+          type: integer
+          description: Total number of pages
+        page:
+          type: integer
+          description: Current page
+        prev: 
+          type: integer
+          description: Previous page number
+        next: 
+          type: integer
+          description: Next page number
+      example:
+        prev_url: "/api/v1/accounts?page="
+        next_url: "/api/v1/accounts?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
 
     GroupPagination:
       type: object
@@ -1603,74 +1608,87 @@ components:
 
     AccountWrite:
       type: object
-      properties:
-        domain:
-          type: string
-          description: Domain of the account. e.g. example.com
-        industry:
-          type: string
-          description: Industry of the account
-        description:
-          type: string
-          description: Information about what the website does. This is used for AI features to tune it for the industry.
-        support_email:
-          type: string
-          format: email
-          description: Support email address for the account. This is shown to users on the consent banner.
-        ai_features:
-          type: object
-          properties:
-            autofill:
-              type: boolean
-            auto_categorise:
-              type: boolean
-            auto_approve:
-              type: boolean
-      required:
-        - domain
-        - support_email
-      example:
-        domain: "example.com"
-        industry: "Technology"
-        description: "A platform for showing examples."
-        support_email: "you@example.com"
-        ai_features:
-          autofill: true
-          auto_categorise: true
-          auto_approve: false
 
     Account:
       type: object
       allOf:
         - $ref: "#/components/schemas/AccountWrite"
       properties:
-        site_id:
+        id:
           type: string
-          description: Unique CookieChimp site identifier for the account
+          readOnly: true
+          description: Unique identifier for the group
+        name:
+          type: string
+          readOnly: true
+          description: Domain of the account
+        allowed_domains:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: List of allowed domains the the script will run on
+        owner_id:
+          type: string
+          readOnly: true
+          description: ID of the account user that owns the account
+        onboarding_status:
+          type: string
+          readOnly: true
+          description: Status of the account
+        visitor_stats:
+          type: object
+          readOnly: true
+          description: Visitor statistics for the account
         created_at:
           type: string
           format: date-time
+          readOnly: true
           description: Date and time when the account was created
         updated_at:
           type: string
           format: date-time
+          readOnly: true
           description: Date and time when the account was last updated
-        owner_account_user_id:
-          type: string
-          description: ID of the account user that owns the account
       example:
-        site_id: "abc123"
+        id: "abc123"
+        name: "example.com"
+        allowed_domains: ["example.net", "example.org"]
+        owner_id: "xyz123"
+        onboarding_status: "live"
+        visitor_stats: {
+          comparison: "vs. Last 30 days",
+          statistics: {
+            views: {
+              count: 1471,
+              rate_of_change: 3.37
+            },
+            consents: {
+              count: 213,
+              rate_of_change: 25.29
+            },
+            unique_visitors: {
+              count: 895,
+              rate_of_change: 42.06
+            }
+          },
+          raw_data: {
+            views: {
+              current_period: 1471,
+              previous_period: 1423
+            },
+            consents: {
+              current_period: 213,
+              previous_period: 170
+            },
+            unique_visitors: {
+              current_period: 895,
+              previous_period: 630
+            }
+          }
+        }
         created_at: "2022-12-20T18:45:00Z"
         updated_at: "2023-01-10T19:00:00Z"
-        domain: "example.com"
-        industry: "Technology"
-        description: "A platform for showing examples."
-        support_email: "support@example.com"
-        owner_account_user_id: "accuser123"
-        ai_features:
-          autofill: true
-          auto_categorise: true
-          auto_approve: false
 
 security:
   - authorization: []
