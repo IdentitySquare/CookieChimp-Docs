@@ -694,6 +694,7 @@ paths:
         - Account
       parameters:
         - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/onboarding_status"
       responses:
         "200":
           description: List of accounts
@@ -709,6 +710,23 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Account"
+
+  /accounts/{id}:
+    get:
+      summary: Get account
+      description: Get account by ID
+      operationId: getAccount
+      tags:
+        - Accounts
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
 
   # account user endpoints
   /account-users:
@@ -1012,6 +1030,20 @@ components:
       required: false
       schema:
         type: string
+    onboarding_status:
+      name: onboarding_status
+      in: query
+      description: |
+        The status of the account, where:
+        - `account_created`: The account has been created.
+        - `vendors_setup`: Cookie categories, services or TCF vendors have been set up.
+        - `code_installed`: The script has been installed on the user's website.
+        - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
+        - `live`: The account is live and operational.
+      required: false
+      schema:
+        type: string
+        enum: [account_created, vendors_setup, code_installed, inactive, live]
 
   schemas:
     Error:
@@ -1635,7 +1667,13 @@ components:
         onboarding_status:
           type: string
           readOnly: true
-          description: Status of the account
+          description: |
+            The status of the account, where:
+            - `account_created`: The account has been created.
+            - `vendors_setup`: Cookie categories, services or TCF vendors have been set up.
+            - `code_installed`: The script has been installed on the user's website.
+            - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
+            - `live`: The account is live and operational.
         visitor_stats:
           type: object
           readOnly: true
