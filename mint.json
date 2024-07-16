@@ -101,7 +101,8 @@
     {
       "group": "Account",
       "pages": [
-        "docs/api-reference/account/list-accounts"
+        "docs/api-reference/account/list-accounts",
+        "docs/api-reference/account/get-account"
       ]
     },
     {
