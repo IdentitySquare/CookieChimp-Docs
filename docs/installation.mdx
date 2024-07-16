@@ -50,11 +50,9 @@ Add the CookieChimp [Shopify app](#) and set it up in your Shopify admin.
 To ensure compliance with GDPR regulations, it's crucial not only to display a consent banner but also to actively block all non-essential scripts and cookies until the user has given explicit consent.
 For comprehensive instructions on how to effectively manage and block scripts and cookies, please refer to our [Scripts Management Section](/block-scripts-cookies/script-attributes).
 
-## Allow users to update their preferences
+## Step 5: Allow users to update their preferences
 
-Once consent options have been set, users need a way update their preferences.
-
-### Privacy Trigger (Floating Privacy Icon)
+### 5a. Privacy Trigger (Floating Privacy Icon)
 
 CookieChimp provides a floating privacy icon (Privacy Trigger) that allows users to manage their cookie preferences at any time.
 You can enable this in the banner settings.
@@ -74,7 +72,7 @@ If you are using [Turbo](https://turbo.hotwired.dev/handbook/building#persisting
 <div id="cookiechimp-privacy-trigger" data-turbo-permanent></div>
 ```
 
-### Manually Open Preferences Modal
+### 5b. Manually Open Preferences Modal
 
 You can open the preferences modal with a custom link or button by adding a button with the data attribute `data-cc="show-preferencesModal"`:
 
