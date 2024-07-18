@@ -21,7 +21,26 @@ Add your website's CookieChimp JS snippet in the `<head>` tag of your HTML:
 <script src="https://cookiechimp.com/widget/abc123.js"></script>
 ```
 
-    <Info>You need to replace `abc123` with your website's unique CookieChimp ID.</Info>
+<Info>
+  You need to replace `abc123` with your website's unique CookieChimp ID.
+</Info>
+
+If you are using a Single Page Application (SPA), you need to ensure to reinitialize the CookieChimp widget on page navigation. You can do this by including the CookieChimp script in the following way (example is for Astro JS):
+
+```html
+<script is:inline>
+  function runCookieChimp() {
+    var script = document.createElement("script");
+    script.src = "http://localhost:3000/widget/K8ktWD.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
+  }
+
+  // for Astro JS.
+  // listen for other events for different frameworks.
+  document.addEventListener("astro:page-load", runCookieChimp);
+</script>
+```
 
 ### WordPress
 
@@ -57,19 +76,23 @@ For comprehensive instructions on how to effectively manage and block scripts an
 CookieChimp provides a floating privacy icon (Privacy Trigger) that allows users to manage their cookie preferences at any time.
 You can enable this in the banner settings.
 
-Optionally, you can specify location where the Privacy Trigger is added to the DOM by placing a div with the ID `cookiechimp-privacy-trigger` on the page.
+Optionally, you can specify location where the Privacy Trigger is added to the DOM by placing a div with the ID `cookiechimp-container` on the page.
 
 ```html
-<div id="cookiechimp-privacy-trigger"></div>
+<div id="cookiechimp-container"></div>
 ```
 
 This is useful for single page applications (SPA) where you want the floating icon to be persistent across different pages.
 Ensure to add this in a location which does not get replaced when navigating between pages.
 
-If you are using [Turbo](https://turbo.hotwired.dev/handbook/building#persisting-elements-across-page-loads), you can add `data-turbo-permanent` to the div to ensure it persists across navigations.
+If you are using [Turbo](https://turbo.hotwired.dev/handbook/building#persisting-elements-across-page-loads) or [Astro JS with View Transitions](https://docs.astro.build/en/guides/view-transitions/), you can add specific attributes to the div to ensure it persists across navigations.
 
 ```html
-<div id="cookiechimp-privacy-trigger" data-turbo-permanent></div>
+<!-- For Turbo -->
+<div id="cookiechimp-container" data-turbo-permanent></div>
+
+<!-- For Astro JS -->
+<div id="cookiechimp-container" transition:persist></div>
 ```
 
 ### 5b. Manually Open Preferences Modal
