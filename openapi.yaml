@@ -291,6 +291,7 @@ paths:
       tags:
         - Groups
       parameters:
+        - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
         "200":
@@ -693,6 +694,7 @@ paths:
       tags:
         - Account
       parameters:
+        - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
         - $ref: "#/components/parameters/onboarding_status"
       responses:
@@ -1029,7 +1031,18 @@ components:
       description: Page number
       required: false
       schema:
-        type: string
+        type: integer
+        default: 1
+    per_page:
+      name: per_page
+      in: query
+      description: Number of records to return per page
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
     onboarding_status:
       name: onboarding_status
       in: query
