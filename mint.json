@@ -184,7 +184,6 @@
       "group": "Consents",
       "pages": [
         "docs/api-reference/consents/list-consents",
-        "docs/api-reference/consents/create-consent",
         "docs/api-reference/consents/get-consent"
       ]
     },
@@ -195,20 +194,6 @@
         "docs/api-reference/groups/get-group",
         "docs/api-reference/groups/create-group",
         "docs/api-reference/groups/update-group"
-      ]
-    },
-    {
-      "group": "Pageviews",
-      "pages": [
-        "docs/api-reference/pageviews/list-pageviews",
-        "docs/api-reference/pageviews/get-pageview"
-      ]
-    },
-    {
-      "group": "Sessions",
-      "pages": [
-        "docs/api-reference/sessions/list-sessions",
-        "docs/api-reference/sessions/get-session"
       ]
     }
   ],
