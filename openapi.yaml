@@ -8,14 +8,14 @@ servers:
   - url: "https://cookiechimp.com/api/v1"
 
 paths:
-  # cookie category endpoints - GET, POST, PUT, DELETE
-  /cookie-categories:
+  # category endpoints - GET, POST, PUT, DELETE
+  /categories:
     get:
-      summary: List cookie categories
-      description: List all cookie categories
-      operationId: listCookieCategories
+      summary: List categories
+      description: List all categories
+      operationId: listCategories
       tags:
-        - Cookie Categories
+        - Categories
       parameters:
         - $ref: "#/components/parameters/limit"
         - $ref: "#/components/parameters/offset"
@@ -23,7 +23,7 @@ paths:
         - $ref: "#/components/parameters/order"
       responses:
         "200":
-          description: List of cookie categories
+          description: List of categories
           content:
             application/json:
               schema:
@@ -32,7 +32,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/CookieCategory"
+                      $ref: "#/components/schemas/Category"
                   pagination:
                     type: object
                     $ref: "#/components/schemas/Pagination"
@@ -44,25 +44,25 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     post:
-      summary: Create cookie category
-      description: Create a new cookie category
-      operationId: createCookieCategory
+      summary: Create category
+      description: Create a new category
+      operationId: createCategory
       tags:
-        - Cookie Categories
+        - Categories
       requestBody:
-        description: Cookie category to create
+        description: Category to create
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CookieCategoryWrite"
+              $ref: "#/components/schemas/CategoryWrite"
       responses:
         "201":
-          description: Created cookie category
+          description: Created category
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CookieCategory"
+                $ref: "#/components/schemas/Category"
         default:
           description: unexpected error
           content:
@@ -70,22 +70,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /cookie-categories/{id}:
+  /categories/{id}:
     get:
-      summary: Get cookie category
-      description: Get cookie category by ID
-      operationId: getCookieCategory
+      summary: Get category
+      description: Get category by ID
+      operationId: getCategory
       tags:
-        - Cookie Categories
+        - Categories
       parameters:
         - $ref: "#/components/parameters/id"
       responses:
         "200":
-          description: Cookie category
+          description: Category
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CookieCategory"
+                $ref: "#/components/schemas/Category"
         default:
           description: unexpected error
           content:
@@ -93,27 +93,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     put:
-      summary: Update cookie category
-      description: Update cookie category by ID
-      operationId: updateCookieCategory
+      summary: Update category
+      description: Update category by ID
+      operationId: updateCategory
       tags:
-        - Cookie Categories
+        - Categories
       parameters:
         - $ref: "#/components/parameters/id"
       requestBody:
-        description: Cookie category to update
+        description: Category to update
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CookieCategoryWrite"
+              $ref: "#/components/schemas/CategoryWrite"
       responses:
         "200":
-          description: Updated cookie category
+          description: Updated category
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CookieCategory"
+                $ref: "#/components/schemas/Category"
         default:
           description: unexpected error
           content:
@@ -121,20 +121,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Delete cookie category
-      description: Delete cookie category by ID
-      operationId: deleteCookieCategory
+      summary: Delete category
+      description: Delete category by ID
+      operationId: deleteCategory
       tags:
-        - Cookie Categories
+        - Categories
       parameters:
         - $ref: "#/components/parameters/id"
       responses:
         "200":
-          description: Cookie category deleted
+          description: Category deleted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CookieCategory"
+                $ref: "#/components/schemas/Category"
         default:
           description: unexpected error
           content:
@@ -142,14 +142,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  # cookie endpoints - GET, POST, PUT, DELETE
-  /cookies:
+  # storage item endpoints - GET, POST, PUT, DELETE
+  /storage-items:
     get:
-      summary: List cookies
-      description: List all cookies
-      operationId: listCookies
+      summary: List storage items
+      description: List all storage items
+      operationId: listStorageItems
       tags:
-        - Cookies
+        - Storage Items
       parameters:
         - $ref: "#/components/parameters/limit"
         - $ref: "#/components/parameters/offset"
@@ -157,13 +157,13 @@ paths:
         - $ref: "#/components/parameters/order"
         - name: category_id
           in: query
-          description: ID of the cookie category to filter by
+          description: ID of the category to filter by
           required: false
           schema:
             type: string
       responses:
         "200":
-          description: List of cookies
+          description: List of storage items
           content:
             application/json:
               schema:
@@ -172,7 +172,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Cookie"
+                      $ref: "#/components/schemas/StorageItem"
                   pagination:
                     type: object
                     $ref: "#/components/schemas/Pagination"
@@ -184,25 +184,25 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     post:
-      summary: Create cookie
-      description: Create a new cookie
-      operationId: createCookie
+      summary: Create storage item
+      description: Create a new storage item
+      operationId: createStorageItem
       tags:
-        - Cookies
+        - Storage Items
       requestBody:
-        description: Cookie to create
+        description: Storage item to create
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CookieWrite"
+              $ref: "#/components/schemas/StorageItemWrite"
       responses:
         "201":
-          description: Created cookie
+          description: Created storage item
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Cookie"
+                $ref: "#/components/schemas/StorageItem"
         default:
           description: unexpected error
           content:
@@ -210,22 +210,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /cookies/{id}:
+  /storage-items/{id}:
     get:
-      summary: Get cookie
-      description: Get cookie by ID
-      operationId: getCookie
+      summary: Get storage item
+      description: Get storage item by ID
+      operationId: getStorageItem
       tags:
-        - Cookies
+        - Storage Items
       parameters:
         - $ref: "#/components/parameters/id"
       responses:
         "200":
-          description: Cookie
+          description: Storage item
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Cookie"
+                $ref: "#/components/schemas/StorageItem"
         default:
           description: unexpected error
           content:
@@ -233,27 +233,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     put:
-      summary: Update cookie
-      description: Update cookie by ID
-      operationId: updateCookie
+      summary: Update storage item
+      description: Update storage item by ID
+      operationId: updateStorageItem
       tags:
-        - Cookies
+        - Storage Items
       parameters:
         - $ref: "#/components/parameters/id"
       requestBody:
-        description: Cookie to update
+        description: Storage item to update
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CookieWrite"
+              $ref: "#/components/schemas/StorageItemWrite"
       responses:
         "200":
-          description: Updated cookie
+          description: Updated storage item
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Cookie"
+                $ref: "#/components/schemas/StorageItem"
         default:
           description: unexpected error
           content:
@@ -261,20 +261,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Delete cookie
-      description: Delete cookie by ID
-      operationId: deleteCookie
+      summary: Delete storage item
+      description: Delete storage item by ID
+      operationId: deleteStorageItem
       tags:
-        - Cookies
+        - Storage Items
       parameters:
         - $ref: "#/components/parameters/id"
       responses:
         "200":
-          description: Cookie deleted
+          description: Storage item deleted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Cookie"
+                $ref: "#/components/schemas/StorageItem"
         default:
           description: unexpected error
           content:
@@ -1049,7 +1049,7 @@ components:
       description: |
         The status of the account, where:
         - `account_created`: The account has been created.
-        - `vendors_setup`: Cookie categories, services or TCF vendors have been set up.
+        - `vendors_setup`: Categories, services or TCF vendors have been set up.
         - `code_installed`: The script has been installed on the user's website.
         - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
         - `live`: The account is live and operational.
@@ -1149,48 +1149,48 @@ components:
         prev: null
         next: 2
 
-    CookieWrite:
+    StorageItemWrite:
       type: object
       properties:
         name:
           type: string
-          description: Name of the cookie
+          description: Name of the storage item
         description:
           type: string
-          description: Description of the cookie that is displayed to users
+          description: Description of the storage item that is displayed to users
         company_name:
           type: string
-          description: Name of the company that owns the cookie
+          description: Name of the company that owns the storage item
         domain:
           type: string
-          description: Domain of the cookie
+          description: Domain of the storage item
         duration:
           type: string
-          description: Duration of the cookie
+          description: Duration of the storage item
         partitioned:
           type: boolean
-          description: Whether the cookie is partitioned
+          description: Whether the storage item is partitioned
         path:
           type: string
-          description: Path of the cookie
+          description: Path of the storage item
         same_site:
           type: string
-          description: SameSite attribute of the cookie
-        cookie_category_id:
+          description: SameSite attribute of the storage item
+        category_id:
           type: string
-          description: ID of the cookie category
+          description: ID of the storage item category
       required:
         - name
 
-    Cookie:
+    StorageItem:
       type: object
       allOf:
-        - $ref: "#/components/schemas/CookieWrite"
+        - $ref: "#/components/schemas/StorageItemWrite"
       properties:
         id:
           type: string
           readOnly: true
-          description: Unique identifier for the cookie
+          description: Unique identifier for the storage item
         last_seen_at:
           type: string
           format: date-time
@@ -1225,49 +1225,49 @@ components:
         partitioned: false
         path: "/"
         same_site: "Lax"
-        cookie_category_id: "cat1"
+        category_id: "cat1"
         status: "finalised"
         approved_by_type: "AI"
         wildcard_cookie_id: null
         id: "user-pref-cookie"
         is_wildcard_cookie: false
 
-    CookieCategoryWrite:
+    CategoryWrite:
       type: object
       properties:
         name:
           type: string
-          description: Name of the cookie category that is displayed to users
+          description: Name of the category that is displayed to users
         description:
           type: string
-          description: Description of the cookie category that is displayed to users
+          description: Description of the category that is displayed to users
         required:
           type: boolean
-          description: Whether the cookie category is required for the website to function
+          description: Whether the category is required for the website to function
       required:
         - name
         - description
         - required
 
-    CookieCategory:
+    Category:
       type: object
       allOf:
-        - $ref: "#/components/schemas/CookieCategoryWrite"
+        - $ref: "#/components/schemas/CategoryWrite"
       properties:
         id:
           type: string
           readOnly: true
-          description: Unique identifier for the cookie category
+          description: Unique identifier for the category
         created_at:
           type: string
           format: date-time
           readOnly: true
-          description: Date and time when the cookie category was created
+          description: Date and time when the category was created
         updated_at:
           type: string
           format: date-time
           readOnly: true
-          description: Date and time when the cookie category was last updated
+          description: Date and time when the category was last updated
       example:
         id: "essential"
         name: "Essential"
@@ -1683,7 +1683,7 @@ components:
           description: |
             The status of the account, where:
             - `account_created`: The account has been created.
-            - `vendors_setup`: Cookie categories, services or TCF vendors have been set up.
+            - `vendors_setup`: Categories, services or TCF vendors have been set up.
             - `code_installed`: The script has been installed on the user's website.
             - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
             - `live`: The account is live and operational.

@@ -102,7 +102,7 @@
       "group": "Scan & Organise Cookies",
       "pages": [
         "docs/features/cookie-scanning",
-        "docs/features/cookie-categories",
+        "docs/features/categories",
         "docs/features/wildcard-cookies",
         "docs/features/cookie-list-embed",
         "docs/features/invite-team"
@@ -161,23 +161,23 @@
       ]
     },
     {
-      "group": "Cookies",
+      "group": "Storage Items",
       "pages": [
-        "docs/api-reference/cookies/list-cookies",
-        "docs/api-reference/cookies/create-cookie",
-        "docs/api-reference/cookies/get-cookie",
-        "docs/api-reference/cookies/update-cookie",
-        "docs/api-reference/cookies/delete-cookie"
+        "docs/api-reference/storage-items/list-storage-items",
+        "docs/api-reference/storage-items/create-storage-item",
+        "docs/api-reference/storage-items/get-storage-item",
+        "docs/api-reference/storage-items/update-storage-item",
+        "docs/api-reference/storage-items/delete-storage-item"
       ]
     },
     {
-      "group": "Cookie Categories",
+      "group": "Categories",
       "pages": [
-        "docs/api-reference/cookie-categories/list-cookie-categories",
-        "docs/api-reference/cookie-categories/create-cookie-category",
-        "docs/api-reference/cookie-categories/get-cookie-category",
-        "docs/api-reference/cookie-categories/update-cookie-category",
-        "docs/api-reference/cookie-categories/delete-cookie-category"
+        "docs/api-reference/categories/list-categories",
+        "docs/api-reference/categories/create-category",
+        "docs/api-reference/categories/get-category",
+        "docs/api-reference/categories/update-category",
+        "docs/api-reference/categories/delete-category"
       ]
     },
     {
