@@ -29,13 +29,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/CategoryPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Category"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
+
         default:
           description: unexpected error
           content:
@@ -169,13 +170,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/StorageItemPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/StorageItem"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
+
         default:
           description: unexpected error
           content:
@@ -547,13 +549,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/ConsentPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Consent"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
+
         default:
           description: unexpected error
           content:
@@ -648,13 +651,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/AIActionPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/AIAction"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
+
         default:
           description: unexpected error
           content:
@@ -751,13 +755,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/AccountUserPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/AccountUser"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
+
         default:
           description: unexpected error
           content:
@@ -863,13 +868,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  pagination:
+                    type: object
+                    $ref: "#/components/schemas/AccountInvitationPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/AccountInvitation"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
+
         default:
           description: unexpected error
           content:
@@ -1091,36 +1097,7 @@ components:
         limit: 20
         offset: 0
 
-    AccountPagination:
-      type: object
-      properties:
-        prev_url:
-          type: string
-          description: Path to get previous page
-        next_url:
-          type: string
-          description: Path to get next page
-        count:
-          type: integer
-          description: Total number of pages
-        page:
-          type: integer
-          description: Current page
-        prev: 
-          type: integer
-          description: Previous page number
-        next: 
-          type: integer
-          description: Next page number
-      example:
-        prev_url: "/api/v1/accounts?page="
-        next_url: "/api/v1/accounts?page=2"
-        count: 4
-        page: 1
-        prev: null
-        next: 2
-
-    GroupPagination:
+    BasePagination:
       type: object
       properties:
         prev_url:
@@ -1141,9 +1118,90 @@ components:
         next:
           type: integer
           description: Next page number
+
+    AccountPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
+      example:
+        prev_url: "/api/v1/accounts?page="
+        next_url: "/api/v1/accounts?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
+
+    AccountInvitationPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
+      example:
+        prev_url: "/api/v1/account-invitations?page="
+        next_url: "/api/v1/account-invitations?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
+
+    AccountUserPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
+      example:
+        prev_url: "/api/v1/account-users?page="
+        next_url: "/api/v1/account-users?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
+
+    AIActionPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
+      example:
+        prev_url: "/api/v1/ai-actions?page="
+        next_url: "/api/v1/ai-actions?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
+
+    CategoryPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
+      example:
+        prev_url: "/api/v1/categories?page="
+        next_url: "/api/v1/categories?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
+
+    ConsentPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
+      example:
+        prev_url: "/api/v1/consents?page="
+        next_url: "/api/v1/consents?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
+
+    GroupPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
       example:
         prev_url: "/api/v1/groups?page="
         next_url: "/api/v1/groups?page=2"
+        count: 4
+        page: 1
+        prev: null
+        next: 2
+
+    StorageItemPagination:
+      allOf:
+        - $ref: "#/components/schemas/BasePagination"
+      example:
+        prev_url: "/api/v1/storage-items?page="
+        next_url: "/api/v1/storage-items?page=2"
         count: 4
         page: 1
         prev: null
