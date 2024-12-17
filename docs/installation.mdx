@@ -18,7 +18,8 @@ Choose the integration method suitable for your platform:
 Add your website's CookieChimp JS snippet at the top of the `<head>` tag of your HTML:
 
 <Info>
-  Add the CookieChimp script at the top of the `<head>` section to make sure it loads first.
+  The CookieChimp script needs to be added at the top of the `<head>` section, so that it can run first, in order to ensure other scripts are only run based on consent.
+  If other scripts are added before, they may set cookies and other storage items before consent is granted.
 </Info>
 
 ```html
