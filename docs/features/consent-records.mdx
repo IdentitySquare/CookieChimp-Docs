@@ -1,28 +1,24 @@
 ---
 title: "Manage User Consents"
-description: "View, manage, and understand user consents effectively using CookieChimp's comprehensive consent management tools."
+description: "View consent history of users on your website."
 ---
 
-## Overview
+### Data Privacy & Storage
+- CookieChimp generates a random UUID for each visitor.
+- No Personal Identifiable Information (PII) is stored.
+- Users cannot be traced back to their real identity.
 
-View, manage, and understand user consents effectively using CookieChimp's comprehensive consent management tools.
+### IP Address Handling
+- IP addresses are processed only to determine visitor's country & region.
+- IPs are masked before storage.
+- Only country & region information is retained in logs.
 
-## Viewing and Filtering Consents
+### Finding User Records
+You can search for specific consent records using the visitor's UUID, which can be found in the banner:
 
-- **Sessions and Records**: Access detailed logs of all user sessions and consent records.
-- **Search and Filter**: Easily search and filter these records. For identified users, search by user ID.
+<img src="/images/consents/consents.png" alt="Consents" />
 
-## Detailed User Session Insights
+### Consent Details
+You can click on consent records to see more details.
 
-- **Session Details**: View the pages visited in a session, consents given for specific cookies and categories.
-- **Cookie Names**: See all cookie names set for the user (excluding HTTP-only cookies). Refer to [Cookie Scanning Limitations](/docs/features/cookie-scanning#limitations) for more details.
-
-## User Profiles
-
-Each user ID has a profile showing their latest consent, all sessions, cookie consents, and cookies set.
-
-## Advanced Usage: API Integration
-
-- **Sync Consent Details**: Use our API to integrate consent details with your platform.
-- **Consent-Based Actions**: Query consent statuses via API to guide actions in your app.
-- For detailed API usage, see our [API Documentation](/docs/api-reference).
+<img src="/images/consents/consent_details.png" alt="Consent Details" />
