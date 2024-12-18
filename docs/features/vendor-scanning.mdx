@@ -6,17 +6,19 @@ description: "Understand how CookieChimp scans your website for vendors."
 <img src="/images/scan/scan.png" alt="Scan page" />
 
 We scan your website to find the vendors and storage items used on your site.
-We check what storage items were set before and after consent was granted.
+We detect services and storage items set before and after consent was granted.
 
-If a service runs, that are not supposed to run before consent is granted, we will flag this as `Ran before consent`.
+We will flag each service with one of the following status:
 
-If we detect storage items from a service that is not shown in your banner, we will flag the service as `Not shown in banner`.
+- `Ran before consent` - A service that is not part of a required category ran before consent is granted.
 
-If we detect storage items that are not in your banner and we cannot match to a vendor/service, we will flag these as `Not part of a category or service`.
+- `Not shown in banner` - We detected storage items from a service that is not shown in your banner.
 
-If everything is set up correctly then we flag the service as `All good`.
+- `Not part of a category or service` - We detected storage items that are not in your banner and we cannot match to a vendor/service.
 
-We also check if users can update their consent with our privacy trigger button.
+- `All good` - Everything is set up correctly.
+
+We also check if users can update their preferences after their initial consent.
 
 ## Manual Scanning
 
