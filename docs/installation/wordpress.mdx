@@ -1,0 +1,43 @@
+---
+title: "WordPress Plugin"
+description: "Add CookieChimp to your WordPress site"
+icon: "wordpress"
+---
+
+<Steps>
+  <Step title="Enable WordPress Integration">
+    Enable the WordPress integration from the Integrations page.
+    <img src="/images/wordpress/wordpress-integration.png" alt="Enable WordPress Integration" />
+  </Step>
+
+  <Step title="Install WP Consent API plugin">
+    Install the [WP Consent API plugin](https://wordpress.org/plugins/wp-consent-api/) from the WordPress plugin directory.
+    This allows other Wordpress plugins that support WP Consent API to run tags based on user's consent.
+
+    <img src="/images/wordpress/wp-consent-api.png" alt="Install WP Consent API plugin" />
+  </Step>
+
+  <Step title="Install CookieChimp WordPress Plugin">
+    Download the [CookieChimp WordPress Plugin](https://github.com/IdentitySquare/CookieChimp-WP/archive/refs/heads/main.zip).
+    Our plugin ensures that CookieChimp's JS code is run before other scripts on your Wordpress site.
+
+    Upload the file to your WordPress site and install.
+    <img src="/images/wordpress/upload-plugin.png" alt="Install CookieChimp WordPress plugin" />
+  </Step>
+
+  <Step title="Configure CookieChimp Plugin">
+    Open the CookieChimp plugin settings.
+    <img src="/images/wordpress/plugin-settings.png" alt="CookieChimp plugin settings" />
+
+    Enter your CookieChimp account ID and save.
+    <img src="/images/wordpress/cookiechimp-settings.png" alt="Add account id to plugin" />
+
+    Your account ID can be found in the general settings page on CookieChimp.
+    <img src="/images/wordpress/cookiechimp-account.png" alt="CookieChimp Account ID" />
+  </Step>
+</Steps>
+
+CookieChimp will now inform the WP Consent API plugin the user's consent state.
+This API is listened to by other WP plugins such as Google Site Kit to enable/disable their scripts.
+
+For details and supported plugins see the [WP Consent API plugin](https://wordpress.org/plugins/wp-consent-api/).

@@ -76,7 +76,14 @@
       "group": "Get Started",
       "pages": [
         "docs/overview",
-        "docs/installation",
+        {
+          "group": "Installation",
+          "pages": [
+            "docs/installation/installation",
+            "docs/installation/wordpress"
+          ],
+          "icon": "code"
+        },
         {
           "group": "Block Scripts & Cookies",
           "pages": [
