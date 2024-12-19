@@ -1,14 +1,7 @@
 ---
-title: "Block Script Tags"
+title: "Block Script Tags with Code"
 description: "Only enable scripts when a user has given consent."
 ---
-
-## Script Management Methods
-
-There are two primary methods for managing scripts:
-
-- Through `<script>` tag attributes.
-- Using [callbacks and events](/block-scripts-cookies/callbacks-events).
 
 ## Script Attributes and Usage
 
@@ -27,23 +20,23 @@ Control your scripts using these attributes:
 </script>
 
 <script type="text/plain" data-category="analytics">
-  // Executed when the "analytics" category is enabled
+  // Executed when user consents to the "analytics" category
 </script>
 
 <script
   type="text/plain"
   data-category="analytics"
-  data-service="Google Analytics"
+  data-service="Hotjar"
 >
-  // Executed when "Google Analytics" service is enabled
+  // Executed when user consents to "Hotjar" service
 </script>
 
-<!-- Script loads when "Google Analytics" service is enabled -->
+<!-- Script loads when user consents to "Hotjar" service -->
 <script
   type="text/plain"
-  data-src="https://www.googletagmanager.com/gtag/js?id=TAG_ID"
+  data-src="https://static.hotjar.com/c/hotjar-XXXXX.js?sv=X"
   data-category="analytics"
-  data-service="Google Analytics"
+  data-service="Hotjar"
 ></script>
 ```
 
