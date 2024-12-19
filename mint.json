@@ -100,7 +100,7 @@
     {
       "group": "Scan & Organise Cookies",
       "pages": [
-        "docs/features/cookie-scanning",
+        "docs/features/vendor-scanning",
         "docs/features/vendor-management",
         "docs/features/wildcard-cookies",
         "docs/features/cookie-list-embed"
