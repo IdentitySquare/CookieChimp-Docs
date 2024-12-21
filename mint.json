@@ -108,8 +108,8 @@
     {
       "group": "Translations & Customization",
       "pages": [
-        "docs/features/multilingual-banners",
-        "docs/features/ui-customization"
+        "docs/features/banner-designer",
+        "docs/features/multilingual-banners"   
       ]
     },
     {
