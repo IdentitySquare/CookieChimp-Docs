@@ -113,14 +113,14 @@
       ]
     },
     {
-      "group": "Translations & Customization",
+      "group": "Translations & Customisation",
       "pages": [
-        "docs/features/multilingual-banners",
-        "docs/features/ui-customization"
+        "docs/features/banner-designer",
+        "docs/features/multilingual-banners"   
       ]
     },
     {
-      "group": "Advanced Customization",
+      "group": "Advanced Customisation",
       "pages": [
         "docs/advanced/custom-css",
         "docs/advanced/callbacks-events"
