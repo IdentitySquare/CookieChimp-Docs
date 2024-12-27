@@ -12,7 +12,7 @@
     "thumbsRating": false
   },
   "favicon": "/favicon.png",
-  "theme": "quill",
+  "theme": "prism",
   "colors": {
     "primary": "#385be9",
     "light": "#3f79f6",
