@@ -1,0 +1,55 @@
+---
+title: "FAQ"
+icon: "circle-question"
+---
+
+### How do I verify if everything is working correctly?
+
+Go to "Settings" > "Consent Features" and enable Debug Mode.
+<img src="/images/faq/debug-mode.png" alt="Enable Debug Mode" />
+
+Now when a page view or consent is recorded, the banner will log the details in the browser console.
+<img src="/images/faq/console-logs.png" alt="Console Logs" />
+
+To ensure that the cookies are blocked and added when the consent is recorded, you can use the developer console of your browser.
+First, load your website after clearing all the current cookies on the browser or checking from a private browser window.
+After the site has been loaded, check the "Storage" tab in the browser console if any cookies have been set.
+<img src="/images/faq/browser-storage.png" alt="Cookies" />
+
+
+### Why aren't CookieChimp cookies marked as `HttpOnly`?
+
+`HttpOnly` cookies can only be used in server-side communication.
+Since the CookieChimp script is client-side code, in order for it to read these cookies, these cookies cannot be marked as `HttpOnly`.
+
+
+### Do we support cross-domain consent?
+
+No, we do not support cross-domain consent sharing.
+
+Cross Domain Consent is a type of consent where visitors’ consent preferences are recognised across multiple domains.
+To implement this feature, a third-party cookie must be installed and read from all associated domains.
+We do not support this feature as many browsers do not allow setting/sharing of third-party cookies.
+
+However, we do support consent sharing across subdomains when the same CookieChimp script is installed in the subdomain.
+This is enabled by default.
+
+
+### How can I obtain the consent ID?
+
+The consent ID is shown in the preferences modal of the banner.
+<img src="/images/faq/consent-id.png" alt="Consent ID" />
+
+### Can CookieChimp scan for cookies behind a login?
+
+Yes, our scanner can detect and identify cookies behind a login.
+This feature is only available on our custom plans. To configure this, please contact support.
+
+
+### How do I enable Global Privacy Control?
+
+Go to the "Integrations" page and enable the Global Privacy Control integration.
+<img src="/images/faq/gpc.png" alt="Enable Global Privacy Control" />
+
+Now if we detect a Global Privacy Control signal from the browser, the opt-out preferences will automatically be set.
+
