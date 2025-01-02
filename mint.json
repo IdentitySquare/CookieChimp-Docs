@@ -46,10 +46,6 @@
   },
   "tabs": [
     {
-      "name": "Advanced",
-      "url": "docs/advanced"
-    },
-    {
       "name": "API Reference",
       "url": "docs/api-reference"
     }
@@ -76,14 +72,7 @@
       "group": "Get Started",
       "pages": [
         "docs/overview",
-        {
-          "group": "Installation",
-          "pages": [
-            "docs/installation/installation",
-            "docs/installation/wordpress"
-          ],
-          "icon": "code"
-        },
+        "docs/installation/installation",
         {
           "group": "Block Scripts & Cookies",
           "pages": [
@@ -97,34 +86,35 @@
       ]
     },
     {
-      "group": "Record & Manage Consent",
+      "group": "Platform Specific Installations",
       "pages": [
-        "docs/features/identify-users",
-        "docs/features/block-iframes",
-        "docs/features/consent-records"
+        "docs/installation/google-tag-manager",
+        "docs/installation/shopify",
+        "docs/installation/single-page-applications",
+        "docs/installation/wordpress"
       ]
     },
     {
-      "group": "Scan & Organise Cookies",
-      "pages": [
-        "docs/features/vendor-scanning",
-        "docs/features/vendor-management",
-        "docs/features/wildcard-cookies",
-        "docs/features/vendor-list-embed"
-      ]
-    },
-    {
-      "group": "Translations & Customisation",
+      "group": "Features",
       "pages": [
         "docs/features/banner-designer",
-        "docs/features/multilingual-banners"   
+        "docs/features/multilingual-banners",
+        "docs/features/consent-records",
+        "docs/features/vendor-scanning",
+        "docs/features/vendor-management",
+        "docs/features/vendor-list-embed"
       ]
     },
     {
       "group": "Advanced Customisation",
       "pages": [
+        "docs/advanced/custom-update-consent-button",
+        "docs/advanced/wildcard-cookies",
         "docs/advanced/custom-css",
-        "docs/advanced/callbacks-events"
+        "docs/advanced/identify-users",
+        "docs/advanced/block-iframes",
+        "docs/advanced/callbacks-events",
+        "docs/advanced/custom-consent-banner"
       ]
     },
     {
