@@ -1,0 +1,253 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "CookieChimp Docs",
+  "colors": {
+    "primary": "#385be9",
+    "light": "#3f79f6",
+    "dark": "#385be9"
+  },
+  "styling": {
+    "eyebrows": "section"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude"],
+  },
+  "favicon": "/favicon.png",
+  "navigation": {
+    "dropdowns": [
+      {
+        "dropdown": "Documentation",
+        "icon": "book",
+        "description": "Setup CookieChimp",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "docs/overview",
+              {
+                "group": "Installation",
+                "icon": "code",
+                "pages": [
+                  "docs/installation/installation",
+                  "docs/installation/wordpress"
+                ]
+              },
+              {
+                "group": "Block Scripts & Cookies",
+                "icon": "traffic-cone",
+                "pages": [
+                  "docs/block-scripts-cookies/script-attributes",
+                  "docs/block-scripts-cookies/block-tags",
+                  "docs/block-scripts-cookies/callbacks-events"
+                ]
+              },
+              "docs/faq"
+            ]
+          },
+          {
+            "group": "Record & Manage Consent",
+            "pages": [
+              "docs/features/identify-users",
+              "docs/features/block-iframes",
+              "docs/features/consent-records"
+            ]
+          },
+          {
+            "group": "Scan & Organise Cookies",
+            "pages": [
+              "docs/features/vendor-scanning",
+              "docs/features/vendor-management",
+              "docs/features/wildcard-cookies",
+              "docs/features/vendor-list-embed"
+            ]
+          },
+          {
+            "group": "Translations & Customisation",
+            "pages": [
+              "docs/features/banner-designer",
+              "docs/features/multilingual-banners"
+            ]
+          },
+          {
+            "group": "Advanced Customisation",
+            "pages": [
+              "docs/advanced/custom-css",
+              "docs/advanced/callbacks-events"
+            ]
+          }
+        ]
+      },
+      {
+        "dropdown": "API Reference",
+        "icon": "terminal",
+        "description": "Reference for the API",
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "docs/api-reference/authentication"
+            ]
+          },
+          {
+            "group": "Account",
+            "pages": [
+              "docs/api-reference/account/list-accounts",
+              "docs/api-reference/account/get-account"
+            ]
+          },
+          {
+            "group": "Account Users",
+            "pages": [
+              "docs/api-reference/account-users/list-account-users",
+              "docs/api-reference/account-users/get-account-user",
+              "docs/api-reference/account-users/update-account-user",
+              "docs/api-reference/account-users/delete-account-user"
+            ]
+          },
+          {
+            "group": "Account Invitations",
+            "pages": [
+              "docs/api-reference/account-invitations/list-account-invitations",
+              "docs/api-reference/account-invitations/create-account-invitation",
+              "docs/api-reference/account-invitations/get-account-invitation",
+              "docs/api-reference/account-invitations/update-account-invitation",
+              "docs/api-reference/account-invitations/delete-account-invitation"
+            ]
+          },
+          {
+            "group": "AI Actions",
+            "pages": [
+              "docs/api-reference/ai-actions/list-ai-actions",
+              "docs/api-reference/ai-actions/get-ai-action"
+            ]
+          },
+          {
+            "group": "Storage Items",
+            "pages": [
+              "docs/api-reference/storage-items/list-storage-items",
+              "docs/api-reference/storage-items/create-storage-item",
+              "docs/api-reference/storage-items/get-storage-item",
+              "docs/api-reference/storage-items/update-storage-item",
+              "docs/api-reference/storage-items/delete-storage-item"
+            ]
+          },
+          {
+            "group": "Categories",
+            "pages": [
+              "docs/api-reference/categories/list-categories",
+              "docs/api-reference/categories/create-category",
+              "docs/api-reference/categories/get-category",
+              "docs/api-reference/categories/update-category",
+              "docs/api-reference/categories/delete-category"
+            ]
+          },
+          {
+            "group": "Consents",
+            "pages": [
+              "docs/api-reference/consents/list-consents",
+              "docs/api-reference/consents/get-consent"
+            ]
+          },
+          {
+            "group": "Groups",
+            "pages": [
+              "docs/api-reference/groups/list-groups",
+              "docs/api-reference/groups/get-group",
+              "docs/api-reference/groups/create-group",
+              "docs/api-reference/groups/update-group"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Quick Start",
+          "href": "https://cookiechimp.com/install",
+          "icon": "rocket",
+          "color": {
+            "light": "#9d59ef",
+            "dark": "#9d59ef"
+          }
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "api": {
+    "openapi": [
+      "openapi.yaml"
+    ]
+  },
+  "background": {
+    "color": {
+      "light": "#fafbfc",
+      "dark": "#1e1e1e"
+    }
+  },
+  "navbar": {
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://cookiechimp.com/users/sign_up"
+    }
+  },
+  "footer": {
+    "socials": {
+      "twitter": "https://twitter.com/danielpaulme",
+      "github": "https://github.com/IdentitySquare/CookieChimp-Docs"
+    },
+    "links": [
+      {
+        "header": "Product",
+        "items": [
+          {
+            "label": "Features",
+            "href": "https://cookiechimp.com/#features"
+          },
+          {
+            "label": "Integrations",
+            "href": "https://cookiechimp.com/#integrations"
+          },
+          {
+            "label": "Pricing",
+            "href": "https://cookiechimp.com/pricing"
+          }
+        ]
+      },
+      {
+        "header": "Company",
+        "items": [
+          {
+            "label": "About",
+            "href": "https://cookiechimp.com"
+          },
+          {
+            "label": "Blog",
+            "href": "https://cookiechimp.com/blog"
+          },
+          {
+            "label": "Contact",
+            "href": "https://cookiechimp.com"
+          }
+        ]
+      }
+    ]
+  },
+  "integrations": {
+    "pirsch": {
+      "id": "Vr5YSZNge2WlBW5CxGvi7U2UDRBNPCka"
+    },
+    "intercom": {
+      "appId": "r4jecam1"
+    }
+  }
+}
