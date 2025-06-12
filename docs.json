@@ -28,55 +28,40 @@
             "group": "Get Started",
             "pages": [
               "docs/overview",
-              {
-                "group": "Installation",
-                "icon": "code",
-                "pages": [
-                  "docs/installation/installation",
-                  "docs/installation/wordpress"
-                ]
-              },
-              {
-                "group": "Block Scripts & Cookies",
-                "icon": "traffic-cone",
-                "pages": [
-                  "docs/block-scripts-cookies/script-attributes",
-                  "docs/block-scripts-cookies/block-tags",
-                  "docs/block-scripts-cookies/callbacks-events"
-                ]
-              },
+              "docs/installation/installation",
+              "docs/block-scripts-cookies/script-attributes",
+              "docs/features/vendor-list-embed",
               "docs/faq"
             ]
           },
           {
-            "group": "Record & Manage Consent",
+            "group": "Platform Specific Installation",
             "pages": [
-              "docs/features/identify-users",
-              "docs/features/block-iframes",
-              "docs/features/consent-records"
+              "docs/installation/google-tag-manager",
+              "docs/installation/shopify",
+              "docs/installation/single-page-applications",
+              "docs/installation/wordpress"
             ]
           },
           {
-            "group": "Scan & Organise Cookies",
+            "group": "Features",
             "pages": [
+              "docs/features/consent-records",
               "docs/features/vendor-scanning",
               "docs/features/vendor-management",
-              "docs/features/wildcard-cookies",
-              "docs/features/vendor-list-embed"
-            ]
-          },
-          {
-            "group": "Translations & Customisation",
-            "pages": [
               "docs/features/banner-designer",
-              "docs/features/multilingual-banners"
+              "docs/features/multilingual-banners",
+              "docs/features/wildcard-cookies"
             ]
           },
           {
-            "group": "Advanced Customisation",
+            "group": "Advanced",
             "pages": [
+              "docs/features/block-iframes",
+              "docs/features/identify-users",
+              "docs/advanced/custom-update-consent-button",
               "docs/advanced/custom-css",
-              "docs/advanced/callbacks-events"
+              "docs/advanced/callbacks-events",
             ]
           }
         ]

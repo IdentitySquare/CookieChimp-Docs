@@ -1,7 +1,26 @@
 ---
-title: "Block Tags with Google Tag Manager"
-description: "Trigger tags based on user consent with Google Consent Mode v2."
+title: "Google Tag Manager"
+description: "Add CookieChimp with Google Tag Manager"
+icon: "google"
 ---
+
+Add your website's CookieChimp JS snippet in the `<head>` tag of your HTML. 
+
+<Warning>Do not add our HTML code via Google Tag Manager since we set the default consent states before Google Tag Manager runs.</Warning>
+
+<Info>
+  The CookieChimp script needs to be added at the top of the `<head>` section, so that it can run first, in order to ensure other scripts are only run based on consent.
+  If other scripts are added before, they may set cookies and other storage items before consent is granted.
+</Info>
+
+```html
+<script src="https://cookiechimp.com/widget/abc123.js"></script>
+```
+
+You need to replace `abc123` with your website's unique CookieChimp ID.
+
+
+# Block Tags with Google Tag Manager
 
 <Steps>
   <Step title="Enable Google Consent Mode">
@@ -59,8 +78,6 @@ This tag is now set up and will only fire when the required consent is granted.
   | analytics               | analytics_storage                            |
   | personalization         | personalization_storage                      |
 
-  These categories are setup by default.
-  When a user opts-in to a consent category or a Google service in the category is consented to, the linked Google consent type will change from 'denied' to 'granted' and vice versa.
+  These categories are setup by default. When a user opts-in to a consent category or a Google service in the category is consented to, the linked Google consent type will change from 'denied' to 'granted' and vice versa.
 
-  Apart from the default 7 consent types, we will also send the consent state of your services to Google.  
-  e.g. When a user consents to a service named "Hotjar", the consent for this service is updated as 'granted'.
+  Apart from the default 7 consent types, we will also send the consent state of your services to Google. e.g. When a user consents to a service named "Hotjar", the consent for this service is updated as 'granted'.
