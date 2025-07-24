@@ -46,10 +46,10 @@ If you are using [Turbo](https://turbo.hotwired.dev/handbook/building#persisting
 
 ## Callbacks & Events
 
-The `cc:onConsent` event can be used to execute code based on user consent.
+The `cc:onConsented` event can be used to execute code based on user consent.
 
 ```javascript
-window.addEventListener("cc:onConsent", function (event) {
+window.addEventListener("cc:onConsented", function (event) {
   if (CookieConsent.acceptedCategory("analytics")) {
     // "analytics" category enabled
   }
@@ -60,10 +60,10 @@ window.addEventListener("cc:onConsent", function (event) {
 });
 ```
 
-The `cc:onChange` event can be used to execute code when the user changes their consent.
+The `cc:onUpdate` event can be used to execute code when the user changes their consent.
 
 ```javascript
-window.addEventListener("cc:onChange", function (event) {
+window.addEventListener("cc:onUpdate", function (event) {
   var detail = event.detail;
 
   /**
