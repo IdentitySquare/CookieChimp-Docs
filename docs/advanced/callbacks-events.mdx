@@ -26,12 +26,12 @@ window.addEventListener("cc:onFirstConsent", function (event) {
 });
 ```
 
-### `cc:onConsent`
+### `cc:onConsented`
 
 This event is triggered the very first time the user expresses their choice of consent — just like `onFirstConsent` — but also on every subsequent page load.
 
 ```js
-window.addEventListener("cc:onConsent", function (event) {
+window.addEventListener("cc:onConsented", function (event) {
   var detail = event.detail;
   // detail.cookie
 
@@ -39,12 +39,12 @@ window.addEventListener("cc:onConsent", function (event) {
 });
 ```
 
-### `cc:onChange`
+### `cc:onUpdate`
 
 This event is triggered when the user modifies their preferences and only if consent has already been provided.
 
 ```js
-window.addEventListener("cc:onChange", function (event) {
+window.addEventListener("cc:onUpdate", function (event) {
   var detail = event.detail;
   /**
    * detail.cookie
