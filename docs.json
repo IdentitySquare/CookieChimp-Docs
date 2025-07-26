@@ -40,7 +40,8 @@
               "docs/installation/google-tag-manager",
               "docs/installation/shopify",
               "docs/installation/single-page-applications",
-              "docs/installation/wordpress"
+              "docs/installation/wordpress",
+              "docs/installation/webflow"
             ]
           },
           {
