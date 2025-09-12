@@ -1,10 +1,10 @@
 ---
 title: "Next.js"
-description: "Add CookieChimp to your Next.js application with minimal integration"
+description: "Add CookieChimp to your Next.js application"
 icon: "react"
 ---
 
-# Next.js + CookieChimp (Minimal Integration)
+# Next.js + CookieChimp
 
 This page shows the **simplest** way to add CookieChimp to a Next.js app and log whether a **specific service** (e.g., "Google Analytics" in the "analytics" category) is allowed.
 
@@ -59,9 +59,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ---
 
-## Step 2 — Add a minimal consent logger
+## Step 2 — Add a consent logger
 
-This tiny client component:
+If you need to take actions based on user consent (such as loading analytics scripts, tracking pixels, or other third-party services), this is where you'll implement that logic. If you're using Google Tag Manager, you can implement the GTM setup following our [Google Tag Manager integration guide](/docs/installation/google-tag-manager) for the same approach.
+
+This client component:
 
 * Checks if a **single service** is allowed (e.g., "Google Analytics" in "analytics")
 * Logs the result on initial load and on user updates
@@ -76,8 +78,12 @@ export default function ConsentLogger() {
     function logConsent() {
       // ✅ Service-level check
       // @ts-ignore
-      const allowed = !!window.CookieConsent?.acceptedService?.("Google Analytics", "analytics");
-      console.log(allowed ? "✅ Google Analytics allowed" : "❌ Google Analytics blocked");
+      const allowed = window.CookieConsent?.acceptedService?.("Google Analytics", "analytics");
+      if (allowed) {
+        console.log("✅ Google Analytics allowed");
+      } else {
+        console.log("❌ Google Analytics blocked");
+      }
     }
 
     // Run now + on changes
