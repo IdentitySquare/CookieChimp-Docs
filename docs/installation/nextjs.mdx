@@ -4,8 +4,6 @@ description: "Add CookieChimp to your Next.js application"
 icon: "react"
 ---
 
-# Next.js + CookieChimp
-
 This page shows the **simplest** way to add CookieChimp to a Next.js app and check whether a **specific service** (e.g., "Google Analytics" in the "analytics" category) has consent to take actions.
 
 ---
@@ -25,7 +23,7 @@ This page shows the **simplest** way to add CookieChimp to a Next.js app and che
 
 ---
 
-## Step 1 — Load CookieChimp in `<head>` first
+## Step 1 - Load CookieChimp in `<head>` first
 
 Use Next.js `<Script>` with `strategy="beforeInteractive"` so CookieChimp runs **before hydration**.
 
@@ -59,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ---
 
-## Step 2 — Add a consent logger
+## Step 2 - Add a consent logger
 
 If you need to take actions based on user consent (such as loading analytics scripts, tracking pixels, or other third-party services), this is where you'll implement that logic. If you're using Google Tag Manager, you can implement the GTM setup following our [Google Tag Manager integration guide](/docs/installation/google-tag-manager) for the same approach.
 
@@ -107,7 +105,7 @@ export default function ConsentLogger() {
 
 ---
 
-## Step 3 — Use the logger on your page
+## Step 3 - Use the logger on your page
 
 Drop the logger onto any page (or mount once in `app/layout.tsx` if you prefer a global listener).
 
