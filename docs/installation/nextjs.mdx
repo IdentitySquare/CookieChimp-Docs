@@ -1,0 +1,193 @@
+---
+title: "Next.js"
+description: "Add CookieChimp to your Next.js application with minimal integration"
+icon: "react"
+---
+
+# Next.js + CookieChimp (Minimal Integration)
+
+This page shows the **simplest** way to add CookieChimp to a Next.js app and log whether a **specific service** (e.g., "Google Analytics" in the "analytics" category) is allowed.
+
+---
+
+## Prerequisites
+
+- **Next.js (App Router)** project (`app/` directory).
+- Your CookieChimp **Site ID** (replace `YOUR_SITE_ID` below).
+
+---
+
+## What You'll Build
+
+1) Load the CookieChimp script **first** in `<head>`  
+2) Add the required **trigger container**  
+3) Listen for consent and **log** if a service is allowed
+
+---
+
+## Step 1 — Load CookieChimp in `<head>` first
+
+Use Next.js `<Script>` with `strategy="beforeInteractive"` so CookieChimp runs **before hydration**.
+
+```tsx
+// app/layout.tsx
+import Script from "next/script";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        {/* CookieChimp script MUST load first */}
+        <Script
+          src="https://cookiechimp.com/widget/YOUR_SITE_ID.js"
+          strategy="beforeInteractive"
+        />
+      </head>
+      <body>
+        {/* Required container for privacy trigger */}
+        <div id="cookiechimp-container" />
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+<Warning>
+  Replace `YOUR_SITE_ID` with your actual CookieChimp Site ID from your dashboard.
+</Warning>
+
+---
+
+## Step 2 — Add a minimal consent logger
+
+This tiny client component:
+
+* Checks if a **single service** is allowed (e.g., "Google Analytics" in "analytics")
+* Logs the result on initial load and on user updates
+
+```tsx
+// app/consent-logger.tsx
+"use client";
+import { useEffect } from "react";
+
+export default function ConsentLogger() {
+  useEffect(() => {
+    function logConsent() {
+      // ✅ Service-level check
+      // @ts-ignore
+      const allowed = !!window.CookieConsent?.acceptedService?.("Google Analytics", "analytics");
+      console.log(allowed ? "✅ Google Analytics allowed" : "❌ Google Analytics blocked");
+    }
+
+    // Run now + on changes
+    logConsent();
+    window.addEventListener("cc:onConsented", logConsent);
+    window.addEventListener("cc:onUpdate", logConsent);
+
+    return () => {
+      window.removeEventListener("cc:onConsented", logConsent);
+      window.removeEventListener("cc:onUpdate", logConsent);
+    };
+  }, []);
+
+  return null;
+}
+```
+
+<Info>
+  Replace `"Google Analytics"` and `"analytics"` with the **exact service** and **category** names you configured in CookieChimp.
+</Info>
+
+---
+
+## Step 3 — Use the logger on your page
+
+Drop the logger onto any page (or mount once in `app/layout.tsx` if you prefer a global listener).
+
+```tsx
+// app/page.tsx
+"use client";
+import ConsentLogger from "./consent-logger";
+
+export default function HomePage() {
+  return (
+    <div>
+      <ConsentLogger />
+      <h1>Welcome to My Next.js App</h1>
+      <p>Check the console to see consent status logs.</p>
+    </div>
+  );
+}
+```
+
+---
+
+## Verify
+
+1. Start your app and **open the homepage**.
+2. **Open DevTools → Console**.
+3. Interact with the Cookie banner (Accept / Deny / Update preferences).
+4. You should see logs:
+
+   * `✅ Google Analytics allowed`
+   * `❌ Google Analytics blocked`
+
+---
+
+## Notes & Tips
+
+* **Service vs Category**: use `acceptedService("Service", "Category")` for granular control.
+* **Already Consented Users**: the logger runs once on mount to catch prior consent, and again on `cc:onConsented` / `cc:onUpdate`.
+* **Production**: replace `console.log` with your real actions (e.g., loading pixels/SDKs) **only after consent**.
+
+---
+
+## Pages Router?
+
+If you're on the **Pages Router**, place the `<Script>` tag in `pages/_document.tsx` within `<Head>`, keep the `<div id="cookiechimp-container" />` in `pages/_app.tsx`, and use the same `ConsentLogger`.
+
+### Pages Router Example
+
+```tsx
+// pages/_document.tsx
+import { Html, Head, Main, NextScript } from 'next/document'
+import Script from 'next/script'
+
+export default function Document() {
+  return (
+    <Html>
+      <Head>
+        <Script
+          src="https://cookiechimp.com/widget/YOUR_SITE_ID.js"
+          strategy="beforeInteractive"
+        />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  )
+}
+```
+
+```tsx
+// pages/_app.tsx
+import type { AppProps } from 'next/app'
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <div id="cookiechimp-container" />
+      <Component {...pageProps} />
+    </>
+  )
+}
+```
+
+---
+
+## Advanced Usage
+
+For more advanced integration patterns, including category-level consent checking and custom consent buttons, see our [JavaScript & SPA guide](/docs/installation/single-page-applications).

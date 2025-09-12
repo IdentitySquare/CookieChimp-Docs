@@ -38,6 +38,7 @@
             "group": "Platform Specific Installation",
             "pages": [
               "docs/installation/google-tag-manager",
+              "docs/installation/nextjs",
               "docs/installation/shopify",
               "docs/installation/single-page-applications",
               "docs/installation/wordpress"
