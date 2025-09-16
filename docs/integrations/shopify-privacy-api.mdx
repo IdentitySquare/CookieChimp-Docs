@@ -1,0 +1,145 @@
+---
+title: "Shopify Customer Privacy API"
+description: "Sync consent preferences directly with your Shopify store"
+icon: "shopify"
+---
+
+The Shopify Customer Privacy API integration allows CookieChimp to communicate user consent preferences directly with Shopify's privacy framework. This ensures that your Shopify store's tracking, analytics, and marketing features respect customer privacy choices while maintaining compliance with privacy regulations.
+
+## What is Shopify Customer Privacy API?
+
+Shopify's Customer Privacy API is a framework that allows apps and themes to:
+
+- **Respect customer consent** for data collection and tracking
+- **Manage privacy preferences** across Shopify's ecosystem
+- **Integrate with privacy tools** like CookieChimp
+- **Maintain compliance** with privacy regulations
+
+## How It Works with CookieChimp
+
+The integration creates a seamless connection between CookieChimp and Shopify:
+
+1. **Consent Collection**: CookieChimp gathers customer consent preferences
+2. **API Communication**: Consent status is sent to Shopify's Privacy API
+3. **Store-wide Application**: Shopify apps and features respect the consent choices
+4. **Real-time Updates**: Changes in consent are immediately reflected in Shopify
+
+<CardGroup cols={2}>
+  <Card title="Analytics Tracking" icon="chart-bar">
+    Control Shopify analytics and reporting based on consent
+  </Card>
+  
+  <Card title="Marketing Features" icon="megaphone">
+    Manage email marketing and ad tracking consent
+  </Card>
+  
+  <Card title="Third-party Apps" icon="puzzle-piece">
+    Ensure Shopify apps respect customer privacy choices
+  </Card>
+  
+  <Card title="Checkout Experience" icon="shopping-cart">
+    Apply privacy preferences throughout the purchase flow
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+Before enabling Shopify Customer Privacy API integration:
+
+- **Shopify store** with appropriate plan and privacy features enabled
+- **CookieChimp Shopify app** installed on your store
+- **Privacy categories** configured in CookieChimp for e-commerce tracking
+
+<Info>
+  The Shopify Customer Privacy API is available on Shopify Plus stores and supported themes. Check with Shopify support if you're unsure about compatibility.
+</Info>
+
+## How to Enable Shopify Privacy API Integration
+
+<Steps>
+  <Step title="Install CookieChimp Shopify App">
+    Install the CookieChimp app from the Shopify App Store or through your CookieChimp dashboard.
+  </Step>
+
+  <Step title="Configure App Permissions">
+    Grant the necessary permissions for the app to access Shopify's Customer Privacy API.
+  </Step>
+
+  <Step title="Enable Integration">
+    In your CookieChimp dashboard:
+    - Go to the **Integrations** page
+    - Find "Shopify Customer Privacy API"
+    - Toggle the integration on
+  </Step>
+
+  <Step title="Configure Consent Categories">
+    Map CookieChimp consent categories to Shopify privacy preferences:
+    - **Analytics**: Shopify analytics and reporting
+    - **Marketing**: Email marketing and ad tracking
+    - **Functional**: Essential store functionality
+  </Step>
+
+  <Step title="Test the Integration">
+    Verify the integration by:
+    - Testing different consent scenarios on your store
+    - Checking Shopify analytics for consent-aware data
+    - Verifying third-party apps respect consent choices
+  </Step>
+</Steps>
+
+## Consent Categories and Shopify Features
+
+| CookieChimp Category | Shopify Feature | Consented Behavior | Declined Behavior |
+|---------------------|----------------|-------------------|-------------------|
+| **Analytics** | Shopify Analytics | Full analytics tracking | Limited analytics |
+| **Marketing** | Email Marketing | Marketing pixels and tracking | No marketing tracking |
+| **Advertising** | Ad Tracking | Facebook Pixel, Google Ads | No ad tracking |
+| **Functional** | Store Features | Cart abandonment, recommendations | Basic functionality only |
+
+## Shopify App Ecosystem Integration
+
+### Supported Apps
+When consent is properly configured, these types of Shopify apps automatically respect customer preferences:
+
+- **Analytics Apps**: Google Analytics, Facebook Pixel, etc.
+- **Marketing Apps**: Klaviyo, Mailchimp, SMS marketing tools
+- **Review Apps**: Product review and rating systems
+- **Personalization Apps**: Product recommendation engines
+
+### App Behavior by Consent Status
+
+#### With Marketing Consent
+- Email marketing apps can send promotional emails
+- Ad tracking pixels fire normally
+- Customer behavior tracking is enabled
+- Personalized product recommendations work
+
+#### Without Marketing Consent
+- Only transactional emails are sent
+- No ad tracking pixels
+- Limited behavior tracking
+- Basic product recommendations only
+
+## Verification and Testing
+
+### Using Shopify Admin
+1. **Open Shopify Admin** dashboard
+2. **Check Analytics** section for consent-aware data
+3. **Review Customer Privacy** settings
+4. **Verify app behavior** matches consent choices
+
+### Testing Customer Journey
+1. **Place test orders** with different consent choices
+2. **Check email marketing** enrollment based on consent
+3. **Verify analytics tracking** in Shopify reports
+4. **Test third-party app** behavior
+
+### Using Browser Developer Tools
+1. **Monitor network requests** to Shopify APIs
+2. **Check for privacy API calls** when consent changes
+3. **Verify tracking pixels** fire only with consent
+4. **Review local storage** for consent preferences
+
+<Info>
+  Shopify Customer Privacy API integration works automatically once enabled. The integration handles all consent communication without requiring additional theme modifications.
+</Info>

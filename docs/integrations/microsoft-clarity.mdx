@@ -1,0 +1,110 @@
+---
+title: "Microsoft Clarity Consent Mode"
+description: "Ensure session recordings respect user consent preferences"
+icon: "microsoft"
+---
+
+Microsoft Clarity Consent Mode integration enables CookieChimp to communicate user consent preferences to Microsoft Clarity, ensuring that session recordings and user analytics respect visitor privacy choices. This integration helps maintain compliance while preserving valuable user behavior insights.
+
+## What is Microsoft Clarity?
+
+Microsoft Clarity is a free user behavior analytics tool that provides:
+
+- **Session recordings** of user interactions
+- **Heatmaps** showing click and scroll patterns
+- **User journey analysis** and funnel tracking
+- **Performance insights** for website optimization
+
+## How Consent Mode Works
+
+When integrated with CookieChimp, Microsoft Clarity Consent Mode:
+
+1. **Receives consent status** from CookieChimp in real-time
+2. **Adjusts data collection** based on user preferences
+3. **Respects privacy choices** for session recordings
+4. **Maintains compliance** with privacy regulations
+
+<CardGroup cols={2}>
+  <Card title="Session Recordings" icon="video">
+    Control whether user sessions are recorded based on consent
+  </Card>
+  
+  <Card title="Heatmap Data" icon="fire">
+    Manage heatmap data collection according to user preferences
+  </Card>
+  
+  <Card title="Analytics Tracking" icon="chart-bar">
+    Adjust analytics collection based on consent status
+  </Card>
+  
+  <Card title="Privacy Compliance" icon="shield-check">
+    Ensure all Clarity features respect user privacy choices
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+Before enabling Microsoft Clarity Consent Mode:
+
+- **Microsoft Clarity account** with your website configured
+- **Clarity tracking code** properly installed on your website
+- **CookieChimp analytics category** configured for user consent
+
+## How to Enable Microsoft Clarity Integration
+
+<Steps>
+  <Step title="Access Integrations Dashboard">
+    Navigate to the **Integrations** page in your CookieChimp dashboard.
+  </Step>
+
+  <Step title="Locate Microsoft Clarity">
+    Find the "Microsoft Clarity Consent Mode" integration card.
+  </Step>
+
+  <Step title="Enable the Integration">
+    Toggle the integration on to activate consent mode.
+  </Step>
+
+  <Step title="Verify Configuration">
+    Ensure your Microsoft Clarity tracking code is properly installed and configured.
+  </Step>
+
+  <Step title="Test Consent Handling">
+    Test the integration by:
+    - Changing consent preferences on your website
+    - Checking Clarity dashboard for consent-aware data collection
+    - Verifying session recordings respect user choices
+  </Step>
+</Steps>
+
+## Consent Categories and Clarity Features
+
+| Consent Category | Clarity Feature | Behavior When Consented | Behavior When Declined |
+|-----------------|----------------|----------------------|----------------------|
+| **Analytics** | Session Recordings | Full session capture | No recordings |
+| **Analytics** | Heatmaps | Click and scroll tracking | No heatmap data |
+| **Analytics** | User Insights | Behavior analysis | No user tracking |
+| **Functional** | Basic Metrics | Page views and errors | Limited functionality data |
+
+## Verification and Testing
+
+### Using Microsoft Clarity Dashboard
+1. **Open your Clarity dashboard**
+2. **Check the Settings** > **Setup** section
+3. **Look for consent mode status** indicators
+4. **Verify data collection** reflects consent choices
+
+### Using CookieChimp Debug Mode
+1. **Enable Debug Mode** in CookieChimp settings
+2. **Change analytics consent** on your website
+3. **Monitor browser console** for Clarity API calls
+4. **Confirm consent updates** are being sent to Clarity
+
+### Testing Consent Scenarios
+- **Full consent**: Verify all Clarity features are active
+- **Analytics denied**: Confirm no session recordings or heatmaps
+- **Consent withdrawn**: Test that data collection stops immediately
+
+<Info>
+  Microsoft Clarity Consent Mode works automatically once enabled. The integration handles all consent communication without requiring additional configuration.
+</Info>
