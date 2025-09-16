@@ -6,12 +6,21 @@ icon: "react"
 
 This page shows the **simplest** way to add CookieChimp to a Next.js app and check whether a **specific service** (e.g., "Google Analytics" in the "analytics" category) has consent to take actions.
 
+<Info>
+  **Important Setup Notes**: Before following this guide, ensure you have your correct **Account ID** (Site ID) from your CookieChimp dashboard. If you're testing on `localhost`, make sure to add `localhost` to the **Additional Domains** in your Account Settings > General, otherwise the banner will not show during local development.
+</Info>
+
+<Tip>
+  Looking for a complete example? Check out our [Next.js example implementation](https://github.com/IdentitySquare/cookiechimp-nextjs-example) on GitHub for a working reference.
+</Tip>
+
 ---
 
 ## Prerequisites
 
 - **Next.js (App Router)** project (`app/` directory).
-- Your CookieChimp **Site ID** (replace `YOUR_SITE_ID` below).
+- Your CookieChimp **Account ID** (also called Site ID - replace `YOUR_SITE_ID` below).
+- If testing locally: `localhost` added to **Additional Domains** in Account Settings > General.
 
 ---
 
@@ -52,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 <Warning>
-  Replace `YOUR_SITE_ID` with your actual CookieChimp Site ID from your dashboard.
+  Replace `YOUR_SITE_ID` with your actual CookieChimp Account ID (Site ID) from your dashboard.
 </Warning>
 
 ---
