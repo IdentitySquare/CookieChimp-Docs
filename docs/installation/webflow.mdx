@@ -9,10 +9,7 @@ icon: "browsers"
     In your Webflow dashboard, navigate to your project settings:
 
     1. Go to **Project Settings** > **Custom Code**
-    <img src="/images/webflow/webflow-project-settings.png" alt="Webflow Project Settings navigation" />
-    
     2. In the **Head Code** section, add your CookieChimp script:
-    <img src="/images/webflow/webflow-custom-code-head.png" alt="Webflow Custom Code Head section" />
 
     <Info>
       The CookieChimp script needs to be added in the Head Code section so that it loads first, before other scripts. This ensures other scripts only run based on user consent.
@@ -32,7 +29,6 @@ icon: "browsers"
 
     1. In the **Webflow Designer**, add a **Div Block** where you want the privacy trigger to appear
     2. Set the Div Block's **ID** to `cookiechimp-container` in the Element Settings panel
-    <img src="/images/webflow/webflow-element-id-setting.png" alt="Setting element ID in Webflow Designer" />
     3. This div will host the floating privacy icon, allowing users to update their preferences
 
     <Note>
@@ -47,7 +43,6 @@ icon: "browsers"
     2. In the Element Settings panel, add a **Custom Attribute**:
        - **Name**: `data-cc`
        - **Value**: `show-preferencesModal`
-    <img src="/images/webflow/webflow-custom-attribute.png" alt="Adding custom attributes in Webflow" />
 
     This allows users to manage their cookie preferences through your custom UI elements.
 
