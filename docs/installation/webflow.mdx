@@ -1,0 +1,105 @@
+---
+title: "Webflow"
+description: "Add CookieChimp to your Webflow site"
+icon: "browsers"
+---
+
+<Steps>
+  <Step title="Add CookieChimp Script to Site Settings">
+    In your Webflow dashboard, navigate to your project settings:
+
+    1. Go to **Project Settings** > **Custom Code**
+    2. In the **Head Code** section, add your CookieChimp script:
+
+    <Info>
+      The CookieChimp script needs to be added in the Head Code section so that it loads first, before other scripts. This ensures other scripts only run based on user consent.
+    </Info>
+
+    ```html
+    <script src="https://cookiechimp.com/widget/abc123.js"></script>
+    ```
+
+    Replace `abc123` with your unique CookieChimp Account ID from your [CookieChimp dashboard](https://cookiechimp.com/dashboard).
+
+    3. Click **Save Changes**
+  </Step>
+
+  <Step title="Add Privacy Trigger Container (Optional)">
+    If you want to customize where the privacy trigger (floating icon) appears, you can add a specific container element:
+
+    1. In the **Webflow Designer**, add a **Div Block** where you want the privacy trigger to appear
+    2. Set the Div Block's **ID** to `cookiechimp-container` in the Element Settings panel
+    3. This div will host the floating privacy icon, allowing users to update their preferences
+
+    <Note>
+      If you don't add this container, CookieChimp will automatically place the privacy trigger in an appropriate location.
+    </Note>
+  </Step>
+
+  <Step title="Configure Custom Consent Button (Optional)">
+    You can add custom buttons or links to open the consent preferences modal:
+
+    1. Select any **Button** or **Link** element in the Designer
+    2. In the Element Settings panel, add a **Custom Attribute**:
+       - **Name**: `data-cc`
+       - **Value**: `show-preferencesModal`
+
+    This allows users to manage their cookie preferences through your custom UI elements.
+
+    ```html
+    <!-- Example of what gets generated -->
+    <button data-cc="show-preferencesModal">
+      Manage Cookie Preferences
+    </button>
+    ```
+  </Step>
+
+  <Step title="Publish Your Site">
+    1. Click **Publish** in the top-right corner of the Designer
+    2. Select your domain and publish the changes
+    3. The CookieChimp consent banner will now appear on your live site
+
+    <Info>
+      Make sure your domain is added to the **Additional Domains** section in your CookieChimp Account Settings > General if you're using a custom domain.
+    </Info>
+  </Step>
+</Steps>
+
+## Webflow-Specific Considerations
+
+### Custom Code Limitations
+- Webflow's custom code is applied site-wide. If you need page-specific consent handling, consider using Webflow's conditional visibility features
+- Custom code in Webflow is processed during site publishing, so changes require republishing your site
+
+### E-commerce Integration
+For Webflow E-commerce sites:
+- CookieChimp will automatically handle e-commerce tracking scripts based on user consent
+- Ensure your analytics and marketing pixels are properly categorized in your CookieChimp dashboard
+- Consider enabling the **E-commerce** category in your banner settings for commerce-specific cookies
+
+### CMS Collections
+If you're using Webflow CMS:
+- The CookieChimp script will work across all CMS template pages
+- Dynamic content loading will respect user consent preferences
+- No additional configuration needed for CMS-generated pages
+
+## Troubleshooting
+
+**Banner not showing:**
+- Verify your Account ID is correct in the script tag
+- Check that your domain is allowed in CookieChimp Account Settings
+- Ensure the script is in the **Head Code** section, not Footer Code
+
+**Script conflicts:**
+- If you have other analytics or tracking scripts in custom code, ensure CookieChimp loads first
+- Move other tracking scripts to the **Footer Code** section or use CookieChimp's script management features
+
+**Custom styling issues:**
+- Use CookieChimp's Banner Designer for visual customization
+- For advanced CSS customization, add custom styles to your Webflow project's custom CSS
+
+## Need Help?
+
+<Note>
+  If you encounter any issues or need assistance with your Webflow integration, please contact us through the chat widget in your CookieChimp dashboard.
+</Note>
