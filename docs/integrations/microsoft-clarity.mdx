@@ -1,0 +1,224 @@
+---
+title: "Microsoft Clarity Consent Mode"
+description: "Ensure session recordings respect user consent preferences"
+icon: "microsoft"
+---
+
+Microsoft Clarity Consent Mode integration enables CookieChimp to communicate user consent preferences to Microsoft Clarity, ensuring that session recordings and user analytics respect visitor privacy choices. This integration helps maintain compliance while preserving valuable user behavior insights.
+
+## What is Microsoft Clarity?
+
+Microsoft Clarity is a free user behavior analytics tool that provides:
+
+- **Session recordings** of user interactions
+- **Heatmaps** showing click and scroll patterns
+- **User journey analysis** and funnel tracking
+- **Performance insights** for website optimization
+
+## How Consent Mode Works
+
+When integrated with CookieChimp, Microsoft Clarity Consent Mode:
+
+1. **Receives consent status** from CookieChimp in real-time
+2. **Adjusts data collection** based on user preferences
+3. **Respects privacy choices** for session recordings
+4. **Maintains compliance** with privacy regulations
+
+<CardGroup cols={2}>
+  <Card title="Session Recordings" icon="video">
+    Control whether user sessions are recorded based on consent
+  </Card>
+  
+  <Card title="Heatmap Data" icon="fire">
+    Manage heatmap data collection according to user preferences
+  </Card>
+  
+  <Card title="Analytics Tracking" icon="chart-bar">
+    Adjust analytics collection based on consent status
+  </Card>
+  
+  <Card title="Privacy Compliance" icon="shield-check">
+    Ensure all Clarity features respect user privacy choices
+  </Card>
+</CardGroup>
+
+## Benefits of Microsoft Clarity Integration
+
+### Privacy Benefits
+- **Granular Control**: Users can opt-out of session recordings specifically
+- **Real-time Updates**: Consent changes are applied immediately
+- **Transparent Data Collection**: Clear communication about what's being tracked
+
+### Analytics Benefits
+- **Continued Insights**: Maintain analytics for consenting users
+- **Quality Data**: Focus on users who've opted in for better insights
+- **Compliance-First Analytics**: Build user behavior insights responsibly
+
+### Technical Benefits
+- **Automatic Integration**: No manual coding required for consent handling
+- **Seamless Updates**: Consent changes are communicated automatically
+- **Debugging Support**: Clear logging for troubleshooting
+
+## Prerequisites
+
+Before enabling Microsoft Clarity Consent Mode:
+
+- **Microsoft Clarity account** with your website configured
+- **Clarity tracking code** properly installed on your website
+- **CookieChimp analytics category** configured for user consent
+
+## How to Enable Microsoft Clarity Integration
+
+<Steps>
+  <Step title="Access Integrations Dashboard">
+    Navigate to the **Integrations** page in your CookieChimp dashboard.
+  </Step>
+
+  <Step title="Locate Microsoft Clarity">
+    Find the "Microsoft Clarity Consent Mode" integration card.
+  </Step>
+
+  <Step title="Enable the Integration">
+    Toggle the integration on to activate consent mode.
+  </Step>
+
+  <Step title="Verify Configuration">
+    Ensure your Microsoft Clarity tracking code is properly installed and configured.
+  </Step>
+
+  <Step title="Test Consent Handling">
+    Test the integration by:
+    - Changing consent preferences on your website
+    - Checking Clarity dashboard for consent-aware data collection
+    - Verifying session recordings respect user choices
+  </Step>
+</Steps>
+
+## Technical Implementation
+
+The integration automatically manages consent for Microsoft Clarity:
+
+```javascript
+// CookieChimp automatically handles consent for Clarity
+window.addEventListener('cc:onConsented', function(event) {
+  if (CookieConsent.acceptedCategory('analytics')) {
+    // Microsoft Clarity tracking enabled
+    // Session recordings and heatmaps active
+  } else {
+    // Microsoft Clarity tracking disabled
+    // No session recordings or data collection
+  }
+});
+
+// Consent updates are handled automatically
+window.addEventListener('cc:onUpdate', function(event) {
+  // Clarity consent mode adjusts in real-time
+  // No additional code required
+});
+```
+
+## Consent Categories and Clarity Features
+
+| Consent Category | Clarity Feature | Behavior When Consented | Behavior When Declined |
+|-----------------|----------------|----------------------|----------------------|
+| **Analytics** | Session Recordings | Full session capture | No recordings |
+| **Analytics** | Heatmaps | Click and scroll tracking | No heatmap data |
+| **Analytics** | User Insights | Behavior analysis | No user tracking |
+| **Functional** | Basic Metrics | Page views and errors | Limited functionality data |
+
+## Verification and Testing
+
+### Using Microsoft Clarity Dashboard
+1. **Open your Clarity dashboard**
+2. **Check the Settings** > **Setup** section
+3. **Look for consent mode status** indicators
+4. **Verify data collection** reflects consent choices
+
+### Using CookieChimp Debug Mode
+1. **Enable Debug Mode** in CookieChimp settings
+2. **Change analytics consent** on your website
+3. **Monitor browser console** for Clarity API calls
+4. **Confirm consent updates** are being sent to Clarity
+
+### Testing Consent Scenarios
+- **Full consent**: Verify all Clarity features are active
+- **Analytics denied**: Confirm no session recordings or heatmaps
+- **Consent withdrawn**: Test that data collection stops immediately
+
+<Info>
+  Microsoft Clarity Consent Mode works automatically once enabled. The integration handles all consent communication without requiring additional configuration.
+</Info>
+
+## Privacy and Compliance
+
+### GDPR Compliance
+- Session recordings require explicit consent
+- Users can withdraw consent at any time
+- Data collection stops immediately when consent is withdrawn
+
+### CCPA Compliance
+- Supports "Do Not Sell" preferences
+- Provides clear opt-out mechanisms
+- Maintains transparency about data collection
+
+### Data Protection
+- **Anonymization**: Clarity can anonymize sensitive data
+- **Data Retention**: Respect user preferences for data storage
+- **Geographic Controls**: Apply regional privacy requirements
+
+## Best Practices
+
+### Implementation
+- **Clear Consent Language**: Explain what Microsoft Clarity does in your consent banner
+- **Granular Options**: Allow users to consent to analytics separately from other categories
+- **Regular Testing**: Verify consent handling works correctly after website updates
+
+### Privacy Communication
+- **Privacy Policy Updates**: Mention Microsoft Clarity and consent handling
+- **User Education**: Help users understand what session recordings involve
+- **Transparency**: Be clear about how Clarity data is used
+
+### Monitoring
+- **Consent Rates**: Track how many users consent to analytics
+- **Data Quality**: Monitor the impact of consent on your analytics insights
+- **Compliance Audits**: Regularly verify consent handling is working correctly
+
+## Troubleshooting
+
+### Common Issues
+- **Clarity still tracking without consent**: Check if integration is properly enabled
+- **Missing consent signals**: Verify Clarity tracking code installation
+- **Delayed consent updates**: Check network connectivity and browser console
+
+### Debug Steps
+1. **Check Clarity Setup**: Verify tracking code is correctly implemented
+2. **Review CookieChimp Logs**: Look for Clarity API communication
+3. **Test Different Browsers**: Ensure consistent behavior across browsers
+4. **Monitor Clarity Dashboard**: Check for real-time consent status updates
+
+### Support Resources
+- Microsoft Clarity documentation
+- CookieChimp support for integration issues
+- Browser developer tools for debugging
+
+## Advanced Configuration
+
+### Custom Consent Categories
+If you use custom consent categories, you can map them to Clarity features:
+
+- Map specific categories to different Clarity features
+- Configure regional compliance requirements
+- Set up advanced consent scenarios
+
+### Enterprise Features
+For enterprise users:
+- **Advanced consent reporting** in Clarity dashboard
+- **Multi-domain consent** synchronization
+- **Custom data retention** policies based on consent
+
+## Related Documentation
+
+- [Microsoft Clarity Setup Guide](https://docs.microsoft.com/en-us/clarity/)
+- [CookieChimp Analytics Configuration](/docs/features/vendor-management)
+- [Consent Categories Setup](/docs/features/banner-designer)
+- [Privacy Compliance Guide](/docs/features/consent-records)

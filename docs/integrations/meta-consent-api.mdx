@@ -1,0 +1,187 @@
+---
+title: "Meta Consent API"
+description: "Communicate user consent status to Meta for compliant ad tracking"
+icon: "meta"
+---
+
+The Meta Consent API integration allows CookieChimp to communicate user consent status directly to Meta (Facebook and Instagram) services. This ensures that Meta's advertising and analytics tools respect user privacy preferences and maintain compliance with privacy regulations.
+
+## What is Meta Consent API?
+
+Meta Consent API is a system that allows websites to programmatically communicate user consent preferences to Meta's advertising platform. This enables:
+
+- **Compliant ad tracking** based on user consent
+- **Proper data handling** according to privacy choices
+- **Optimized ad delivery** while respecting privacy preferences
+- **Regulatory compliance** with GDPR, CCPA, and other privacy laws
+
+## How It Works with CookieChimp
+
+When integrated with CookieChimp, the Meta Consent API:
+
+1. **Receives consent updates** when users change their preferences
+2. **Communicates with Meta services** about consent status
+3. **Adjusts tracking behavior** based on user choices
+4. **Maintains compliance** across Meta's advertising ecosystem
+
+<CardGroup cols={2}>
+  <Card title="Facebook Pixel" icon="facebook">
+    Ensures Facebook Pixel respects user consent for tracking
+  </Card>
+  
+  <Card title="Instagram Tracking" icon="instagram">
+    Manages Instagram-related tracking based on consent
+  </Card>
+  
+  <Card title="Meta Ads Manager" icon="chart-line">
+    Communicates consent for advertising attribution
+  </Card>
+  
+  <Card title="Conversions API" icon="exchange-alt">
+    Handles server-side tracking consent status
+  </Card>
+</CardGroup>
+
+## Benefits of Meta Consent API Integration
+
+### Compliance Benefits
+- **GDPR Compliance**: Automatically handle consent for EU users
+- **CCPA Compliance**: Respect California privacy rights
+- **Global Privacy**: Maintain consistent privacy practices worldwide
+
+### Technical Benefits
+- **Automatic Updates**: Consent changes are communicated in real-time
+- **Reduced Errors**: Eliminates manual consent management
+- **Better Attribution**: Maintains tracking accuracy while respecting privacy
+
+### Business Benefits
+- **Continued Ad Performance**: Optimize campaigns within privacy constraints
+- **User Trust**: Demonstrate commitment to privacy protection
+- **Legal Protection**: Reduce compliance risks
+
+## Prerequisites
+
+Before enabling Meta Consent API integration:
+
+- **Meta Business Manager account** with appropriate permissions
+- **Facebook Pixel or Conversions API** implemented on your website
+- **CookieChimp categories** configured for social media/advertising consent
+
+## How to Enable Meta Consent API Integration
+
+<Steps>
+  <Step title="Navigate to Integrations">
+    Go to the **Integrations** page in your CookieChimp dashboard.
+  </Step>
+
+  <Step title="Find Meta Consent API">
+    Locate the "Meta Consent API" integration in the available integrations section.
+  </Step>
+
+  <Step title="Enable the Integration">
+    Click on the integration card and toggle it on.
+  </Step>
+
+  <Step title="Configure Settings">
+    If required, configure any additional settings such as:
+    - Meta Pixel ID verification
+    - Consent mapping preferences
+    - Regional compliance settings
+  </Step>
+
+  <Step title="Test the Integration">
+    Verify the integration is working by:
+    - Checking Meta Events Manager for consent signals
+    - Testing with different consent choices
+    - Monitoring debug logs in CookieChimp
+  </Step>
+</Steps>
+
+## Technical Implementation
+
+The integration automatically handles consent communication:
+
+```javascript
+// When user consent changes
+window.addEventListener('cc:onUpdate', function(event) {
+  // Meta Consent API automatically receives:
+  // - Consent status for advertising
+  // - Consent status for analytics
+  // - User preference updates
+  
+  // Meta services adjust behavior accordingly
+});
+```
+
+## Consent Mapping
+
+CookieChimp maps consent categories to Meta services:
+
+| CookieChimp Category | Meta Service | Purpose |
+|---------------------|--------------|---------|
+| **Analytics** | Facebook Analytics | Website analytics and insights |
+| **Advertising** | Facebook Ads | Ad targeting and attribution |
+| **Social Media** | Social Plugins | Facebook Like buttons, comments |
+| **Personalization** | Custom Audiences | Personalized ad experiences |
+
+## Verification and Testing
+
+### Using Meta Events Manager
+1. **Open Events Manager** in your Meta Business account
+2. **Check the Test Events** tool
+3. **Look for consent parameters** in event data
+4. **Verify proper consent signals** are being sent
+
+### Using CookieChimp Debug Mode
+1. **Enable Debug Mode** in CookieChimp settings
+2. **Change consent preferences** on your website
+3. **Monitor browser console** for Meta API calls
+4. **Confirm consent updates** are being transmitted
+
+<Info>
+  Meta Consent API integration works automatically once enabled. Consent changes are communicated in real-time without requiring additional configuration.
+</Info>
+
+## Compliance Considerations
+
+### GDPR Compliance
+- Consent is properly withdrawn when users opt out
+- Data processing stops for non-consenting users
+- Legal basis for processing is clearly established
+
+### CCPA Compliance
+- "Do Not Sell" requests are honored
+- Personal information sharing stops when requested
+- User rights are respected across Meta services
+
+### Other Regulations
+- Adapts to local privacy requirements
+- Supports global privacy frameworks
+- Maintains consistent privacy practices
+
+## Troubleshooting
+
+### Common Issues
+- **Missing consent signals**: Verify Meta Pixel is properly installed
+- **Delayed updates**: Check network connectivity and API status
+- **Incorrect mapping**: Review consent category configuration
+
+### Debug Steps
+1. **Check Meta Business Manager** for recent activity
+2. **Review CookieChimp logs** for API communication
+3. **Test with different browsers** and consent choices
+4. **Verify Meta Pixel implementation** is working correctly
+
+## Best Practices
+
+- **Regular Testing**: Periodically verify consent signals are working
+- **Privacy Policy Updates**: Mention Meta Consent API in your privacy documentation
+- **User Communication**: Clearly explain how Meta services use consent
+- **Monitoring**: Keep track of consent rates and user preferences
+
+## Related Documentation
+
+- [Facebook Pixel Implementation](https://developers.facebook.com/docs/facebook-pixel/)
+- [Meta Conversions API](https://developers.facebook.com/docs/marketing-api/conversions-api/)
+- [CookieChimp Consent Categories](/docs/features/vendor-management)
+- [Privacy Compliance Best Practices](/docs/features/consent-records)

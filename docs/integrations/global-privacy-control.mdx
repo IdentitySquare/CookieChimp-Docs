@@ -1,0 +1,118 @@
+---
+title: "Global Privacy Control (GPC)"
+description: "Automatically respect user privacy preferences from browser signals"
+icon: "shield-check"
+---
+
+Global Privacy Control (GPC) is a browser signal that allows users to communicate their privacy preferences to websites automatically. When enabled, CookieChimp will detect GPC signals from visitors' browsers and automatically set their opt-out preferences without requiring interaction with the consent banner.
+
+## What is Global Privacy Control?
+
+Global Privacy Control is a technical specification that allows users to signal their preference to opt-out of the sale or sharing of their personal data. It's similar to the "Do Not Track" signal but with legal backing in certain jurisdictions like California (CCPA/CPRA).
+
+### How GPC Works with CookieChimp
+
+When a visitor's browser sends a GPC signal:
+1. **CookieChimp detects the signal** automatically
+2. **Opt-out preferences are set** without showing the banner
+3. **Tracking is disabled** according to the user's privacy preference
+4. **Compliance is maintained** with privacy regulations
+
+## Why Enable GPC Integration?
+
+<CardGroup cols={2}>
+  <Card title="Automatic Compliance" icon="check-circle">
+    Respect user privacy choices without manual interaction
+  </Card>
+  
+  <Card title="Better User Experience" icon="user-check">
+    No banner interruption for users who've already expressed their preference
+  </Card>
+  
+  <Card title="Legal Compliance" icon="scale-balanced">
+    Meet requirements under CCPA, CPRA, and other privacy laws
+  </Card>
+  
+  <Card title="Future-Proof" icon="rocket">
+    Stay ahead of evolving privacy standards and browser features
+  </Card>
+</CardGroup>
+
+## Browser Support
+
+GPC is supported by several browsers and browser extensions:
+
+- **DuckDuckGo Browser**
+- **Brave Browser** (with setting enabled)
+- **Firefox** (with extensions like Privacy Badger)
+- **Chrome/Edge** (with GPC extensions)
+- **Safari** (with GPC extensions)
+
+## How to Enable GPC Integration
+
+<Steps>
+  <Step title="Access Integrations Page">
+    Go to the **Integrations** page in your CookieChimp dashboard.
+    <img src="/images/faq/gpc.png" alt="Enable Global Privacy Control" />
+  </Step>
+
+  <Step title="Enable GPC Integration">
+    Find the "Global Privacy Control" integration card and toggle it on.
+  </Step>
+
+  <Step title="Test the Integration">
+    Test with a browser that sends GPC signals to verify the banner behavior.
+  </Step>
+</Steps>
+
+## Technical Implementation
+
+When GPC integration is enabled, CookieChimp:
+
+```javascript
+// Detects GPC signal from the browser
+if (navigator.globalPrivacyControl === true) {
+  // Automatically sets opt-out preferences
+  // Skips banner display
+  // Applies privacy-compliant settings
+}
+```
+
+<Info>
+  The GPC signal is checked before the consent banner is displayed. If a GPC signal is detected, the banner will not be shown and opt-out preferences will be automatically applied.
+</Info>
+
+## Verification
+
+To verify that GPC integration is working:
+
+1. **Enable Debug Mode** in Settings > Consent Features
+2. **Use a GPC-enabled browser** or extension
+3. **Visit your website** and check the browser console
+4. **Look for GPC detection logs** confirming the signal was received
+
+## Legal Considerations
+
+GPC compliance helps with:
+
+- **CCPA/CPRA compliance** in California
+- **GDPR compliance** for data processing preferences
+- **Other state privacy laws** that recognize GPC signals
+- **Future privacy regulations** that may require GPC support
+
+<Warning>
+  While GPC helps with compliance, consult with legal counsel to ensure your implementation meets all applicable privacy law requirements in your jurisdiction.
+</Warning>
+
+## Best Practices
+
+- **Keep GPC enabled** once activated to maintain consistent user experience
+- **Test regularly** with GPC-enabled browsers to ensure proper functionality
+- **Monitor logs** to track GPC signal detection and response
+- **Update privacy policies** to mention GPC support and how it's handled
+
+## Related Documentation
+
+- [Browser Privacy Settings](/docs/features/banner-designer)
+- [Consent Records](/docs/features/consent-records)
+- [Debug Mode](/docs/faq#how-do-i-verify-if-everything-is-working-correctly)
