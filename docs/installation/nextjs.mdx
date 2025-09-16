@@ -19,7 +19,7 @@ This page shows the **simplest** way to add CookieChimp to a Next.js app and che
 ## Prerequisites
 
 - **Next.js (App Router)** project (`app/` directory).
-- Your CookieChimp **Account ID** (replace `YOUR_SITE_ID` below).
+- Your CookieChimp **Account ID** (replace `YOUR_ACCOUNT_ID` below).
 - If testing locally: `localhost` added to **Additional Domains** in Account Settings > General.
 
 ---
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* CookieChimp script MUST load first */}
         <Script
-          src="https://cookiechimp.com/widget/YOUR_SITE_ID.js"
+          src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"
           strategy="beforeInteractive"
         />
       </head>
@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 <Warning>
-  Replace `YOUR_SITE_ID` with your actual CookieChimp Account ID from your dashboard.
+  Replace `YOUR_ACCOUNT_ID` with your actual CookieChimp Account ID from your dashboard.
 </Warning>
 
 ---
@@ -172,7 +172,7 @@ export default function Document() {
     <Html>
       <Head>
         <Script
-          src="https://cookiechimp.com/widget/YOUR_SITE_ID.js"
+          src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"
           strategy="beforeInteractive"
         />
       </Head>
