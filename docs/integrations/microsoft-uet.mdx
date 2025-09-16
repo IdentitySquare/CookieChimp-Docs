@@ -42,25 +42,6 @@ When integrated with CookieChimp, Microsoft UET Consent Mode:
   </Card>
 </CardGroup>
 
-## Benefits of Microsoft UET Integration
-
-### Advertising Benefits
-- **Maintained Campaign Performance**: Continue tracking for consenting users
-- **Quality Audiences**: Build audiences from engaged, opted-in users
-- **Accurate Attribution**: Preserve conversion tracking accuracy
-- **Optimized Bidding**: Use consent-compliant data for bid optimization
-
-### Compliance Benefits
-- **GDPR Compliance**: Respect EU user privacy preferences
-- **CCPA Compliance**: Honor California privacy rights
-- **Global Privacy**: Consistent privacy practices worldwide
-- **Legal Protection**: Reduce compliance risks with automated consent handling
-
-### Technical Benefits
-- **Automatic Integration**: No manual coding for consent management
-- **Real-time Updates**: Immediate response to consent changes
-- **Debug Support**: Clear logging for troubleshooting
-
 ## Prerequisites
 
 Before enabling Microsoft UET Consent Mode:
@@ -113,38 +94,6 @@ Before enabling Microsoft UET Consent Mode:
   </Step>
 </Steps>
 
-## Technical Implementation
-
-The integration automatically manages consent for Microsoft UET:
-
-```javascript
-// CookieChimp handles UET consent automatically
-window.addEventListener('cc:onConsented', function(event) {
-  if (CookieConsent.acceptedCategory('advertising')) {
-    // Microsoft UET tracking enabled
-    // Conversion tracking and audience building active
-    uetq.push('consent', 'granted');
-  } else {
-    // Microsoft UET tracking disabled
-    // No conversion tracking or audience data collection
-    uetq.push('consent', 'denied');
-  }
-});
-
-// Real-time consent updates
-window.addEventListener('cc:onUpdate', function(event) {
-  var detail = event.detail;
-  
-  if (detail.changedCategories.includes('advertising')) {
-    if (CookieConsent.acceptedCategory('advertising')) {
-      uetq.push('consent', 'granted');
-    } else {
-      uetq.push('consent', 'denied');
-    }
-  }
-});
-```
-
 ## Consent Categories and UET Features
 
 | Consent Category | UET Feature | Consented Behavior | Declined Behavior |
@@ -185,111 +134,3 @@ window.addEventListener('cc:onUpdate', function(event) {
 <Info>
   Microsoft UET Consent Mode automatically adjusts tracking behavior based on user consent. No additional configuration is required once the integration is enabled.
 </Info>
-
-## Privacy and Compliance
-
-### GDPR Compliance
-- **Explicit Consent**: UET tracking requires user consent for advertising
-- **Right to Withdraw**: Users can change consent preferences anytime
-- **Data Minimization**: Only collect data when consent is granted
-
-### CCPA Compliance
-- **Opt-Out Rights**: Support "Do Not Sell" preferences
-- **Transparency**: Clear communication about UET data collection
-- **User Control**: Easy consent management for California residents
-
-### Regional Considerations
-- **EU Privacy**: Enhanced protection for European users
-- **State Laws**: Compliance with various US state privacy laws
-- **Global Standards**: Consistent privacy practices worldwide
-
-## Best Practices
-
-### Implementation Best Practices
-- **Test Regularly**: Verify consent handling after website updates
-- **Monitor Performance**: Track the impact of consent on campaign performance
-- **Clear Communication**: Explain UET tracking in your privacy policy
-
-### Privacy Communication
-- **Consent Language**: Use clear, understandable language about Microsoft UET
-- **Granular Control**: Allow separate consent for different advertising features
-- **User Education**: Help users understand what UET tracking involves
-
-### Campaign Management
-- **Audience Segmentation**: Create separate campaigns for different consent levels
-- **Conversion Attribution**: Adjust attribution models for consent-compliant data
-- **Performance Monitoring**: Track consent rates and campaign effectiveness
-
-## Troubleshooting
-
-### Common Issues
-
-#### UET Still Firing Without Consent
-- **Check Integration Status**: Verify Microsoft UET integration is enabled
-- **Review UET Implementation**: Ensure UET tag respects consent signals
-- **Test Different Browsers**: Confirm consistent behavior across browsers
-
-#### Missing Conversion Data
-- **Verify Consent Rates**: Check how many users consent to advertising
-- **Review UET Tag Setup**: Ensure conversion goals are properly configured
-- **Check Campaign Settings**: Verify Microsoft Ads campaign configuration
-
-#### Delayed Consent Updates
-- **Network Connectivity**: Check for connectivity issues
-- **Browser Console**: Look for JavaScript errors
-- **UET Tag Status**: Verify UET tag is loading correctly
-
-### Debug Steps
-1. **Enable CookieChimp Debug Mode** for detailed logging
-2. **Check Microsoft Advertising** for UET tag status
-3. **Monitor Browser Network Tab** for UET requests
-4. **Test Consent Changes** in different scenarios
-5. **Review Campaign Performance** for consent impact
-
-## Advanced Configuration
-
-### Custom Event Tracking
-For advanced UET implementations:
-
-```javascript
-// Track custom events with consent awareness
-if (CookieConsent.acceptedCategory('advertising')) {
-  uetq.push('event', 'custom_event', {
-    'event_category': 'engagement',
-    'event_label': 'newsletter_signup'
-  });
-}
-```
-
-### Enhanced Conversions
-Configure enhanced conversions with consent:
-
-```javascript
-// Enhanced conversion tracking with consent
-if (CookieConsent.acceptedCategory('advertising') && 
-    CookieConsent.acceptedCategory('analytics')) {
-  uetq.push('event', 'purchase', {
-    'revenue_value': 99.99,
-    'currency': 'USD'
-  });
-}
-```
-
-## Performance Impact
-
-### Campaign Performance
-- **Conversion Volume**: Expect reduced conversion volume based on consent rates
-- **Audience Quality**: Higher engagement from opted-in users
-- **Attribution Accuracy**: More accurate attribution for consenting users
-
-### Optimization Strategies
-- **Consent Rate Optimization**: Improve consent request presentation
-- **Campaign Segmentation**: Create strategies for different consent levels
-- **Performance Monitoring**: Track consent impact on campaign ROI
-
-## Related Documentation
-
-- [Microsoft UET Tag Setup](https://help.ads.microsoft.com/apex/index/3/en/56684)
-- [Microsoft Advertising Conversion Tracking](https://help.ads.microsoft.com/apex/index/3/en/56687)
-- [CookieChimp Advertising Categories](/docs/features/vendor-management)
-- [Consent Management Best Practices](/docs/features/consent-records)

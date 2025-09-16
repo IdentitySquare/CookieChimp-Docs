@@ -32,32 +32,7 @@ When integrated with CookieChimp, the Meta Consent API:
   <Card title="Instagram Tracking" icon="instagram">
     Manages Instagram-related tracking based on consent
   </Card>
-  
-  <Card title="Meta Ads Manager" icon="chart-line">
-    Communicates consent for advertising attribution
-  </Card>
-  
-  <Card title="Conversions API" icon="exchange-alt">
-    Handles server-side tracking consent status
-  </Card>
 </CardGroup>
-
-## Benefits of Meta Consent API Integration
-
-### Compliance Benefits
-- **GDPR Compliance**: Automatically handle consent for EU users
-- **CCPA Compliance**: Respect California privacy rights
-- **Global Privacy**: Maintain consistent privacy practices worldwide
-
-### Technical Benefits
-- **Automatic Updates**: Consent changes are communicated in real-time
-- **Reduced Errors**: Eliminates manual consent management
-- **Better Attribution**: Maintains tracking accuracy while respecting privacy
-
-### Business Benefits
-- **Continued Ad Performance**: Optimize campaigns within privacy constraints
-- **User Trust**: Demonstrate commitment to privacy protection
-- **Legal Protection**: Reduce compliance risks
 
 ## Prerequisites
 
@@ -82,13 +57,6 @@ Before enabling Meta Consent API integration:
     Click on the integration card and toggle it on.
   </Step>
 
-  <Step title="Configure Settings">
-    If required, configure any additional settings such as:
-    - Meta Pixel ID verification
-    - Consent mapping preferences
-    - Regional compliance settings
-  </Step>
-
   <Step title="Test the Integration">
     Verify the integration is working by:
     - Checking Meta Events Manager for consent signals
@@ -96,22 +64,6 @@ Before enabling Meta Consent API integration:
     - Monitoring debug logs in CookieChimp
   </Step>
 </Steps>
-
-## Technical Implementation
-
-The integration automatically handles consent communication:
-
-```javascript
-// When user consent changes
-window.addEventListener('cc:onUpdate', function(event) {
-  // Meta Consent API automatically receives:
-  // - Consent status for advertising
-  // - Consent status for analytics
-  // - User preference updates
-  
-  // Meta services adjust behavior accordingly
-});
-```
 
 ## Consent Mapping
 
@@ -141,47 +93,3 @@ CookieChimp maps consent categories to Meta services:
 <Info>
   Meta Consent API integration works automatically once enabled. Consent changes are communicated in real-time without requiring additional configuration.
 </Info>
-
-## Compliance Considerations
-
-### GDPR Compliance
-- Consent is properly withdrawn when users opt out
-- Data processing stops for non-consenting users
-- Legal basis for processing is clearly established
-
-### CCPA Compliance
-- "Do Not Sell" requests are honored
-- Personal information sharing stops when requested
-- User rights are respected across Meta services
-
-### Other Regulations
-- Adapts to local privacy requirements
-- Supports global privacy frameworks
-- Maintains consistent privacy practices
-
-## Troubleshooting
-
-### Common Issues
-- **Missing consent signals**: Verify Meta Pixel is properly installed
-- **Delayed updates**: Check network connectivity and API status
-- **Incorrect mapping**: Review consent category configuration
-
-### Debug Steps
-1. **Check Meta Business Manager** for recent activity
-2. **Review CookieChimp logs** for API communication
-3. **Test with different browsers** and consent choices
-4. **Verify Meta Pixel implementation** is working correctly
-
-## Best Practices
-
-- **Regular Testing**: Periodically verify consent signals are working
-- **Privacy Policy Updates**: Mention Meta Consent API in your privacy documentation
-- **User Communication**: Clearly explain how Meta services use consent
-- **Monitoring**: Keep track of consent rates and user preferences
-
-## Related Documentation
-
-- [Facebook Pixel Implementation](https://developers.facebook.com/docs/facebook-pixel/)
-- [Meta Conversions API](https://developers.facebook.com/docs/marketing-api/conversions-api/)
-- [CookieChimp Consent Categories](/docs/features/vendor-management)
-- [Privacy Compliance Best Practices](/docs/features/consent-records)

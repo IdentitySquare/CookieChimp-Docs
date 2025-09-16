@@ -42,25 +42,6 @@ The integration creates a seamless connection between CookieChimp and Shopify:
   </Card>
 </CardGroup>
 
-## Benefits of Shopify Privacy API Integration
-
-### E-commerce Benefits
-- **Seamless Shopping Experience**: Privacy preferences apply across all store features
-- **Trusted Checkout**: Customers know their privacy choices are respected
-- **App Ecosystem**: Third-party Shopify apps automatically respect consent
-- **Marketing Efficiency**: Focus marketing efforts on consenting customers
-
-### Compliance Benefits
-- **GDPR Compliance**: Automatic consent management for EU customers
-- **CCPA Compliance**: Respect California privacy rights in e-commerce
-- **Global Privacy**: Consistent privacy practices for international customers
-- **Audit Trail**: Complete record of consent choices for compliance reporting
-
-### Technical Benefits
-- **Native Integration**: Built into Shopify's core privacy framework
-- **Automatic Updates**: Real-time consent synchronization
-- **No Custom Code**: Works without additional development effort
-
 ## Prerequisites
 
 Before enabling Shopify Customer Privacy API integration:
@@ -105,33 +86,6 @@ Before enabling Shopify Customer Privacy API integration:
     - Verifying third-party apps respect consent choices
   </Step>
 </Steps>
-
-## Technical Implementation
-
-The integration automatically handles consent communication with Shopify:
-
-```javascript
-// CookieChimp automatically communicates with Shopify
-window.addEventListener('cc:onConsented', function(event) {
-  // Shopify Customer Privacy API receives:
-  // - Analytics consent status
-  // - Marketing consent status  
-  // - Functional consent status
-  
-  if (CookieConsent.acceptedCategory('analytics')) {
-    // Shopify analytics enabled
-    Shopify.loadFeatures([
-      { name: 'consent-tracking-api', version: '0.1' }
-    ]);
-  }
-});
-
-// Real-time consent updates to Shopify
-window.addEventListener('cc:onUpdate', function(event) {
-  // Shopify Privacy API automatically updated
-  // No additional code required
-});
-```
 
 ## Consent Categories and Shopify Features
 
@@ -189,107 +143,3 @@ When consent is properly configured, these types of Shopify apps automatically r
 <Info>
   Shopify Customer Privacy API integration works automatically once enabled. The integration handles all consent communication without requiring additional theme modifications.
 </Info>
-
-## Privacy and Compliance
-
-### GDPR Compliance
-- **Explicit Consent**: Required for non-essential features
-- **Right to Withdraw**: Customers can change preferences anytime
-- **Data Portability**: Consent preferences included in customer data exports
-- **Privacy by Design**: Built into Shopify's core architecture
-
-### CCPA Compliance
-- **Do Not Sell**: Respects customer opt-out preferences
-- **Transparency**: Clear disclosure of data collection practices
-- **Consumer Rights**: Easy access to privacy controls
-
-### International Commerce
-- **Regional Compliance**: Adapts to local privacy requirements
-- **Cross-border Sales**: Consistent privacy practices globally
-- **Multi-currency Support**: Privacy preferences persist across regions
-
-## Best Practices
-
-### Store Configuration
-- **Clear Privacy Policy**: Explain how customer data is used
-- **Prominent Consent Options**: Make privacy choices easily accessible
-- **Regular Testing**: Verify consent handling after app updates
-
-### Customer Communication
-- **Onboarding**: Educate customers about privacy choices during signup
-- **Transparent Marketing**: Clearly communicate about email marketing consent
-- **Privacy Center**: Provide easy access to privacy preference management
-
-### Marketing Strategy
-- **Consent-based Segments**: Create marketing segments based on consent status
-- **Quality over Quantity**: Focus on engaged, consenting customers
-- **Compliance First**: Prioritize privacy compliance in all marketing activities
-
-## Troubleshooting
-
-### Common Issues
-
-#### Apps Not Respecting Consent
-- **Check App Compatibility**: Verify apps support Shopify Customer Privacy API
-- **Review App Settings**: Some apps require manual privacy configuration
-- **Contact App Support**: Reach out to app developers for privacy compliance
-
-#### Missing Analytics Data
-- **Verify Consent Rates**: Check how many customers consent to analytics
-- **Review Integration Status**: Ensure CookieChimp integration is active
-- **Check Shopify Settings**: Verify analytics are properly configured
-
-#### Consent Not Syncing
-- **Check Internet Connection**: Verify stable connection to Shopify APIs
-- **Review App Permissions**: Ensure CookieChimp has necessary Shopify permissions
-- **Test Integration**: Use different browsers and consent scenarios
-
-### Debug Steps
-1. **Enable CookieChimp Debug Mode** for detailed logging
-2. **Check Shopify Admin** for Customer Privacy API status
-3. **Review Browser Console** for integration errors
-4. **Test Different Consent Scenarios** systematically
-5. **Monitor App Behavior** for privacy compliance
-
-## Advanced Configuration
-
-### Custom Consent Categories
-For stores with specific privacy needs:
-
-```javascript
-// Custom consent handling for specialized apps
-if (CookieConsent.acceptedService('Product Reviews', 'functional')) {
-  // Enable review collection and display
-  enableProductReviews();
-}
-
-if (CookieConsent.acceptedService('Live Chat', 'marketing')) {
-  // Enable customer support chat with marketing features
-  enableLiveChat();
-}
-```
-
-### Multi-store Setup
-For merchants with multiple Shopify stores:
-- **Centralized Consent**: Manage consent preferences across stores
-- **Consistent Privacy**: Apply same privacy standards everywhere
-- **Cross-store Analytics**: Aggregate consent-compliant data
-
-## Performance Considerations
-
-### Store Performance
-- **Loading Speed**: Privacy integration has minimal impact on store speed
-- **Checkout Flow**: Consent preferences don't slow down checkout
-- **Mobile Experience**: Optimized for mobile shoppers
-
-### Analytics Impact
-- **Data Quality**: Higher engagement from consenting customers
-- **Conversion Tracking**: More accurate conversion attribution
-- **Customer Insights**: Better understanding of engaged customer base
-
-## Related Documentation
-
-- [Shopify Customer Privacy API](https://shopify.dev/api/storefront/reference/common-objects/customerdata)
-- [CookieChimp Shopify App Installation](/docs/installation/shopify)
-- [E-commerce Privacy Best Practices](/docs/features/consent-records)
-- [Shopify App Store Privacy Guidelines](https://shopify.dev/apps/store/requirements)

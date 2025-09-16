@@ -15,8 +15,8 @@ Global Privacy Control is a technical specification that allows users to signal 
 When a visitor's browser sends a GPC signal:
 1. **CookieChimp detects the signal** automatically
 2. **Opt-out preferences are set** without showing the banner
-3. **Tracking is disabled** according to the user's privacy preference
-4. **Compliance is maintained** with privacy regulations
+
+Based on the setup you have done to not track or run scripts based on opt-out, that will be in place automatically.
 
 ## Why Enable GPC Integration?
 
@@ -90,29 +90,3 @@ To verify that GPC integration is working:
 2. **Use a GPC-enabled browser** or extension
 3. **Visit your website** and check the browser console
 4. **Look for GPC detection logs** confirming the signal was received
-
-## Legal Considerations
-
-GPC compliance helps with:
-
-- **CCPA/CPRA compliance** in California
-- **GDPR compliance** for data processing preferences
-- **Other state privacy laws** that recognize GPC signals
-- **Future privacy regulations** that may require GPC support
-
-<Warning>
-  While GPC helps with compliance, consult with legal counsel to ensure your implementation meets all applicable privacy law requirements in your jurisdiction.
-</Warning>
-
-## Best Practices
-
-- **Keep GPC enabled** once activated to maintain consistent user experience
-- **Test regularly** with GPC-enabled browsers to ensure proper functionality
-- **Monitor logs** to track GPC signal detection and response
-- **Update privacy policies** to mention GPC support and how it's handled
-
-## Related Documentation
-
-- [Browser Privacy Settings](/docs/features/banner-designer)
-- [Consent Records](/docs/features/consent-records)
-- [Debug Mode](/docs/faq#how-do-i-verify-if-everything-is-working-correctly)
