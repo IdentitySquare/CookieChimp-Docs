@@ -24,27 +24,13 @@ icon: "browsers"
     3. Click **Save Changes**
   </Step>
 
-  <Step title="Add Privacy Trigger Container (Optional)">
-    If you want to customize where the privacy trigger (floating icon) appears, you can add a specific container element:
-
-    1. In the **Webflow Designer**, add a **Div Block** where you want the privacy trigger to appear
-    2. Set the Div Block's **ID** to `cookiechimp-container` in the Element Settings panel
-    3. This div will host the floating privacy icon, allowing users to update their preferences
-
-    <Note>
-      If you don't add this container, CookieChimp will automatically place the privacy trigger in an appropriate location.
-    </Note>
-  </Step>
-
-  <Step title="Configure Custom Consent Button (Optional)">
-    You can add custom buttons or links to open the consent preferences modal:
+  <Step title="Allow users to update their preferences">
+    CookieChimp provides a floating privacy icon that allows users to manage their cookie preferences at any time. Alternatively, you can add a custom button or link in your website's footer to allow users to update their preferences:
 
     1. Select any **Button** or **Link** element in the Designer
     2. In the Element Settings panel, add a **Custom Attribute**:
        - **Name**: `data-cc`
        - **Value**: `show-preferencesModal`
-
-    This allows users to manage their cookie preferences through your custom UI elements.
 
     ```html
     <!-- Example of what gets generated -->
@@ -64,24 +50,6 @@ icon: "browsers"
     </Info>
   </Step>
 </Steps>
-
-## Webflow-Specific Considerations
-
-### Custom Code Limitations
-- Webflow's custom code is applied site-wide. If you need page-specific consent handling, consider using Webflow's conditional visibility features
-- Custom code in Webflow is processed during site publishing, so changes require republishing your site
-
-### E-commerce Integration
-For Webflow E-commerce sites:
-- CookieChimp will automatically handle e-commerce tracking scripts based on user consent
-- Ensure your analytics and marketing pixels are properly categorized in your CookieChimp dashboard
-- Consider enabling the **E-commerce** category in your banner settings for commerce-specific cookies
-
-### CMS Collections
-If you're using Webflow CMS:
-- The CookieChimp script will work across all CMS template pages
-- Dynamic content loading will respect user consent preferences
-- No additional configuration needed for CMS-generated pages
 
 ## Troubleshooting
 
