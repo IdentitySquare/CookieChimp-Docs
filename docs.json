@@ -56,6 +56,18 @@
             ]
           },
           {
+            "group": "Integrations",
+            "pages": [
+              "docs/integrations/overview",
+              "docs/integrations/global-privacy-control",
+              "docs/integrations/meta-consent-api",
+              "docs/integrations/microsoft-clarity",
+              "docs/integrations/microsoft-uet",
+              "docs/integrations/shopify-privacy-api",
+              "docs/integrations/wordpress-consent-api"
+            ]
+          },
+          {
             "group": "Advanced",
             "pages": [
               "docs/features/block-iframes",
