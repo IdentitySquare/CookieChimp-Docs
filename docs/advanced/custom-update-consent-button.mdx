@@ -1,6 +1,104 @@
 ---
 title: "Custom Update Consent Button"
-description: ""
+description: "Allow users to update their cookie preferences with custom buttons or links"
+icon: "hand-pointer"
 ---
 
-{/* TODO */}
+## Overview
+
+Most privacy regulations (GDPR, CCPA, etc.) require that users have an easy way to update their cookie consent preferences after providing their initial consent. This ensures users maintain control over their data and can change their mind at any time.
+
+## Privacy Trigger (Recommended)
+
+CookieChimp provides a built-in floating privacy icon called the **Privacy Trigger** that allows users to manage their cookie preferences at any time. This is the easiest way to remain compliant.
+
+You can enable and customize the Privacy Trigger in the [Banner Designer](/docs/features/banner-designer#privacy-trigger) settings:
+- Toggle it on/off
+- Customize its position on the page
+- Adjust its appearance to match your brand
+
+<Note>
+  If you enable the Privacy Trigger, you don't need to add a custom button or link, as users will already have an obvious way to update their preferences.
+</Note>
+
+## Custom Button or Link
+
+If you prefer not to use the Privacy Trigger, or want to provide additional access points for users to update their preferences (such as in your website footer or privacy policy page), you can add custom buttons or links.
+
+### Using Data Attributes (Recommended)
+
+The simplest way to create a custom button or link is by adding a `data-cc` attribute:
+
+```html
+<button type="button" data-cc="show-preferencesModal">
+  Manage cookie preferences
+</button>
+```
+
+You can also use a link instead of a button:
+
+```html
+<a href="#" data-cc="show-preferencesModal">
+  Cookie Settings
+</a>
+```
+
+### Using JavaScript API
+
+Alternatively, you can programmatically open the preferences modal using the JavaScript API:
+
+```html
+<button type="button" onclick="CookieConsent.showPreferences()">
+  Manage cookie preferences
+</button>
+```
+
+Or attach an event listener:
+
+```html
+<button type="button" id="cookie-settings">
+  Manage cookie preferences
+</button>
+
+<script>
+  document.getElementById('cookie-settings').addEventListener('click', function() {
+    CookieConsent.showPreferences();
+  });
+</script>
+```
+
+For more information about the JavaScript API, see the [Callbacks & Events](/docs/advanced/callbacks-events#showpreferences) documentation.
+
+## Best Practices
+
+<Check>
+  **Place the link in an obvious location** - Common locations include:
+  - Website footer
+  - Privacy policy page
+  - Cookie policy page
+  - User account settings
+</Check>
+
+<Check>
+  **Use clear, descriptive text** - Examples:
+  - "Manage cookie preferences"
+  - "Cookie settings"
+  - "Update cookie consent"
+  - "Privacy settings"
+</Check>
+
+<Check>
+  **Make it accessible** - Ensure the button/link is keyboard navigable and screen reader friendly
+</Check>
+
+## Compliance Requirements
+
+<Warning>
+  Most privacy regulations mandate that users must be able to update their consent preferences after giving their initial consent. Failing to provide this functionality may result in non-compliance.
+</Warning>
+
+The requirement to update preferences is typically satisfied by either:
+- Enabling the **Privacy Trigger** (floating icon), OR
+- Adding a **custom button or link** in an obvious location (such as the footer)
+
+Choose the approach that best fits your website's design and user experience.
