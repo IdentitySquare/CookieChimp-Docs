@@ -1,0 +1,193 @@
+---
+title: "WordPress Consent API"
+description: "Share consent signals with WordPress sites and plugins"
+icon: "wordpress"
+---
+
+The WordPress Consent API integration connects CookieChimp with WordPress sites using the WordPress Consent API framework. This allows WordPress plugins and themes to receive and respond to user consent preferences, ensuring that all WordPress functionality respects visitor privacy choices.
+
+## What is WordPress Consent API?
+
+The WordPress Consent API is a standardized framework that:
+
+- **Provides a common interface** for consent management across WordPress
+- **Enables plugin communication** about user privacy preferences  
+- **Standardizes consent handling** across the WordPress ecosystem
+- **Supports privacy compliance** for WordPress sites
+
+## How It Works with CookieChimp
+
+The integration creates seamless consent communication:
+
+1. **CookieChimp collects consent** from website visitors
+2. **Consent status is communicated** to WordPress Consent API
+3. **WordPress plugins receive** consent signals automatically
+4. **Site functionality adjusts** based on user preferences
+
+<CardGroup cols={2}>
+  <Card title="Plugin Compatibility" icon="puzzle-piece">
+    Works with any WordPress plugin that supports Consent API
+  </Card>
+  
+  <Card title="Analytics Integration" icon="chart-bar">
+    Google Site Kit and other analytics plugins respect consent
+  </Card>
+  
+  <Card title="Marketing Tools" icon="megaphone">
+    Email marketing and tracking plugins honor privacy choices
+  </Card>
+  
+  <Card title="Social Features" icon="share-nodes">
+    Social media widgets and integrations respect consent
+  </Card>
+</CardGroup>
+
+## Supported WordPress Plugins
+
+### Analytics Plugins
+- **Google Site Kit**: Google Analytics, Search Console, PageSpeed Insights
+- **MonsterInsights**: Enhanced Google Analytics for WordPress
+- **ExactMetrics**: Analytics and tracking with consent awareness
+
+### Marketing Plugins
+- **Mailchimp for WordPress**: Email marketing with consent integration
+- **Contact Form 7**: Form submissions with privacy compliance
+- **WooCommerce**: E-commerce tracking and analytics
+
+### Social Media Plugins
+- **Social Login**: Facebook, Google login with consent awareness
+- **Social Sharing**: Share buttons that respect privacy choices
+- **Instagram Feed**: Social media embeds with consent control
+
+### Advertising Plugins
+- **Ad Inserter**: Display ads based on consent status
+- **Google AdSense**: Ad serving with consent integration
+- **Facebook Pixel**: Advertising tracking with privacy compliance
+
+## Prerequisites
+
+Before enabling WordPress Consent API integration:
+
+- **WordPress site** running WordPress 5.0 or higher
+- **WP Consent API plugin** installed and activated
+- **CookieChimp WordPress plugin** installed and configured
+- **Compatible plugins** that support WordPress Consent API
+
+## How to Enable WordPress Consent API Integration
+
+<Steps>
+  <Step title="Install WP Consent API Plugin">
+    Install the [WP Consent API plugin](https://wordpress.org/plugins/wp-consent-api/) from the WordPress plugin directory.
+    
+    ```bash
+    # Via WordPress Admin
+    Plugins > Add New > Search "WP Consent API" > Install > Activate
+    ```
+  </Step>
+
+  <Step title="Install CookieChimp WordPress Plugin">
+    Download and install the [CookieChimp WordPress Plugin](https://github.com/IdentitySquare/CookieChimp-WP/archive/refs/heads/main.zip).
+    
+    <img src="/images/wordpress/upload-plugin.png" alt="Install CookieChimp WordPress plugin" />
+  </Step>
+
+  <Step title="Configure CookieChimp Plugin">
+    Enter your CookieChimp account ID in the plugin settings.
+    
+    <img src="/images/wordpress/cookiechimp-settings.png" alt="Add account id to plugin" />
+  </Step>
+
+  <Step title="Enable WordPress Integration">
+    In your CookieChimp dashboard:
+    - Go to the **Integrations** page
+    - Find "WordPress Consent API"
+    - Toggle the integration on
+    
+    <img src="/images/wordpress/wordpress-integration.png" alt="Enable WordPress Integration" />
+  </Step>
+
+  <Step title="Test Plugin Compatibility">
+    Verify that your WordPress plugins respond to consent changes by:
+    - Testing different consent scenarios
+    - Checking plugin behavior with and without consent
+    - Monitoring WordPress admin for consent-aware features
+  </Step>
+</Steps>
+
+## Consent Categories and WordPress Features
+
+| CookieChimp Category | WordPress Consent Type | Common Plugin Features |
+|---------------------|----------------------|----------------------|
+| **Functional** | `functional` | Contact forms, search, site functionality |
+| **Analytics** | `statistics` | Google Analytics, visitor tracking, performance monitoring |
+| **Marketing** | `marketing` | Email marketing, advertising, conversion tracking |
+| **Social Media** | `marketing` | Social login, sharing buttons, social feeds |
+| **Personalization** | `preferences` | User preferences, personalized content |
+
+## Plugin Integration Examples
+
+### Google Site Kit Integration
+```php
+// Google Site Kit automatically respects WordPress Consent API
+if (wp_has_consent('statistics')) {
+    // Google Analytics tracking enabled
+    // Search Console data collection active
+    // PageSpeed Insights tracking enabled
+}
+```
+
+### WooCommerce Integration
+```php
+// WooCommerce e-commerce tracking with consent
+if (wp_has_consent('statistics')) {
+    // Enhanced e-commerce tracking enabled
+    // Customer behavior analytics active
+}
+
+if (wp_has_consent('marketing')) {
+    // Marketing pixels enabled
+    // Email marketing automation active
+}
+```
+
+### Contact Form 7 Integration
+```php
+// Contact Form 7 with consent-aware features
+if (wp_has_consent('marketing')) {
+    // Newsletter signup options available
+    // Marketing automation integration enabled
+}
+```
+
+## Verification and Testing
+
+### Using WordPress Admin
+1. **Check Plugin Status**: Verify WP Consent API plugin is active
+2. **Review Plugin Settings**: Ensure plugins show consent-aware options
+3. **Test Admin Features**: Check if admin interfaces reflect consent status
+
+### Frontend Testing
+1. **Change Consent Preferences** on your website
+2. **Check Plugin Behavior** for different consent scenarios
+3. **Monitor Network Requests** for consent-aware loading
+4. **Verify User Experience** matches consent choices
+
+### Developer Testing
+```php
+// Debug consent status in WordPress
+function debug_consent_status() {
+    $consent_types = ['functional', 'statistics', 'marketing', 'preferences'];
+    
+    foreach ($consent_types as $type) {
+        $status = wp_has_consent($type) ? 'granted' : 'denied';
+        error_log("Consent for {$type}: {$status}");
+    }
+}
+
+// Add to functions.php for debugging
+add_action('wp_footer', 'debug_consent_status');
+```
+
+<Info>
+  WordPress Consent API integration works automatically once both plugins are installed and configured. The system handles all consent communication between CookieChimp and WordPress plugins.
+</Info>
