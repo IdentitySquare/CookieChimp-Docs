@@ -110,10 +110,10 @@ window.addEventListener("cc:onModalReady", function (event) {
 Shows the consent banner. If consent was previously expressed, the consent modal will not be generated; you'll have to pass the argument `true` to generate it on the fly.
 
 ```js
-CookieConsent.show();
+CookieChimp.show();
 
 // show modal (if it doesn't exist, create it)
-CookieConsent.show(true);
+CookieChimp.show(true);
 ```
 
 ### `hide`
@@ -121,7 +121,7 @@ CookieConsent.show(true);
 Hides the consent banner.
 
 ```js
-CookieConsent.hide();
+CookieChimp.hide();
 ```
 
 ### `showPreferences`
@@ -129,7 +129,7 @@ CookieConsent.hide();
 Shows the preferences modal.
 
 ```js
-CookieConsent.showPreferences();
+CookieChimp.showPreferences();
 ```
 
 ### `hidePreferences`
@@ -137,7 +137,29 @@ CookieConsent.showPreferences();
 Hides the preferences modal.
 
 ```js
-CookieConsent.hidePreferences();
+CookieChimp.hidePreferences();
+```
+
+### `getUserPreferences`
+
+```js
+// see all user preferences
+CookieChimp.getUserPreferences();
+
+// see type of consent given (returns '', all, necessary or custom )
+CookieChimp.getUserPreferences().accpetType;
+
+// see accepted categories (returns array of accepted category names)
+CookieChimp.getUserPreferences().acceptedCategories;
+
+// see rejected categories (returns array of rejected category names)
+CookieChimp.getUserPreferences().rejectedCategories;
+
+// see accepted services (returns an object with accepted services)
+CookieChimp.getUserPreferences().acceptedServices;
+
+// see rejected services (returns an object with rejected services)
+CookieChimp.getUserPreferences().rejectedServices;
 ```
 
 ### `acceptCategory`
@@ -146,33 +168,33 @@ Programmatically accept or reject a cookie category.
 
 ```js
 // accept all categories
-CookieConsent.acceptCategory("all");
+CookieChimp.acceptCategory("all");
 
 // reject all (accept only categories marked as readOnly/necessary)
-CookieConsent.acceptCategory([]);
+CookieChimp.acceptCategory([]);
 
 // accept currently selected categories inside the preferences modal
-CookieConsent.acceptCategory();
+CookieChimp.acceptCategory();
 
 // accept only the "analytics" category
-CookieConsent.acceptCategory("analytics");
+CookieChimp.acceptCategory("analytics");
 
 // accept only these 2 categories
-CookieConsent.acceptCategory(["analytics", "marketing"]);
+CookieChimp.acceptCategory(["analytics", "marketing"]);
 
 // accept all categories except the "analytics" category
-CookieConsent.acceptCategory("all", ["analytics"]);
+CookieChimp.acceptCategory("all", ["analytics"]);
 
 // accept all categories except these 2
-CookieConsent.acceptCategory("all", ["analytics", "marketing"]);
+CookieChimp.acceptCategory("all", ["analytics", "marketing"]);
 ```
 
 ### `acceptedCategory`
 
-Returns `true` if the specified category was accepted, otherwise `false`.
+Returns `true` if the specified category was accepted by the user, otherwise `false`.
 
 ```javascript
-if (CookieConsent.acceptedCategory("analytics")) {
+if (CookieChimp.acceptedCategory("analytics")) {
   // "analytics" category was accepted
 } else {
   // not accepted
@@ -185,24 +207,24 @@ Accepts or rejects services.
 
 ```javascript
 // accept all services in the 'analytics' category
-CookieConsent.acceptService("all", "analytics");
+CookieChimp.acceptService("all", "analytics");
 
 // reject all services
-CookieConsent.acceptService([], "analytics");
+CookieChimp.acceptService([], "analytics");
 
 // accept only specified service and reject all the others
-CookieConsent.acceptService("Google Analytics", "analytics");
+CookieChimp.acceptService("Google Analytics", "analytics");
 
 // accept only these 2 services and reject all the others
-CookieConsent.acceptService(["service1", "service2"], "analytics");
+CookieChimp.acceptService(["service1", "service2"], "analytics");
 ```
 
 ### `acceptedService`
 
-Returns `true` if the specified service was accepted, otherwise `false`.
+Returns `true` if the specified service was accepted by the user, otherwise `false`.
 
 ```javascript
-if (CookieConsent.acceptedService("Google Analytics", "analytics")) {
+if (CookieChimp.acceptedService("Google Analytics", "analytics")) {
   // "Google Analytics" service was accepted
 } else {
   // not accepted
@@ -220,7 +242,7 @@ Consent is **NOT** valid when at least one of following situations occurs:
 - CookieChimp's cookie is structurally not valid (e.g. empty)
 
 ```javascript
-if (CookieConsent.validConsent()) {
+if (CookieChimp.validConsent()) {
   // consent is valid
 } else {
   // consent is not valid
@@ -250,7 +272,7 @@ Possible acceptType values:
 - `'necessary'`
 
 ```javascript
-var preferences = CookieConsent.getUserPreferences();
+var preferences = CookieChimp.getUserPreferences();
 
 if (preferences.acceptType === "all") {
   console.log("Everything has been accepted!");
@@ -271,7 +293,7 @@ Resets CookieConsent by dropping all internal pointers and config. You can pass 
 </Warning>
 
 ```js
-CookieConsent.reset(true);
+CookieChimp.reset(true);
 
 // Reload the page
 window.location.reload();
