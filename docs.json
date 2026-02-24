@@ -27,42 +27,42 @@
           {
             "group": "Get Started",
             "pages": [
-              "docs/overview",
-              "docs/installation/installation",
-              "docs/block-scripts-cookies/script-attributes",
-              "docs/features/vendor-list-embed",
-              "docs/faq"
+              "overview",
+              "installation/installation",
+              "block-scripts-cookies/script-attributes",
+              "features/vendor-list-embed",
+              "faq"
             ]
           },
           {
             "group": "Platform Specific Installation",
             "pages": [
-              "docs/installation/google-tag-manager",
-              "docs/installation/nextjs",
-              "docs/installation/shopify",
-              "docs/installation/single-page-applications",
-              "docs/installation/wordpress"
+              "installation/google-tag-manager",
+              "installation/nextjs",
+              "installation/shopify",
+              "installation/single-page-applications",
+              "installation/wordpress"
             ]
           },
           {
             "group": "Features",
             "pages": [
-              "docs/features/consent-records",
-              "docs/features/vendor-scanning",
-              "docs/features/vendor-management",
-              "docs/features/banner-designer",
-              "docs/features/multilingual-banners",
-              "docs/features/wildcard-cookies"
+              "features/consent-records",
+              "features/vendor-scanning",
+              "features/vendor-management",
+              "features/banner-designer",
+              "features/multilingual-banners",
+              "features/wildcard-cookies"
             ]
           },
           {
             "group": "Advanced",
             "pages": [
-              "docs/features/block-iframes",
-              "docs/features/identify-users",
-              "docs/advanced/custom-update-consent-button",
-              "docs/advanced/custom-css",
-              "docs/advanced/callbacks-events"
+              "features/block-iframes",
+              "features/identify-users",
+              "advanced/custom-update-consent-button",
+              "advanced/custom-css",
+              "advanced/callbacks-events"
             ]
           }
         ]
@@ -75,76 +75,76 @@
           {
             "group": "API Documentation",
             "pages": [
-              "docs/api-reference/authentication"
+              "api-reference/authentication"
             ]
           },
           {
             "group": "Account",
             "pages": [
-              "docs/api-reference/account/list-accounts",
-              "docs/api-reference/account/get-account"
+              "api-reference/account/list-accounts",
+              "api-reference/account/get-account"
             ]
           },
           {
             "group": "Account Users",
             "pages": [
-              "docs/api-reference/account-users/list-account-users",
-              "docs/api-reference/account-users/get-account-user",
-              "docs/api-reference/account-users/update-account-user",
-              "docs/api-reference/account-users/delete-account-user"
+              "api-reference/account-users/list-account-users",
+              "api-reference/account-users/get-account-user",
+              "api-reference/account-users/update-account-user",
+              "api-reference/account-users/delete-account-user"
             ]
           },
           {
             "group": "Account Invitations",
             "pages": [
-              "docs/api-reference/account-invitations/list-account-invitations",
-              "docs/api-reference/account-invitations/create-account-invitation",
-              "docs/api-reference/account-invitations/get-account-invitation",
-              "docs/api-reference/account-invitations/update-account-invitation",
-              "docs/api-reference/account-invitations/delete-account-invitation"
+              "api-reference/account-invitations/list-account-invitations",
+              "api-reference/account-invitations/create-account-invitation",
+              "api-reference/account-invitations/get-account-invitation",
+              "api-reference/account-invitations/update-account-invitation",
+              "api-reference/account-invitations/delete-account-invitation"
             ]
           },
           {
             "group": "AI Actions",
             "pages": [
-              "docs/api-reference/ai-actions/list-ai-actions",
-              "docs/api-reference/ai-actions/get-ai-action"
+              "api-reference/ai-actions/list-ai-actions",
+              "api-reference/ai-actions/get-ai-action"
             ]
           },
           {
             "group": "Storage Items",
             "pages": [
-              "docs/api-reference/storage-items/list-storage-items",
-              "docs/api-reference/storage-items/create-storage-item",
-              "docs/api-reference/storage-items/get-storage-item",
-              "docs/api-reference/storage-items/update-storage-item",
-              "docs/api-reference/storage-items/delete-storage-item"
+              "api-reference/storage-items/list-storage-items",
+              "api-reference/storage-items/create-storage-item",
+              "api-reference/storage-items/get-storage-item",
+              "api-reference/storage-items/update-storage-item",
+              "api-reference/storage-items/delete-storage-item"
             ]
           },
           {
             "group": "Categories",
             "pages": [
-              "docs/api-reference/categories/list-categories",
-              "docs/api-reference/categories/create-category",
-              "docs/api-reference/categories/get-category",
-              "docs/api-reference/categories/update-category",
-              "docs/api-reference/categories/delete-category"
+              "api-reference/categories/list-categories",
+              "api-reference/categories/create-category",
+              "api-reference/categories/get-category",
+              "api-reference/categories/update-category",
+              "api-reference/categories/delete-category"
             ]
           },
           {
             "group": "Consents",
             "pages": [
-              "docs/api-reference/consents/list-consents",
-              "docs/api-reference/consents/get-consent"
+              "api-reference/consents/list-consents",
+              "api-reference/consents/get-consent"
             ]
           },
           {
             "group": "Groups",
             "pages": [
-              "docs/api-reference/groups/list-groups",
-              "docs/api-reference/groups/get-group",
-              "docs/api-reference/groups/create-group",
-              "docs/api-reference/groups/update-group"
+              "api-reference/groups/list-groups",
+              "api-reference/groups/get-group",
+              "api-reference/groups/create-group",
+              "api-reference/groups/update-group"
             ]
           }
         ]
