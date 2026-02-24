@@ -1,0 +1,56 @@
+---
+title: "Block Script Tags"
+description: "Only enable scripts when a user has given consent."
+icon: "traffic-cone"
+---
+
+<Info>If you are using **Google Tag Manager** to trigger tags, follow the instructions <a href="/installation/google-tag-manager">here</a>.</Info>
+
+## Script Attributes and Usage
+
+Control your scripts using these attributes:
+
+- `data-category`: Assigns the script to a consent category. You can find the ID of each category from your CookieChimp dashboard.
+- `data-service` (optional): Name of the company, service or a group of scripts. Can be used to disable a single service in a category while leaving others enabled - or the other way around.
+- `data-type` (optional): Defines a custom script type.
+- `data-src` (optional): Can be used instead of `src` for validation purposes.
+
+## Code Examples
+
+```html
+<script>
+  // Always executed
+</script>
+
+<script type="text/plain" data-category="analytics">
+  // Executed when user consents to the "analytics" category
+</script>
+
+<script
+  type="text/plain"
+  data-category="analytics"
+  data-service="Hotjar"
+>
+  // Executed when user consents to "Hotjar" service
+</script>
+
+<!-- Script loads when user consents to "Hotjar" service -->
+<script
+  type="text/plain"
+  data-src="https://static.hotjar.com/c/hotjar-XXXXX.js?sv=X"
+  data-category="analytics"
+  data-service="Hotjar"
+></script>
+```
+
+<Tip>
+  You can also run scripts when a category or service is disabled (if it was
+  previously enabled) by prepending the '!' character to the name.
+
+```html
+<script type="text/plain" data-category="!analytics">
+  // Executed when the "analytics category is disabled
+</script>
+```
+
+</Tip>
