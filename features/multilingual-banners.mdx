@@ -1,17 +1,56 @@
 ---
 title: "Multilingual Banners"
-description: "Translate your consent banner into different languages."
+description: "Translate your consent banner into different languages and control language detection."
 ---
 
 ## Language Detection
 
-We can detect language based on:
-1. The HTML document language - controlled by the [lang attribute](https://www.tpgi.com/using-the-html-lang-attribute/) in the `html` element.
-2. The user's browser language - set by the user's browser.
+CookieChimp automatically detects the language to display your consent banner in. The detection method is configured in your banner settings and uses one of the following:
+
+1. **HTML document language** — the [lang attribute](https://www.tpgi.com/using-the-html-lang-attribute/) on the `<html>` element (e.g. `<html lang="fr">`).
+2. **Browser language** — the language set in the visitor's browser preferences.
 
 <img src="/images/consent-banner/language-detection.png" alt="Language Detection" />
 
 The default language is used if the visitor's language is not supported or there is no translation available for the visitor's language.
+
+### Overriding the Detected Language
+
+In some cases, you may want to display the banner in a language that differs from what is automatically detected. For example, your site might serve content in a language that doesn't match the HTML `lang` attribute or the visitor's browser language.
+
+CookieChimp resolves the display language using the following priority order:
+
+1. `window.CookieChimpLang` — a global JavaScript variable you set before the CookieChimp script loads.
+2. `data-lang` attribute on the `<html>` element.
+3. The default detection method configured in your banner settings (HTML `lang` attribute or browser language).
+
+<Tip>
+  The HTML `lang` attribute remains the recommended way to control the banner language, since it also benefits SEO and accessibility. Only use the override methods below if you need the banner language to differ from the document language.
+</Tip>
+
+#### Option 1: Set `window.CookieChimpLang`
+
+Add a script **before** the CookieChimp snippet to set the language:
+
+```html
+<script>
+  window.CookieChimpLang = "de";
+</script>
+```
+
+#### Option 2: Set `data-lang` on the HTML element
+
+Add a `data-lang` attribute to your `<html>` tag:
+
+```html
+<html lang="en" data-lang="de">
+```
+
+In this example, the page's document language is English, but the consent banner will be displayed in German.
+
+<Note>
+  The language value must be a valid [ISO 639-1 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) (e.g. `en`, `fr`, `de`, `es`) and you must have a translation available for that language in your banner settings.
+</Note>
 
 ## Translations
 
