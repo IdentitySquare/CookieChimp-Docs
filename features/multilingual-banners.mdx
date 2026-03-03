@@ -1,9 +1,9 @@
 ---
 title: "Multilingual Banners"
-description: "Translate your consent banner into different languages and control language detection."
+description: "Understand language detection, overrides, and how to translate your consent banner."
 ---
 
-## Language Detection
+## How does language detection work?
 
 CookieChimp automatically detects the language to display your consent banner in. The detection method is configured in your banner settings and uses one of the following:
 
@@ -14,7 +14,7 @@ CookieChimp automatically detects the language to display your consent banner in
 
 The default language is used if the visitor's language is not supported or there is no translation available for the visitor's language.
 
-### Overriding the Detected Language
+## How do I override the detected language?
 
 In some cases, you may want to display the banner in a language that differs from what is automatically detected. For example, your site might serve content in a language that doesn't match the HTML `lang` attribute or the visitor's browser language.
 
@@ -28,7 +28,7 @@ CookieChimp resolves the display language using the following priority order:
   The HTML `lang` attribute remains the recommended way to control the banner language, since it also benefits SEO and accessibility. Only use the override methods below if you need the banner language to differ from the document language.
 </Tip>
 
-#### Option 1: Set `window.CookieChimpLang`
+### Using window.CookieChimpLang
 
 Add a script **before** the CookieChimp snippet to set the language:
 
@@ -38,7 +38,7 @@ Add a script **before** the CookieChimp snippet to set the language:
 </script>
 ```
 
-#### Option 2: Set `data-lang` on the HTML element
+### Using data-lang attribute
 
 Add a `data-lang` attribute to your `<html>` tag:
 
@@ -52,7 +52,7 @@ In this example, the page's document language is English, but the consent banner
   The language value must be a valid [ISO 639-1 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) (e.g. `en`, `fr`, `de`, `es`) and you must have a translation available for that language in your banner settings.
 </Note>
 
-## Translations
+## How do I translate the banner?
 
 Consent banners can be translated into multiple languages.
 

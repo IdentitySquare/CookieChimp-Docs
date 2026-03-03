@@ -1,9 +1,10 @@
 ---
 title: "FAQ"
+description: "Answers to common questions about consent banners and cookie management."
 icon: "message-circle-question"
 ---
 
-### How do I verify if everything is working correctly?
+## How do I verify if everything is working correctly?
 
 Go to "Settings" > "Consent Features" and enable Debug Mode.
 <img src="/images/faq/debug-mode.png" alt="Enable Debug Mode" />
@@ -17,13 +18,13 @@ After the site has been loaded, check the "Storage" tab in the browser console i
 <img src="/images/faq/browser-storage.png" alt="Cookies" />
 
 
-### Why aren't CookieChimp cookies marked as `HttpOnly`?
+## Why aren't CookieChimp cookies marked as `HttpOnly`?
 
 `HttpOnly` cookies can only be used in server-side communication.
 Since the CookieChimp script is client-side code, in order for it to read these cookies, these cookies cannot be marked as `HttpOnly`.
 
 
-### Do we support cross-domain consent?
+## Do we support cross-domain consent?
 
 No, we do not support cross-domain consent sharing.
 
@@ -35,14 +36,14 @@ However, we do support consent sharing across subdomains when the same CookieChi
 This is enabled by default.
 
 
-### How can I obtain the consent ID?
+## How can I obtain the consent ID?
 
 The consent ID is shown in the preferences modal of the banner.
 <img src="/images/faq/consent-id.png" alt="Consent ID" />
 
 
 
-### How do I enable Global Privacy Control?
+## How do I enable Global Privacy Control?
 
 Go to the "Integrations" page and enable the Global Privacy Control integration.
 <img src="/images/faq/gpc.png" alt="Enable Global Privacy Control" />

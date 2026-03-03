@@ -1,0 +1,44 @@
+# CookieChimp
+
+> CookieChimp is a developer-first Consent Management Platform (CMP) for GDPR, CCPA, and Google Consent Mode compliance. It intelligently blocks scripts until consent is granted.
+
+## Docs
+
+- [Overview](https://docs.cookiechimp.com/overview): Learn what a developer-first consent management platform can do.
+- [How do I install a consent banner?](https://docs.cookiechimp.com/installation/installation): Add a consent banner to your website in under 5 minutes.
+- [How do I block scripts until consent?](https://docs.cookiechimp.com/block-scripts-cookies/script-attributes): Control which scripts run based on user consent using data attributes.
+- [How do I embed a vendor list on my site?](https://docs.cookiechimp.com/features/vendor-list-embed): Add an up-to-date vendor list to your cookie or privacy policy page.
+- [FAQ](https://docs.cookiechimp.com/faq): Answers to common questions about consent banners and cookie management.
+
+## Platform Installation
+
+- [How do I use a consent banner with Google Tag Manager?](https://docs.cookiechimp.com/installation/google-tag-manager): Set up a consent banner with Google Tag Manager and Google Consent Mode.
+- [How do I add a consent banner to Next.js?](https://docs.cookiechimp.com/installation/nextjs): Install a consent banner in a Next.js application with the App Router or Pages Router.
+- [How do I add a consent banner to Shopify?](https://docs.cookiechimp.com/installation/shopify): Install a consent banner on your Shopify store.
+- [How do I add a consent banner to a Single Page Application?](https://docs.cookiechimp.com/installation/single-page-applications): Install a consent banner in JavaScript-powered SPAs like React, Astro, and more.
+- [How do I add a consent banner to WordPress?](https://docs.cookiechimp.com/installation/wordpress): Install a consent banner on your WordPress site.
+
+## Features
+
+- [How are consent records stored?](https://docs.cookiechimp.com/features/consent-records): Understand how consent records are stored and how to find user records.
+- [How does vendor scanning work?](https://docs.cookiechimp.com/features/vendor-scanning): Understand how your website is scanned for vendors and storage items.
+- [How do I manage vendors and storage items?](https://docs.cookiechimp.com/features/vendor-management): Organize categories, vendors, and storage items.
+- [How do I customize the consent banner?](https://docs.cookiechimp.com/features/banner-designer): Design and configure your consent banner's layout, theme, and behavior.
+- [How does a consent banner handle multiple languages?](https://docs.cookiechimp.com/features/multilingual-banners): Understand language detection, overrides, and how to translate your consent banner.
+- [How do I use wildcard patterns for cookies?](https://docs.cookiechimp.com/features/wildcard-cookies): Group similar storage items using wildcard patterns.
+
+## Advanced
+
+- [How do I block third-party iframes?](https://docs.cookiechimp.com/features/block-iframes): Block iframes from loading before consent and show a placeholder notice.
+- [How do I identify users in consent records?](https://docs.cookiechimp.com/features/identify-users): Match consent records with your application's user IDs.
+- [Custom Consent Button](https://docs.cookiechimp.com/advanced/custom-update-consent-button): Add custom buttons or links for users to change their cookie preferences.
+- [How do I customize a consent banner with CSS?](https://docs.cookiechimp.com/advanced/custom-css): Override the banner's styles using CSS variables and custom selectors.
+- [What consent banner callbacks and events are available?](https://docs.cookiechimp.com/advanced/callbacks-events): Listen for consent events and control the banner programmatically.
+
+## API Reference
+
+- [API Authentication](https://docs.cookiechimp.com/api-reference/authentication): Authenticate with the CookieChimp API using API keys.
+
+## OpenAPI Specs
+
+- [OpenAPI Spec](https://docs.cookiechimp.com/openapi.yaml): Full OpenAPI specification for the CookieChimp API.

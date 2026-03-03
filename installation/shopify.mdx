@@ -1,7 +1,57 @@
 ---
 title: "Shopify"
-description: "Add CookieChimp to your Shopify site"
+description: "Install a consent banner on your Shopify store."
 icon: "shopify"
 ---
 
-Add the CookieChimp [Shopify app](#) and set it up in your Shopify admin.
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    Log in to your [CookieChimp dashboard](https://app.cookiechimp.com) and copy your website's JS snippet. It looks like this:
+
+    ```html
+    <script src="https://cookiechimp.com/widget/abc123.js"></script>
+    ```
+
+    Replace `abc123` with your website's unique CookieChimp ID.
+  </Step>
+
+  <Step title="Add the snippet to your Shopify theme">
+    1. In your Shopify admin, go to **Online Store → Themes**.
+    2. Click the **three-dot menu (⋯)** on your current theme and select **Edit code**.
+    3. In the **Layout** folder, open `theme.liquid`.
+    4. Find the opening `<head>` tag and paste the CookieChimp snippet directly after it, before any other scripts.
+    5. Click **Save**.
+
+    <Info>
+      The CookieChimp script needs to be the first script in the `<head>` section so it can block other scripts before they run and set cookies without consent.
+    </Info>
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    To ensure compliance with privacy regulations, you need to block non-essential scripts and cookies until the user gives consent.
+    Refer to our [Scripts Management Section](/block-scripts-cookies/script-attributes) for detailed instructions.
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    CookieChimp provides a floating privacy icon (Privacy Trigger) that allows users to manage their cookie preferences at any time.
+    You can enable this in the banner settings.
+
+    Optionally, you can open the preferences modal with a custom link or button by adding a button with the data attribute `data-cc="show-preferencesModal"`:
+
+    ```html
+    <button type="button" data-cc="show-preferencesModal">
+      Manage cookie preferences
+    </button>
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- Make sure the domain is allowed in the Settings page on the CookieChimp dashboard.
+- Clear your browser cache and cookies, then reload your store.
+- Enable "Debug mode" from the CookieChimp dashboard and check the browser JS console for errors.
+
+<Note>
+  If you encounter any issues or need further assistance, please reach out to us via our chat.
+</Note>

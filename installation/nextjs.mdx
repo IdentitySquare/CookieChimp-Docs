@@ -1,6 +1,6 @@
 ---
 title: "Next.js"
-description: "Add CookieChimp to your Next.js application"
+description: "Install a consent banner in a Next.js application with the App Router or Pages Router."
 icon: "react"
 ---
 
@@ -16,7 +16,7 @@ This page shows the **simplest** way to add CookieChimp to a Next.js app and che
 
 ---
 
-## Prerequisites
+## What do I need before starting?
 
 - **Next.js (App Router)** project (`app/` directory).
 - Your CookieChimp **Account ID** (replace `YOUR_ACCOUNT_ID` below).
@@ -24,7 +24,7 @@ This page shows the **simplest** way to add CookieChimp to a Next.js app and che
 
 ---
 
-## What You'll Build
+## What will this guide cover?
 
 1) Load the CookieChimp script **first** in `<head>`  
 2) Add the required **trigger container**  
@@ -32,7 +32,7 @@ This page shows the **simplest** way to add CookieChimp to a Next.js app and che
 
 ---
 
-## Step 1 - Load CookieChimp in `<head>` first
+## How do I load the CookieChimp script?
 
 Use Next.js `<Script>` with `strategy="beforeInteractive"` so CookieChimp runs **before hydration**.
 
@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ---
 
-## Step 2 - Add a consent logger
+## How do I check consent status in code?
 
 If you need to take actions based on user consent (such as loading analytics scripts, tracking pixels, or other third-party services), this is where you'll implement that logic. If you're using Google Tag Manager, you can implement the GTM setup following our [Google Tag Manager integration guide](/installation/google-tag-manager) for the same approach.
 
@@ -114,7 +114,7 @@ export default function ConsentLogger() {
 
 ---
 
-## Step 3 - Use the logger on your page
+## How do I use the consent logger on a page?
 
 Drop the logger onto any page (or mount once in `app/layout.tsx` if you prefer a global listener).
 
@@ -136,7 +136,7 @@ export default function HomePage() {
 
 ---
 
-## Verify
+## How do I verify it's working?
 
 1. Start your app and **open the homepage**.
 2. **Open DevTools → Console**.
@@ -148,7 +148,7 @@ export default function HomePage() {
 
 ---
 
-## Notes & Tips
+## What else should I know?
 
 * **Service vs Category**: use `acceptedService("Service", "Category")` for granular control.
 * **Already Consented Users**: the logger runs once on mount to catch prior consent, and again on `cc:onConsented` / `cc:onUpdate`.
@@ -156,7 +156,7 @@ export default function HomePage() {
 
 ---
 
-## Pages Router?
+## How do I set this up with Pages Router?
 
 If you're on the **Pages Router**, place the `<Script>` tag in `pages/_document.tsx` within `<Head>`, keep the `<div id="cookiechimp-container" />` in `pages/_app.tsx`, and use the same `ConsentLogger`.
 
@@ -201,6 +201,6 @@ export default function App({ Component, pageProps }: AppProps) {
 
 ---
 
-## Advanced Usage
+## Where can I learn more?
 
 For more advanced integration patterns, including category-level consent checking and custom consent buttons, see our [JavaScript & SPA guide](/installation/single-page-applications) and [Callbacks & Events documentation](/advanced/callbacks-events).

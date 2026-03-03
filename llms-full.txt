@@ -1,0 +1,880 @@
+# CookieChimp Documentation
+
+> CookieChimp is a developer-first Consent Management Platform (CMP) for GDPR, CCPA, and Google Consent Mode compliance. It intelligently blocks scripts until consent is granted.
+
+---
+
+# Overview
+
+## What is CookieChimp?
+
+CookieChimp is a modern, developer-first Consent Management Platform (CMP) that intelligently blocks scripts until consent is granted. It helps you seamlessly comply with GDPR, CCPA, Google Consent Mode and other privacy standards.
+
+## What can CookieChimp do?
+
+- **Cookie Management**: AI-powered cookie management for effortless compliance.
+- **Consent Records**: Secure storage and management of user consent records.
+- **API Access**: Full API access for managing consents and data integration.
+- **Custom Widget**: Customisable consent interface with JavaScript and CSS options.
+- **Headless Option**: Use as a headless platform with your own UI implementation.
+- **Framework Agnostic**: Works with any web platform or framework.
+- **GDPR & CCPA**: Automatic script blocking and opt-out options for compliance.
+- **Privacy First**: Privacy-focused with data minimisation and security.
+
+---
+
+# How do I install CookieChimp?
+
+Add CookieChimp to your website in under 5 minutes.
+
+**Step 1: Add the JS code**
+
+Add your website's CookieChimp JS snippet in the `<head>` tag of your HTML:
+
+```html
+<script src="https://cookiechimp.com/widget/abc123.js"></script>
+```
+
+Replace `abc123` with your website's unique CookieChimp ID.
+
+> The CookieChimp script needs to be added at the top of the `<head>` section, so that it can run first, in order to ensure other scripts are only run based on consent.
+
+**Step 2: Block Scripts & Cookies**
+
+To ensure compliance with GDPR regulations, actively block all non-essential scripts and cookies until the user has given explicit consent. See the script blocking section below.
+
+**Step 3: Allow users to update their preferences**
+
+CookieChimp provides a floating privacy icon (Privacy Trigger) that allows users to manage their cookie preferences at any time. You can enable this in the banner settings.
+
+Optionally, open the preferences modal with a custom button:
+
+```html
+<button type="button" data-cc="show-preferencesModal">
+  Manage cookie preferences
+</button>
+```
+
+## What if the banner doesn't show?
+
+- Check if the domain is allowed in the Settings page on the platform.
+- Ensure there are no conflicts with other scripts or styles on your website.
+- Clear your browser cache and cookies, then reload the website.
+- Enable "Debug mode" from the platform and open JS console to check for any errors.
+
+---
+
+# How do I block scripts until consent?
+
+Control which scripts run based on user consent using data attributes.
+
+> If you are using Google Tag Manager to trigger tags, see the Google Tag Manager section.
+
+## What attributes can I use?
+
+- `data-category`: Assigns the script to a consent category. Find the ID of each category from your CookieChimp dashboard.
+- `data-service` (optional): Name of the company, service or a group of scripts. Can be used to disable a single service in a category while leaving others enabled.
+- `data-type` (optional): Defines a custom script type.
+- `data-src` (optional): Can be used instead of `src` for validation purposes.
+
+## How do I block a script?
+
+```html
+<script>
+  // Always executed
+</script>
+
+<script type="text/plain" data-category="analytics">
+  // Executed when user consents to the "analytics" category
+</script>
+
+<script
+  type="text/plain"
+  data-category="analytics"
+  data-service="Hotjar"
+>
+  // Executed when user consents to "Hotjar" service
+</script>
+
+<!-- Script loads when user consents to "Hotjar" service -->
+<script
+  type="text/plain"
+  data-src="https://static.hotjar.com/c/hotjar-XXXXX.js?sv=X"
+  data-category="analytics"
+  data-service="Hotjar"
+></script>
+```
+
+You can also run scripts when a category or service is disabled by prepending `!`:
+
+```html
+<script type="text/plain" data-category="!analytics">
+  // Executed when the "analytics" category is disabled
+</script>
+```
+
+---
+
+# How do I embed a vendor list on my site?
+
+Add an up-to-date vendor list to your cookie or privacy policy page.
+
+Add the script to your `<head>`:
+
+```html
+<script src="https://cookiechimp.com/portal/{account_id}/vendors.js"></script>
+```
+
+Add the div where you want the vendor list:
+
+```html
+<div data-cookiechimp-vendor-list></div>
+```
+
+---
+
+# FAQ
+
+## How do I verify if everything is working correctly?
+
+Go to "Settings" > "Consent Features" and enable Debug Mode. When a page view or consent is recorded, the banner will log the details in the browser console.
+
+To ensure cookies are blocked and added on consent, use the developer console. Load your website after clearing cookies or in a private browser window. Check the "Storage" tab in the browser console to see if any cookies have been set.
+
+## Why aren't CookieChimp cookies marked as HttpOnly?
+
+`HttpOnly` cookies can only be used in server-side communication. Since the CookieChimp script is client-side code, in order for it to read these cookies, they cannot be marked as `HttpOnly`.
+
+## Do we support cross-domain consent?
+
+No. Cross Domain Consent requires third-party cookies, which many browsers do not allow.
+
+However, we do support consent sharing across subdomains when the same CookieChimp script is installed. This is enabled by default.
+
+## How can I obtain the consent ID?
+
+The consent ID is shown in the preferences modal of the banner.
+
+## How do I enable Global Privacy Control?
+
+Go to the "Integrations" page and enable the Global Privacy Control integration. If a GPC signal is detected from the browser, opt-out preferences will automatically be set.
+
+---
+
+# How do I use CookieChimp with Google Tag Manager?
+
+Add your website's CookieChimp JS snippet in the `<head>` tag of your HTML.
+
+> Do not add the CookieChimp code via Google Tag Manager since we set the default consent states before Google Tag Manager runs.
+
+```html
+<script src="https://cookiechimp.com/widget/abc123.js"></script>
+```
+
+Replace `abc123` with your website's unique CookieChimp ID.
+
+## How do I block tags with Google Tag Manager?
+
+1. **Enable Google Consent Mode**: Navigate to "Integrations" from the sidebar and enable the Google Consent Mode integration.
+2. **Add/Edit Tag**: Create or update a tag. Navigate to "Advanced Settings" > "Consent Settings". Check "Require additional consent for tag to fire" and add consent checks.
+3. **Add a custom trigger**: Create a Custom Event trigger with event name `cookiechimp_consent_update`.
+
+## How does CookieChimp map to Google consent types?
+
+| CookieChimp Category ID | Google Consent Type                          |
+| ----------------------- | -------------------------------------------- |
+| essential               | functionality_storage, security_storage      |
+| marketing               | ad_storage, ad_user_data, ad_personalization |
+| analytics               | analytics_storage                            |
+| personalization         | personalization_storage                      |
+
+When a user opts-in to a consent category, the linked Google consent type changes from 'denied' to 'granted'. We also send the consent state of individual services to Google.
+
+---
+
+# How do I add CookieChimp to Next.js?
+
+Install CookieChimp in a Next.js application with the App Router or Pages Router.
+
+## What do I need before starting?
+
+- Next.js (App Router) project (`app/` directory).
+- Your CookieChimp Account ID (replace `YOUR_ACCOUNT_ID` below).
+- If testing locally: `localhost` added to Additional Domains in Account Settings > General.
+
+## How do I load the CookieChimp script?
+
+Use Next.js `<Script>` with `strategy="beforeInteractive"`:
+
+```tsx
+// app/layout.tsx
+import Script from "next/script";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <Script
+          src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"
+          strategy="beforeInteractive"
+        />
+      </head>
+      <body>
+        <div id="cookiechimp-container" />
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+## How do I check consent status in code?
+
+```tsx
+// app/consent-logger.tsx
+"use client";
+import { useEffect } from "react";
+
+export default function ConsentLogger() {
+  useEffect(() => {
+    function logConsent() {
+      // @ts-ignore
+      const allowed = window.CookieConsent?.acceptedService?.("Google Analytics", "analytics");
+      if (allowed) {
+        console.log("Google Analytics allowed");
+      } else {
+        console.log("Google Analytics blocked");
+      }
+    }
+
+    logConsent();
+    window.addEventListener("cc:onConsented", logConsent);
+    window.addEventListener("cc:onUpdate", logConsent);
+
+    return () => {
+      window.removeEventListener("cc:onConsented", logConsent);
+      window.removeEventListener("cc:onUpdate", logConsent);
+    };
+  }, []);
+
+  return null;
+}
+```
+
+Replace `"Google Analytics"` and `"analytics"` with the exact service and category names you configured in CookieChimp.
+
+## How do I set this up with Pages Router?
+
+Place the `<Script>` tag in `pages/_document.tsx` within `<Head>`, keep `<div id="cookiechimp-container" />` in `pages/_app.tsx`, and use the same ConsentLogger.
+
+```tsx
+// pages/_document.tsx
+import { Html, Head, Main, NextScript } from 'next/document'
+import Script from 'next/script'
+
+export default function Document() {
+  return (
+    <Html>
+      <Head>
+        <Script
+          src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"
+          strategy="beforeInteractive"
+        />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  )
+}
+```
+
+```tsx
+// pages/_app.tsx
+import type { AppProps } from 'next/app'
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <div id="cookiechimp-container" />
+      <Component {...pageProps} />
+    </>
+  )
+}
+```
+
+---
+
+# How do I add CookieChimp to Shopify?
+
+Add the CookieChimp Shopify app and set it up in your Shopify admin.
+
+---
+
+# How do I add CookieChimp to a Single Page Application?
+
+Install CookieChimp in JavaScript-powered SPAs like React, Astro, and more.
+
+## How do I load CookieChimp in an SPA?
+
+Reinitialize the CookieChimp widget on page navigation:
+
+```html
+<script is:inline>
+  function runCookieChimp() {
+    var script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/K8ktWD.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
+  }
+
+  // for Astro JS
+  document.addEventListener("astro:page-load", runCookieChimp);
+</script>
+```
+
+## How do I position the Privacy Trigger in an SPA?
+
+Place a div with ID `cookiechimp-container` in a location that does not get replaced during navigation:
+
+```html
+<div id="cookiechimp-container"></div>
+```
+
+For framework-specific persistence:
+
+```html
+<!-- For Turbo -->
+<div id="cookiechimp-container" data-turbo-permanent></div>
+
+<!-- For Astro JS -->
+<div id="cookiechimp-container" transition:persist></div>
+```
+
+## How do I run code based on consent?
+
+Use the `cc:onConsented` event:
+
+```javascript
+window.addEventListener("cc:onConsented", function (event) {
+  if (CookieChimp.acceptedCategory("analytics")) {
+    // "analytics" category enabled
+  }
+
+  if (CookieChimp.acceptedService("Google Analytics", "analytics")) {
+    // "Google Analytics" service enabled
+  }
+});
+```
+
+Use the `cc:onUpdate` event for consent changes:
+
+```javascript
+window.addEventListener("cc:onUpdate", function (event) {
+  var detail = event.detail;
+
+  if (detail.changedCategories.includes("analytics")) {
+    if (CookieChimp.acceptedCategory("analytics")) {
+      // "analytics" category was just enabled
+    } else {
+      // "analytics" category was just disabled
+    }
+
+    if (detail.changedServices["analytics"].includes("Google Analytics")) {
+      if (CookieChimp.acceptedService("Google Analytics", "analytics")) {
+        // "Google Analytics" service was just enabled
+      } else {
+        // "Google Analytics" service was just disabled
+      }
+    }
+  }
+});
+```
+
+---
+
+# How do I add CookieChimp to WordPress?
+
+Install CookieChimp on your WordPress site with our plugin.
+
+1. **Install CookieChimp WordPress Plugin**: Download from GitHub and upload to WordPress.
+2. **Install WP Consent API plugin**: Install from the WordPress plugin directory. This allows other plugins to run tags based on consent.
+3. **Configure CookieChimp Plugin**: Open plugin settings and enter your CookieChimp account ID.
+4. **Enable WordPress Integration**: Enable the WordPress integration from the Integrations page.
+
+---
+
+# How does CookieChimp store consent records?
+
+## How is visitor data stored?
+
+- CookieChimp generates a random UUID for each visitor.
+- No Personal Identifiable Information (PII) is stored in the database.
+
+## How are IP addresses handled?
+
+- IP addresses are processed only to determine visitor's country & region.
+- IPs are masked before storage.
+- Only country & region information is retained in logs.
+
+## How do I find a user's consent record?
+
+Search for specific consent records using the visitor's UUID, which can be found in the banner.
+
+## How do I view consent details?
+
+Click on consent records to see more details.
+
+---
+
+# How does vendor scanning work?
+
+CookieChimp scans your website to find vendors and storage items used on your site. It detects services and storage items set before and after consent was granted.
+
+Each service is flagged with one of these statuses:
+
+- `Ran before consent` - A non-essential service ran before consent is granted.
+- `Not shown in banner` - Storage items detected from a service not shown in your banner.
+- `Not part of a category or service` - Storage items detected that cannot be matched to a vendor.
+- `All good` - Everything is set up correctly.
+
+## How do I run a manual scan?
+
+Scans can be created from the Website Scan page. Free plans: 1 scan per day. Paid plans: 5 scans per day.
+
+## How do I enable automatic scanning?
+
+Enable auto scanning through the Vendor Scanner integration. Paid plans: automatic weekly scanning. Free plans: automatic monthly scanning.
+
+---
+
+# How do I manage vendors and storage items?
+
+## What are categories?
+
+Categories organize vendors into groups. Default categories: Essential, Analytics, Marketing, Personalization. A category becomes active when it contains an active service or storage items. Only active categories are shown to visitors in the banner.
+
+## What are vendors?
+
+Storage items set by a vendor/service can be grouped together. Services must be associated with a category. CookieChimp offers a vendor library of popular services. You can also create services manually.
+
+## What are storage items?
+
+Storage items can be: Cookie, Local Storage, or Session Storage. They can be grouped into a service or added to a category directly.
+
+---
+
+# How do I customize the consent banner?
+
+## How do I show different banners by region?
+
+Banners can be configured to show only in specific countries or U.S. states. This lets you create multiple banners customised for different regions and their regulations.
+
+## How do I force users to consent before browsing?
+
+Enable the force consent option to require users to accept/deny consent before interacting with the website.
+
+## How do I change the banner layout?
+
+The layout, position and button placement of banners can be customised. The preferences modal layout can also be customised.
+
+## How do I customize banner buttons?
+
+The weights, position and text of banner buttons can be customised.
+
+> Some regulations like GDPR require banner buttons to be equally weighted.
+
+## What is the Privacy Trigger?
+
+A floating button that allows users to update their consent preferences at any time. Can be enabled/disabled and its position customised.
+
+> Most regulations mandate that users must be able to update their consent preferences after giving their initial consent.
+
+## How do I control what users see in preferences?
+
+The preferences modal can show only categories, or include services and cookies for more granular control.
+
+> Some regulations require all storage items and services to be shown.
+
+## How do I theme the banner?
+
+- Dark/Light mode - Choose between light, dark, or auto mode
+- Colors - Customise primary, text, and button colors
+- Border radius - Adjust corner roundness
+- Logo - Add your company logo
+
+For more detailed styling, use Custom CSS.
+
+---
+
+# How does CookieChimp handle multiple languages?
+
+## How does language detection work?
+
+CookieChimp automatically detects the language to display your consent banner in. The detection method is configured in banner settings:
+
+1. **HTML document language** — the `lang` attribute on the `<html>` element (e.g. `<html lang="fr">`).
+2. **Browser language** — the language set in the visitor's browser preferences.
+
+The default language is used if the visitor's language is not supported.
+
+## How do I override the detected language?
+
+CookieChimp resolves the display language using this priority order:
+
+1. `window.CookieChimpLang` — a global JavaScript variable you set before the CookieChimp script loads.
+2. `data-lang` attribute on the `<html>` element.
+3. The default detection method configured in your banner settings.
+
+> The HTML `lang` attribute remains the recommended way to control the banner language, since it also benefits SEO and accessibility.
+
+### Using window.CookieChimpLang
+
+```html
+<script>
+  window.CookieChimpLang = "de";
+</script>
+```
+
+### Using data-lang attribute
+
+```html
+<html lang="en" data-lang="de">
+```
+
+The language value must be a valid ISO 639-1 language code (e.g. `en`, `fr`, `de`, `es`) and you must have a translation available in your banner settings.
+
+## How do I translate the banner?
+
+Consent banners can be translated into multiple languages. AI auto translate is available for paid accounts. Categories, services and storage items can be individually translated.
+
+---
+
+# How do I use wildcard patterns for cookies?
+
+Platforms that generate unique storage item names can create many individual cookies. Wildcards group these under a single pattern using `*`.
+
+## How do wildcards work?
+
+- Standard Naming: `session_12345`, `session_67890`, etc.
+- Wildcard Usage: `session_*`
+
+This matches any storage item of the same type that starts with `session_`.
+
+---
+
+# How do I block third-party iframes?
+
+Block iframes from loading before consent and show a placeholder notice. Enable this feature in the CookieChimp dashboard.
+
+## How do I block an iframe?
+
+```html
+<div data-service="youtube" data-id="<video-id>"></div>
+```
+
+## How do I customize the iframe placeholder?
+
+```html
+<div
+  data-service="youtube"
+  data-id="5b35haQV7tU"
+  data-autoscale
+  data-iframe-id="YoutubeEmbed"
+  data-iframe-loading="lazy"
+  data-iframe-frameborder="0"
+></div>
+```
+
+### What configuration options are available?
+
+- `data-service`: [String, Required] Service name (e.g., YouTube, Vimeo, Google Maps).
+- `data-id`: [String, Required] Unique resource ID (e.g., video ID).
+- `data-title`: [String] Notice title.
+- `data-params`: [String] Iframe query parameters.
+- `data-thumbnail`: [String] Path to custom thumbnail.
+- `data-ratio`: [String] Custom aspect ratio (e.g., "16:9").
+- `data-autoscale`: Responsive iframe that fills parent width.
+- `data-widget`: Use for custom widgets with explicit width and height.
+
+## Which services are supported?
+
+- YouTube
+- Vimeo
+- Google Maps
+
+---
+
+# How do I identify users in consent records?
+
+Match consent records with your application's user IDs. Add the following code to your HTML page, as high up in the `<head>` as possible (before CookieChimp loads):
+
+```html
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    userId: "your_user_ID_123", // Replace with your generated ID
+  });
+</script>
+```
+
+> Don't use any Personal Identifiable Information (PII) as the user ID. Use a unique ID that you can match with your database. PII will be discarded.
+
+---
+
+# How do I let users update their consent?
+
+Most privacy regulations require that users can update their cookie consent preferences after initial consent.
+
+## What is the Privacy Trigger?
+
+CookieChimp provides a built-in floating privacy icon that allows users to manage preferences at any time. Enable and customize it in the Banner Designer settings.
+
+## How do I add a custom consent button?
+
+### Using data attributes
+
+```html
+<button type="button" data-cc="show-preferencesModal">
+  Manage cookie preferences
+</button>
+```
+
+Or as a link:
+
+```html
+<a href="#" data-cc="show-preferencesModal">
+  Cookie Settings
+</a>
+```
+
+### Using the JavaScript API
+
+```html
+<button type="button" onclick="CookieConsent.showPreferences()">
+  Manage cookie preferences
+</button>
+```
+
+## What are best practices for placement?
+
+Place the link in an obvious location: website footer, privacy policy page, cookie policy page, or user account settings. Use clear, descriptive text like "Manage cookie preferences" or "Cookie settings". Make it accessible and keyboard navigable.
+
+## What do regulations require?
+
+Most privacy regulations mandate that users must be able to update their consent preferences. Satisfy this by enabling the Privacy Trigger or adding a custom button/link in an obvious location.
+
+---
+
+# How do I customize CookieChimp with CSS?
+
+CookieChimp's dashboard allows you to customise the banner and modal. For more control, use custom CSS.
+
+## How do I enable dark mode?
+
+Add `cc--darkmode` class to the HTML element. Or enable auto dark mode in the CookieChimp dashboard.
+
+## What CSS variables can I customize?
+
+Override these CSS variables to build your own theme:
+
+```css
+:root {
+  --cc-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --cc-modal-border-radius: 0.5rem;
+  --cc-btn-border-radius: 0.4rem;
+  --cc-modal-transition-duration: 0.25s;
+  --cc-modal-margin: 1rem;
+  --cc-z-index: 2147483647;
+  --cc-bg: #ffffff;
+  --cc-primary-color: #2c2f31;
+  --cc-secondary-color: #5e6266;
+  --cc-btn-primary-bg: #30363c;
+  --cc-btn-primary-color: #ffffff;
+  --cc-btn-primary-hover-bg: #000000;
+  --cc-btn-primary-hover-color: #ffffff;
+  --cc-btn-secondary-bg: #eaeff2;
+  --cc-btn-secondary-color: var(--cc-primary-color);
+  --cc-btn-secondary-hover-bg: #d4dae0;
+  --cc-toggle-on-bg: var(--cc-btn-primary-bg);
+  --cc-toggle-off-bg: #667481;
+  --cc-overlay-bg: rgba(0, 0, 0, 0.65);
+  --cc-footer-bg: var(--cc-btn-secondary-bg);
+  --cc-footer-color: var(--cc-secondary-color);
+}
+```
+
+Dark mode variables are available under the `.cc--darkmode` class.
+
+## How do I disable transitions?
+
+```css
+#cc-main {
+  --cc-modal-transition-duration: 0;
+}
+```
+
+---
+
+# What callbacks and events does CookieChimp provide?
+
+## What events can I listen for?
+
+### Consent Events
+
+**cc:onFirstConsent** - Triggered the first time user expresses their choice of consent.
+
+```js
+window.addEventListener("cc:onFirstConsent", function (event) {
+  var detail = event.detail;
+  // detail.cookie
+});
+```
+
+**cc:onConsented** - Triggered on first consent and on every subsequent page load.
+
+```js
+window.addEventListener("cc:onConsented", function (event) {
+  var detail = event.detail;
+  // detail.cookie
+});
+```
+
+**cc:onUpdate** - Triggered when the user modifies their preferences (only if consent has already been provided).
+
+```js
+window.addEventListener("cc:onUpdate", function (event) {
+  var detail = event.detail;
+  // detail.cookie
+  // detail.changedCategories
+  // detail.changedServices
+});
+```
+
+### Modal Events
+
+**cc:onModalShow** - The consent modal is visible.
+**cc:onModalHide** - The consent modal is hidden.
+**cc:onModalReady** - The consent modal is created and appended to the DOM.
+
+All modal events provide `event.detail.modalName`.
+
+## What actions can I call programmatically?
+
+### show
+
+Shows the consent banner. Pass `true` to generate it on the fly if consent was previously expressed.
+
+```js
+CookieChimp.show();
+CookieChimp.show(true);
+```
+
+### hide
+
+Hides the consent banner.
+
+```js
+CookieChimp.hide();
+```
+
+### showPreferences
+
+Shows the preferences modal.
+
+```js
+CookieChimp.showPreferences();
+```
+
+### hidePreferences
+
+Hides the preferences modal.
+
+```js
+CookieChimp.hidePreferences();
+```
+
+### getUserPreferences
+
+Returns user's preferences.
+
+```typescript
+function(): {
+    acceptType: string,          // 'all', 'custom', or 'necessary'
+    acceptedCategories: string[],
+    rejectedCategories: string[],
+    acceptedServices: {[category: string]: string[]}
+    rejectedServices: {[category: string]: string[]}
+}
+```
+
+```javascript
+var preferences = CookieChimp.getUserPreferences();
+
+if (preferences.acceptType === "all") {
+  console.log("Everything has been accepted!");
+}
+```
+
+### acceptCategory
+
+Programmatically accept or reject a cookie category.
+
+```js
+CookieChimp.acceptCategory("all");             // accept all
+CookieChimp.acceptCategory([]);                // reject all (keep necessary)
+CookieChimp.acceptCategory();                  // accept current modal selection
+CookieChimp.acceptCategory("analytics");       // accept one category
+CookieChimp.acceptCategory(["analytics", "marketing"]); // accept specific categories
+CookieChimp.acceptCategory("all", ["analytics"]);       // accept all except one
+```
+
+### acceptedCategory
+
+Returns `true` if the specified category was accepted.
+
+```javascript
+if (CookieChimp.acceptedCategory("analytics")) {
+  // "analytics" category was accepted
+}
+```
+
+### acceptService
+
+Accepts or rejects services.
+
+```javascript
+CookieChimp.acceptService("all", "analytics");           // accept all in category
+CookieChimp.acceptService([], "analytics");               // reject all in category
+CookieChimp.acceptService("Google Analytics", "analytics"); // accept one service
+```
+
+### acceptedService
+
+Returns `true` if the specified service was accepted.
+
+```javascript
+if (CookieChimp.acceptedService("Google Analytics", "analytics")) {
+  // "Google Analytics" service was accepted
+}
+```
+
+### validConsent
+
+Returns `true` if consent is valid. Consent is NOT valid when: consent is missing, CookieChimp's cookie doesn't exist/has expired, or cookie is structurally invalid.
+
+```javascript
+if (CookieChimp.validConsent()) {
+  // consent is valid
+}
+```
+
+### reset
+
+Resets CookieChimp. Pass `true` to delete the consent cookie. The page must be reloaded after calling this.
+
+```js
+CookieChimp.reset(true);
+window.location.reload();
+```

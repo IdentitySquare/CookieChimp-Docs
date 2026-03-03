@@ -62,7 +62,8 @@
               "features/identify-users",
               "advanced/custom-update-consent-button",
               "advanced/custom-css",
-              "advanced/callbacks-events"
+              "advanced/callbacks-events",
+              "advanced/content-security-policy"
             ]
           }
         ]

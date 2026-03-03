@@ -1,14 +1,13 @@
 ---
-title: "Custom Update Consent Button"
-description: "Allow users to update their cookie preferences with custom buttons or links"
-icon: "hand-pointer"
+title: "Custom Consent Button"
+description: "Add custom buttons or links for users to change their cookie preferences."
 ---
 
-## Overview
+## Why do users need to update consent?
 
 Most privacy regulations (GDPR, CCPA, etc.) require that users have an easy way to update their cookie consent preferences after providing their initial consent. This ensures users maintain control over their data and can change their mind at any time.
 
-## Privacy Trigger (Recommended)
+## What is the Privacy Trigger?
 
 CookieChimp provides a built-in floating privacy icon called the **Privacy Trigger** that allows users to manage their cookie preferences at any time. This is the easiest way to remain compliant.
 
@@ -21,11 +20,11 @@ You can enable and customize the Privacy Trigger in the [Banner Designer](/featu
   If you enable the Privacy Trigger, you don't need to add a custom button or link, as users will already have an obvious way to update their preferences.
 </Note>
 
-## Custom Button or Link
+## How do I add a custom consent button?
 
 If you prefer not to use the Privacy Trigger, or want to provide additional access points for users to update their preferences (such as in your website footer or privacy policy page), you can add custom buttons or links.
 
-### Using Data Attributes (Recommended)
+### Using data attributes
 
 The simplest way to create a custom button or link is by adding a `data-cc` attribute:
 
@@ -43,7 +42,7 @@ You can also use a link instead of a button:
 </a>
 ```
 
-### Using JavaScript API
+### Using the JavaScript API
 
 Alternatively, you can programmatically open the preferences modal using the JavaScript API:
 
@@ -69,7 +68,7 @@ Or attach an event listener:
 
 For more information about the JavaScript API, see the [Callbacks & Events](/advanced/callbacks-events#showpreferences) documentation.
 
-## Best Practices
+## What are best practices for placement?
 
 <Check>
   **Place the link in an obvious location** - Common locations include:
@@ -91,7 +90,7 @@ For more information about the JavaScript API, see the [Callbacks & Events](/adv
   **Make it accessible** - Ensure the button/link is keyboard navigable and screen reader friendly
 </Check>
 
-## Compliance Requirements
+## What do regulations require?
 
 <Warning>
   Most privacy regulations mandate that users must be able to update their consent preferences after giving their initial consent. Failing to provide this functionality may result in non-compliance.

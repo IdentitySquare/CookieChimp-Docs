@@ -1,9 +1,9 @@
 ---
-title: "Callback & Events"
-description: "Customise the user's experience programmatically."
+title: "Callbacks & Events"
+description: "Listen for consent events and control the banner programmatically."
 ---
 
-# Event Broadcasts
+## What events can I listen for?
 
 <Info>
   You can use this to read user's consent to cookie categories and services.
@@ -11,7 +11,7 @@ description: "Customise the user's experience programmatically."
   ›](/block-scripts-cookies/callbacks-events)
 </Info>
 
-## Consent Callbacks
+### Consent Events
 
 ### `cc:onFirstConsent`
 
@@ -56,7 +56,7 @@ window.addEventListener("cc:onUpdate", function (event) {
 });
 ```
 
-## Modal Callbacks
+### Modal Events
 
 ### `cc:onModalShow`
 
@@ -103,7 +103,7 @@ window.addEventListener("cc:onModalReady", function (event) {
 });
 ```
 
-# Actions
+## What actions can I call programmatically?
 
 ### `show`
 

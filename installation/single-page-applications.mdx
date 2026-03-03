@@ -1,10 +1,10 @@
 ---
-title: "JS & SPA"
-description: "Add CookieChimp to your JavaScript powered website"
+title: "JS & Single Page Apps"
+description: "Install a consent banner in JavaScript-powered SPAs like React, Astro, and more."
 icon: "react"
 ---
 
-## Loading our JS code
+## How do I load CookieChimp in an SPA?
 
 If you are using a Single Page Application (SPA), you need to ensure to reinitialize the CookieChimp widget on page navigation. You can do this by including the CookieChimp script in the following way (example is for Astro JS):
 
@@ -23,7 +23,7 @@ If you are using a Single Page Application (SPA), you need to ensure to reinitia
 </script>
 ```
 
-## Privacy Trigger Position
+## How do I position the Privacy Trigger in an SPA?
 
 You can specify location where the Privacy Trigger (floating icon to update preferences) is added to the DOM by placing a div with the ID `cookiechimp-container` on the page.
 
@@ -44,7 +44,7 @@ If you are using [Turbo](https://turbo.hotwired.dev/handbook/building#persisting
 <div id="cookiechimp-container" transition:persist></div>
 ```
 
-## Callbacks & Events
+## How do I run code based on consent?
 
 The `cc:onConsented` event can be used to execute code based on user consent.
 
