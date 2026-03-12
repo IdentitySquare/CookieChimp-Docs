@@ -1,0 +1,117 @@
+---
+title: "How Long Does It Take to Set Up a CMP?"
+description: "Set up CookieChimp in as little as 10 minutes. The fastest, easiest consent management platform to configure and deploy."
+icon: "timer"
+---
+
+Setting up a Consent Management Platform (CMP) is one of those tasks that most teams expect to take days or even weeks. Between reading through legal requirements, configuring consent categories, blocking scripts, and testing everything — it can feel overwhelming.
+
+With CookieChimp, **it can take as little as 10 minutes** to go from zero to a fully compliant consent setup.
+
+## Why are most CMPs slow to set up?
+
+Traditional consent management platforms require you to:
+
+- Manually audit every cookie and tracker on your site
+- Write complex tag firing rules or modify tag manager configurations
+- Build consent category mappings from scratch
+- Configure consent mode integrations line by line
+- Go through lengthy onboarding flows and sales calls
+
+CookieChimp eliminates most of this by automating vendor detection, providing built-in Google Consent Mode support, and offering a straightforward script-based blocking system.
+
+## How fast can I set up CookieChimp?
+
+Here's a real-world example: a typical website running **Google Analytics, a Facebook Pixel, and a couple of marketing tags** through Google Tag Manager.
+
+<Steps>
+  <Step title="Install the CookieChimp script (2 minutes)">
+    Add a single line of code to the `<head>` of your website:
+
+    ```html
+    <script src="https://cookiechimp.com/widget/abc123.js"></script>
+    ```
+
+    Replace `abc123` with your website's unique CookieChimp ID from the [dashboard](https://cookiechimp.com/install). That's it — the consent banner is live.
+
+    <Info>
+      The script must be placed at the **top** of the `<head>` section so it runs before any other scripts. This ensures no cookies are set before consent is granted.
+    </Info>
+  </Step>
+
+  <Step title="Enable Google Consent Mode (1 minute)">
+    Navigate to **Integrations** from the sidebar in your CookieChimp dashboard and enable the **Google Consent Mode** integration with a single click.
+
+    CookieChimp automatically maps your consent categories to Google's consent types (`analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization`, etc.), so Google Analytics and Google Ads tags will respect user consent out of the box.
+  </Step>
+
+  <Step title="Run a scan and add vendors (3 minutes)">
+    From the **Website Scan** page in your dashboard, run a scan of your website. CookieChimp will automatically detect the vendors and storage items on your site.
+
+    Once the scan completes, review the detected vendors and add them to your consent banner. CookieChimp identifies services like Google Analytics, Facebook Pixel, Hotjar, and hundreds of other vendors automatically.
+  </Step>
+
+  <Step title="Block non-essential tags (4 minutes)">
+    If you're using **Google Tag Manager**, add consent checks to your tags in GTM's Advanced Settings under Consent Settings. Set the trigger to `cookiechimp_consent_update` and you're done. See our [GTM guide](/installation/google-tag-manager) for step-by-step instructions.
+
+    If you have scripts directly in your HTML, add the `type="text/plain"` and `data-category` attributes:
+
+    ```html
+    <!-- Before: runs immediately -->
+    <script src="https://example.com/analytics.js"></script>
+
+    <!-- After: only runs when user consents to analytics -->
+    <script
+      type="text/plain"
+      data-src="https://example.com/analytics.js"
+      data-category="analytics"
+      data-service="Analytics Service"
+    ></script>
+    ```
+
+    For full details, see our [script blocking guide](/block-scripts-cookies/script-attributes).
+  </Step>
+</Steps>
+
+**Total time: ~10 minutes** for a typical setup with Google Analytics and a handful of marketing tags.
+
+## What if I have a lot of tags to block?
+
+The 10-minute estimate assumes a straightforward setup with a small number of tags. If your website has dozens or hundreds of inline scripts and third-party tags, the tag blocking step will naturally take longer — it depends on how many tags you have and how they're embedded.
+
+### Using Google Tag Manager?
+
+If your tags are managed through **Google Tag Manager**, blocking is fast regardless of how many tags you have. You configure consent checks once per tag type in GTM, and CookieChimp handles the rest through Google Consent Mode. Even with 50+ tags, this can be done in under 30 minutes.
+
+### Tags hardcoded in your codebase?
+
+If scripts are embedded directly in your HTML or application code, you'll need to add the `data-category` and `type="text/plain"` attributes to each one. For a large codebase, this can be time-consuming to do manually.
+
+<Tip>
+  **Use AI to speed things up.** Copy the script blocking pattern from our [script blocking guide](/block-scripts-cookies/script-attributes) and use an AI coding assistant (like Claude, Cursor, or GitHub Copilot) to automatically find and update all third-party scripts across your codebase. Give it a prompt like:
+
+  *"Find all third-party script tags in this codebase and add `type="text/plain"` and the appropriate `data-category` attribute based on the service. Use `analytics` for analytics services, `marketing` for advertising/marketing scripts, and `personalization` for personalisation tools."*
+
+  This can turn hours of manual work into minutes.
+</Tip>
+
+## CookieChimp vs. other CMPs
+
+| | CookieChimp | Traditional CMPs |
+|---|---|---|
+| **Setup time** | ~10 minutes | Hours to days |
+| **Script installation** | Single line of code | Multiple scripts and plugins |
+| **Google Consent Mode** | One-click enable | Manual configuration |
+| **Vendor detection** | Automatic scanning | Manual auditing |
+| **Tag blocking** | Simple HTML attributes or GTM consent checks | Complex rule engines |
+| **Onboarding** | Self-serve, instant | Sales calls and onboarding sessions |
+| **Pricing** | Transparent, free tier available | Quote-based, often expensive |
+
+## Ready to get started?
+
+<CardGroup cols={2}>
+    <Card title="Install CookieChimp" icon="download" href="/installation/installation">Start with our installation guide and have your banner live in minutes.</Card>
+    <Card title="Block Scripts" icon="traffic-cone" href="/block-scripts-cookies/script-attributes">Learn how to block scripts until consent is granted.</Card>
+    <Card title="Google Tag Manager" icon="google" href="/installation/google-tag-manager">Set up consent-aware tags with GTM and Google Consent Mode.</Card>
+    <Card title="Scan Your Site" icon="radar" href="/features/vendor-scanning">Automatically detect vendors and storage items on your website.</Card>
+</CardGroup>
