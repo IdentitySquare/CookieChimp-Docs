@@ -1,19 +1,19 @@
 ---
-title: "Block 3rd Party Iframes"
-description: "Disable 3rd party iframes and display a notification regarding their use. Load iframes after user consent is obtained."
+title: "Block Iframes"
+description: "Block iframes from loading before consent and show a placeholder notice."
 ---
 
 <Snippet file="beta-access.mdx" />
 
 To comply with privacy regulations, you can prevent 3rd party iframes from loading before gaining user consent. Enable this feature in the CookieChimp dashboard, then update your website's embeds.
 
-## Basic Usage
+## How do I block an iframe?
 
 ```html
 <div data-service="youtube" data-id="<video-id>"></div>
 ```
 
-## Customised Embedding Example
+## How do I customize the iframe placeholder?
 
 ```html
 <div
@@ -26,7 +26,7 @@ To comply with privacy regulations, you can prevent 3rd party iframes from loadi
 ></div>
 ```
 
-### Configuration Options
+### What configuration options are available?
 
 - `data-service`: [String, Required] Service name (e.g., YouTube, Vimeo, Google Maps).
 - `data-id`: [String, Required] Unique resource ID (e.g., video ID).
@@ -37,7 +37,7 @@ To comply with privacy regulations, you can prevent 3rd party iframes from loadi
 - `data-autoscale`: Responsive iframe that fills parent width and scales proportionally.
 - `data-widget`: Use for custom widgets with explicit width and height.
 
-## Supported Services
+## Which services are supported?
 
 - YouTube
 - Vimeo
