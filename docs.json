@@ -29,6 +29,7 @@
             "pages": [
               "overview",
               "installation/installation",
+              "installation/cmp-setup-guide",
               "block-scripts-cookies/script-attributes",
               "features/vendor-list-embed",
               "faq"
