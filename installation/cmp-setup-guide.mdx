@@ -39,16 +39,22 @@ Here's a real-world example: a typical website running **Google Analytics, a Fac
     </Info>
   </Step>
 
-  <Step title="Enable Google Consent Mode (1 minute)">
-    Navigate to **Integrations** from the sidebar in your CookieChimp dashboard and enable the **Google Consent Mode** integration with a single click.
+  <Step title="Enable Google Consent Mode (1 minute) — optional">
+    If you use any **Google tags** (Google Analytics, Google Ads, GTM, etc.), navigate to **Integrations** from the sidebar in your CookieChimp dashboard and enable the **Google Consent Mode** integration with a single click.
 
     CookieChimp automatically maps your consent categories to Google's consent types (`analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization`, etc.), so Google Analytics and Google Ads tags will respect user consent out of the box.
+
+    <Tip>Skip this step if you don't use any Google services on your website.</Tip>
   </Step>
 
   <Step title="Run a scan and add vendors (3 minutes)">
     From the **Website Scan** page in your dashboard, run a scan of your website. CookieChimp will automatically detect the vendors and storage items on your site.
 
     Once the scan completes, review the detected vendors and add them to your consent banner. CookieChimp identifies services like Google Analytics, Facebook Pixel, Hotjar, and hundreds of other vendors automatically.
+
+    **Here's where CookieChimp saves you serious admin time:** when vendors are detected, we automatically import everything we already know about them — their name, description, privacy policy URL, cookie descriptions, categories, and retention periods. For any vendor or storage item we don't already have in our database, CookieChimp goes out to the internet, researches the details, and autofills the information for you.
+
+    With other CMPs, you'd be manually looking up and entering this information for every single vendor. CookieChimp does it in seconds.
   </Step>
 
   <Step title="Block non-essential tags (4 minutes)">
@@ -95,6 +101,17 @@ If scripts are embedded directly in your HTML or application code, you'll need t
   This can turn hours of manual work into minutes.
 </Tip>
 
+## What about ongoing compliance?
+
+Setup is only half the story. Privacy regulations evolve, your website changes, and vendors update their scripts and cookies. Staying compliant is an ongoing effort — and CookieChimp handles that for you too.
+
+- **Regular automatic scans** — CookieChimp continuously scans your website to detect new vendors, cookies, and storage items as they appear. When your dev team adds a new tool or a vendor updates their tracking code, CookieChimp catches it and alerts you.
+- **Compliance reports** — Generate compliance reports directly from your dashboard to verify your consent setup meets regulatory requirements. Useful for audits, legal reviews, and demonstrating compliance to stakeholders.
+- **Auto-populated vendor details** — Whenever a new vendor is detected in a scan, CookieChimp automatically fills in the vendor's details from our database or by researching the vendor online. No manual data entry required.
+- **Consent records** — Every user consent decision is securely stored and retrievable, giving you a full audit trail if a regulator or user ever asks for proof of consent.
+
+With traditional CMPs, each of these tasks requires manual effort or expensive add-on features. With CookieChimp, it's all built in — so compliance stays up to date without constant attention from your team.
+
 ## CookieChimp vs. other CMPs
 
 | | CookieChimp | Traditional CMPs |
@@ -103,7 +120,10 @@ If scripts are embedded directly in your HTML or application code, you'll need t
 | **Script installation** | Single line of code | Multiple scripts and plugins |
 | **Google Consent Mode** | One-click enable | Manual configuration |
 | **Vendor detection** | Automatic scanning | Manual auditing |
+| **Vendor details** | Auto-imported and AI-researched | Manual data entry for each vendor |
 | **Tag blocking** | Simple HTML attributes or GTM consent checks | Complex rule engines |
+| **Ongoing scans** | Automatic and continuous | Manual re-audits or expensive add-ons |
+| **Compliance reports** | Built-in | Often a paid extra |
 | **Onboarding** | Self-serve, instant | Sales calls and onboarding sessions |
 | **Pricing** | Transparent, free tier available | Quote-based, often expensive |
 
