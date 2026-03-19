@@ -1,0 +1,113 @@
+---
+title: "Single Sign-On (SSO)"
+description: "Integrate CookieChimp with your identity provider using OpenID Connect."
+---
+
+CookieChimp supports Single Sign-On (SSO) for partners via **OpenID Connect (OIDC)**. This allows partner platforms to provide seamless login to CookieChimp without requiring users to create separate credentials.
+
+## How It Works
+
+1. A user on your platform clicks a link to access CookieChimp.
+2. They are redirected to your identity provider (IdP) to authenticate.
+3. After successful authentication, the IdP redirects the user to CookieChimp's callback URL with an authorization code.
+4. CookieChimp exchanges the code for an ID token, extracts user info and group/tenant claims, and signs the user in.
+
+```
+User clicks CookieChimp link
+        │
+        ▼
+Redirect to IdP login
+        │
+        ▼
+User authenticates on IdP
+        │
+        ▼
+IdP redirects to CookieChimp callback
+        │
+        ▼
+CookieChimp creates/updates user + groups
+        │
+        ▼
+User is signed in to CookieChimp
+```
+
+## SSO Callback URL
+
+Each partner SSO provider has a dedicated callback URL:
+
+```
+https://cookiechimp.com/users/auth/{provider_name}/callback
+```
+
+The `{provider_name}` is assigned during partner onboarding. Both `GET` and `POST` methods are accepted on the callback URL.
+
+## OpenID Connect Configuration
+
+CookieChimp uses **OIDC Discovery** to automatically fetch your IdP's configuration. We support both Auth0 and Keycloak as identity providers.
+
+To set up SSO, provide the following to CookieChimp:
+
+| Parameter | Description |
+|-----------|-------------|
+| **Issuer URL** | Your OIDC issuer (e.g. `https://your-tenant.eu.auth0.com/` or `https://auth.yourdomain.com/realms/your-realm`) |
+| **Client ID** | The OIDC client identifier |
+| **Client Secret** | The OIDC client secret |
+
+CookieChimp requests the following OIDC scopes: `openid`, `email`, `profile`.
+
+## JWT Custom Claims for Group Management
+
+CookieChimp reads a custom claim from the ID token to automatically manage group (workspace) membership. Your IdP should include the following claim in the JWT:
+
+```
+https://cookiechimp:com/roles
+```
+
+This claim should contain an array of tenant/group objects that the user has access to. For each tenant in the claim, CookieChimp will:
+
+- **Find or create** a Group matching the `external_id` for your partner
+- **Update** the group name if it has changed
+- **Grant the user access** to the group for the duration of their session
+
+<Note>
+Group membership from SSO is session-based. Each time a user logs in via SSO, their group access is refreshed from the JWT claims. This ensures access is always in sync with your platform.
+</Note>
+
+## User Provisioning
+
+When a user logs in via SSO for the first time, CookieChimp automatically:
+
+1. **Creates a new user account** using the email and name from the ID token
+2. **Links the SSO identity** so future logins are seamless
+3. **Sets the user as partner-managed** — the user's account is flagged as managed by your partner, which adjusts available features in the UI
+4. **Creates group memberships** based on the JWT roles claim
+
+If a user with the same email already exists and has a connected account from your IdP, CookieChimp will link the new provider and sign them in.
+
+## Partner-Managed Users
+
+Users who sign in via partner SSO are marked as `managed_by_partner`. This affects their experience:
+
+- Team member management is handled at the **group level** rather than per-account
+- Users cannot invite individual team members to accounts (managed through your platform instead)
+- Password management is handled by your IdP
+
+## Initiating SSO Login
+
+To send users from your platform to CookieChimp, redirect them to:
+
+```
+https://cookiechimp.com/users/auth/{provider_name}
+```
+
+This will initiate the OIDC authorization flow and redirect the user to your IdP for authentication.
+
+## Setting Up SSO
+
+To configure SSO for your partner integration:
+
+1. Contact [support@cookiechimp.com](mailto:support@cookiechimp.com?subject=Partner%20SSO%20Setup) with your IdP details
+2. Provide your OIDC issuer URL, client ID, and client secret
+3. Configure the callback URL in your IdP: `https://cookiechimp.com/users/auth/{provider_name}/callback`
+4. Add the `https://cookiechimp:com/roles` custom claim to your ID tokens
+5. Test the flow in a development environment before going live

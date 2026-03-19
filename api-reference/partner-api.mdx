@@ -1,0 +1,65 @@
+---
+title: "Partner API"
+description: "Manage groups and accounts programmatically using a partner API token."
+---
+
+The Partner API allows CookieChimp partners to programmatically manage their groups (workspaces) and accounts. Partner API tokens have access to resources across all groups belonging to that partner.
+
+## Authentication
+
+Partner endpoints require a **partner API token** passed in the `Authorization` header:
+
+```http
+Authorization: Bearer YOUR_PARTNER_API_TOKEN
+```
+
+Partner API tokens are issued by CookieChimp and are associated with a specific `Partner` record. To request a partner API token, contact [support@cookiechimp.com](mailto:support@cookiechimp.com?subject=Partner%20API%20Access).
+
+<Note>
+Partner API tokens are different from user or account tokens. Endpoints that require a partner token (such as creating or updating groups) will return a `401` error if a user or account token is used instead.
+</Note>
+
+## Token Types
+
+CookieChimp API tokens can belong to three different bearer types:
+
+| Token Type | Access Scope | Use Case |
+|------------|-------------|----------|
+| **Partner** | All groups and accounts under the partner | Automated provisioning, bulk management |
+| **User** | Accounts the user is a member of | End-user integrations |
+| **Account** | Single account only | Widget and account-scoped operations |
+
+## Available Endpoints
+
+### Groups (Partner token required)
+
+Groups are workspaces that contain one or more accounts. Partners use groups to organize their customers.
+
+- [List Groups](/api-reference/groups/list-groups) — List all groups for your partner
+- [Get Group](/api-reference/groups/get-group) — Get a specific group by ID
+- [Create Group](/api-reference/groups/create-group) — Create a new group
+- [Update Group](/api-reference/groups/update-group) — Update a group's name or external ID
+
+### Accounts (Partner, User, or Account token)
+
+Accounts represent individual websites managed by CookieChimp. With a partner token, you get access to all accounts across your groups.
+
+- [List Accounts](/api-reference/account/list-accounts) — List all accounts (supports `onboarding_status` filter)
+- [Get Account](/api-reference/account/get-account) — Get a specific account by ID
+
+## Account Onboarding Status
+
+When listing accounts, you can filter by `onboarding_status` to track provisioning progress:
+
+| Status | Description |
+|--------|-------------|
+| `account_created` | Account has been created but no vendors configured |
+| `vendors_setup` | Categories, services, or TCF vendors have been configured |
+| `code_installed` | The consent banner script has been installed on the website |
+| `inactive` | Fewer than 10 visitors in the last 30 days |
+| `live` | Account is live and operational |
+
+```bash
+curl -X GET "https://cookiechimp.com/api/v1/accounts?onboarding_status=live" \
+  -H "Authorization: Bearer YOUR_PARTNER_API_TOKEN"
+```

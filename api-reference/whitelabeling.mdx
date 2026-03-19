@@ -1,0 +1,28 @@
+---
+title: "White-Labeling"
+description: "Customize CookieChimp's branding to match your platform."
+---
+
+CookieChimp supports white-labeling for partners, allowing you to present consent management under your own brand.
+
+## Partner Branding in the App
+
+When users sign in via [partner SSO](/api-reference/sso), the CookieChimp dashboard automatically adapts to show your partner branding:
+
+- **Logo replacement** — Your partner logo replaces the CookieChimp logo in the sidebar, top bar, and login screens.
+- **Simplified user profile** — Partner-managed users don't see email or password fields on their profile page, since authentication is handled by your IdP.
+- **Managed team access** — For SSO-integrated partners, team membership is managed through your platform via JWT claims rather than through CookieChimp's invitation system.
+- **Billing handled by partner** — Partner-billed accounts cannot modify their subscription directly. Billing is managed through your commercial agreement with CookieChimp.
+
+## Resale Partnerships
+
+CookieChimp supports a resale model where partners can offer consent management as part of their own product:
+
+- **Discounted pricing** — Resale partners receive partner pricing on all accounts under their groups.
+- **Centralized billing** — All accounts under a partner group are billed through the partner agreement.
+- **Account provisioning** — Create and manage customer accounts programmatically via the [Partner API](/api-reference/partner-api).
+- **Onboarding tracking** — Monitor customer setup progress using the `onboarding_status` filter on the [List Accounts](/api-reference/account/list-accounts) endpoint.
+
+## Setting Up White-Labeling
+
+To get started with a white-label partnership, contact us at [support@cookiechimp.com](mailto:support@cookiechimp.com?subject=White-Label%20Partnership). We'll work with you to configure your branding, SSO integration, and partner API access.

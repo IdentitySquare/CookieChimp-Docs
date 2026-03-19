@@ -81,6 +81,14 @@
             ]
           },
           {
+            "group": "Partner Integration",
+            "pages": [
+              "api-reference/partner-api",
+              "api-reference/sso",
+              "api-reference/whitelabeling"
+            ]
+          },
+          {
             "group": "Account",
             "pages": [
               "api-reference/account/list-accounts",

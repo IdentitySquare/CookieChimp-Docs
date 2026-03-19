@@ -288,7 +288,7 @@ paths:
   /groups:
     get:
       summary: List groups
-      description: List all groups
+      description: List all groups belonging to the authenticated partner. Requires a partner API token.
       operationId: listGroups
       tags:
         - Groups
@@ -312,7 +312,7 @@ paths:
                       $ref: "#/components/schemas/Group"
     post:
       summary: Create group
-      description: Create a new group
+      description: Create a new group under the authenticated partner. Requires a partner API token.
       operationId: createGroup
       tags:
         - Groups
@@ -334,7 +334,7 @@ paths:
   /groups/{id}:
     get:
       summary: Get group
-      description: Get group by ID
+      description: Get a group by ID. Requires a partner API token.
       operationId: getGroup
       tags:
         - Groups
@@ -349,7 +349,7 @@ paths:
                 $ref: "#/components/schemas/Group"
     put:
       summary: Update group
-      description: Update group by ID
+      description: Update a group by ID. Requires a partner API token. Note that `max_pageviews_per_month` cannot be changed after creation.
       operationId: updateGroup
       tags:
         - Groups
@@ -693,7 +693,7 @@ paths:
   /accounts:
     get:
       summary: List accounts
-      description: List all accounts
+      description: List all accounts accessible to the authenticated token. With a partner token, returns all accounts across the partner's groups. With a user token, returns accounts the user is a member of. Supports filtering by `onboarding_status`.
       operationId: listAccounts
       tags:
         - Account
@@ -720,7 +720,7 @@ paths:
   /accounts/{id}:
     get:
       summary: Get account
-      description: Get account by ID
+      description: Get an account by ID. Accepts partner, user, or account tokens.
       operationId: getAccount
       tags:
         - Accounts
@@ -985,9 +985,9 @@ paths:
 components:
   securitySchemes:
     authorization:
-      type: apiKey
-      in: header
-      name: Authorization
+      type: http
+      scheme: bearer
+      description: API token obtained from the login endpoint or the dashboard
 
   parameters:
     id:

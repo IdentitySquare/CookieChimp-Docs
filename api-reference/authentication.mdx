@@ -5,20 +5,70 @@ description: "Access all the data on CookieChimp through our RESTful API."
 
 Welcome to the CookieChimp API. We provide a RESTful API that allows you to access all the data on CookieChimp. You can use our API to integrate your applications, services, and workflows with our platform.
 
-# Authentication
+## Base URL
 
-To authenticate with the CookieChimp API, you will need an API key. This key is a unique identifier for your account and is used to ensure that only authorized users have access to the data.
+All API requests should be made to:
 
-## Obtaining Your API Key
-
-Currently, you cannot generate the API key yourself. To request an API key, please [contact our support](mailto:support@cookiechimp.com?subject=Access%20to%20API) team.
-
-Once you have your API key, you can use it to authenticate your requests to the CookieChimp API. Include it in the header of your HTTP requests like so:
-
-```http
-X-API-Key: YOUR_API_KEY
+```
+https://cookiechimp.com/api/v1
 ```
 
-# Rate Limits
+## Authentication
 
-To ensure fair usage of the API, we limit the number of requests you can make to the API. The rate limit is 100 requests per minute. If you exceed this limit, you will receive a `429 Too Many Requests` response.
+To authenticate with the CookieChimp API, you need an API token. Include it in the `Authorization` header of your HTTP requests as a Bearer token:
+
+```http
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+### Obtaining Your API Token
+
+There are two ways to get an API token:
+
+1. **Via the Dashboard**: Go to your [API Tokens](https://cookiechimp.com/api_tokens) settings page to create and manage tokens.
+2. **Via the API**: Use the [Login endpoint](/api-reference/auth/login) with your email and password to receive a token.
+
+### Token Types
+
+API tokens can belong to different bearer types:
+- **User tokens** — Access resources on behalf of a user across their accounts.
+- **Partner tokens** — Access partner-level resources like groups.
+- **Account tokens** — Access resources scoped to a specific account.
+
+## Rate Limits
+
+To ensure fair usage of the API, we limit the number of requests you can make. The rate limit is 100 requests per minute. If you exceed this limit, you will receive a `429 Too Many Requests` response.
+
+## Pagination
+
+List endpoints support pagination with the following query parameters:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `page` | Page number | 1 |
+| `per_page` | Records per page (1-50) | 20 |
+
+Paginated responses include a `pagination` object with `prev_url`, `next_url`, `count`, `page`, `prev`, and `next` fields.
+
+## Errors
+
+The API returns standard HTTP status codes. Error responses include an `errors` array:
+
+```json
+{
+  "errors": [
+    {
+      "code": 401,
+      "message": "Invalid API Key"
+    }
+  ]
+}
+```
+
+| Status Code | Description |
+|-------------|-------------|
+| `200` | Success |
+| `401` | Unauthorized — invalid or missing API token |
+| `404` | Not found |
+| `422` | Validation error |
+| `429` | Rate limit exceeded |
