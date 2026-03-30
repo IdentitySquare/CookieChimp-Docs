@@ -28,6 +28,7 @@
             "group": "Get Started",
             "pages": [
               "overview",
+              "why-use-a-cmp",
               "installation/installation",
               "installation/cmp-setup-guide",
               "block-scripts-cookies/script-attributes",
