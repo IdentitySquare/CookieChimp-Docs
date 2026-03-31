@@ -1,0 +1,60 @@
+---
+title: "Why Use a CMP?"
+description: "What a consent management platform handles for you — and why building one yourself is harder than it looks."
+icon: "circle-question"
+---
+
+If you're weighing up whether to build consent management in-house or use a dedicated CMP, this page covers what's actually involved. A consent solution is more than a banner — it's an ongoing system that touches legal compliance, ad tracking, performance, and user experience across every market you operate in.
+
+## What a CMP actually does
+
+A complete consent management solution needs to handle all of the following:
+
+- **Detect and categorise** every cookie, pixel, and script across your site
+- **Block scripts** from firing until the user grants consent
+- **Show the right banner** to the right user — based on their region, language, and applicable regulation
+- **Record consent** with timestamped, audit-ready logs
+- **Integrate consent signals** with ad platforms and analytics (Google Consent Mode v2)
+- **Stay current** as privacy regulations change
+
+If your custom solution doesn't cover all of these, you have compliance gaps.
+
+## What's hard to build in-house
+
+### Automated scanning and categorisation
+
+Your marketing stack isn't static. New scripts, pixels, and vendors appear as campaigns change and tools get added. Manually tracking and categorising every cookie is error-prone and rarely keeps up. CookieChimp uses AI combined with a [global vendor library](/features/vendor-scanning) to detect and categorise vendors automatically.
+
+### Regulatory coverage
+
+CookieChimp supports GDPR, CCPA/CPRA, UK GDPR, LGPD, POPIA, PIPL, APPI, and the EU Digital Markets Act. New US state privacy laws are being passed regularly. A custom build means your team owns tracking every regulatory update and implementing the required changes — indefinitely.
+
+### Google Consent Mode v2
+
+Google Consent Mode v2 is required for Google Ads and Analytics measurement in European markets. Getting the consent signal mapping wrong means restricted ad tracking and incomplete conversion data. CookieChimp handles this natively with a one-click integration.
+
+### Geo-targeting and multilingual banners
+
+Different jurisdictions require different consent models — opt-in under GDPR, opt-out under CCPA. You also need [multi-language support](/features/multilingual-banners) for the banner itself. CookieChimp supports configurable per-region banners and multiple languages out of the box, with a [visual banner designer](/features/banner-designer) for customisation.
+
+### Consent record-keeping
+
+Regulators expect timestamped, verifiable records of what users were shown and what they consented to. These records must not contain PII. CookieChimp provides [audit-ready consent logs](/features/consent-records) with no PII stored — ready for regulatory requests without additional engineering work.
+
+### Performance
+
+Consent scripts are render-blocking by design — they need to load before everything else on the page. A self-hosted consent layer adds latency from your own infrastructure. CookieChimp is served from 310+ edge locations globally, keeping page speed impact minimal.
+
+## Build vs. buy — the cost over time
+
+Integrating a CMP is a one-time effort. You add the script, configure your categories, and block your tags. After that, the engineering maintenance cost is minimal — the CMP handles regulatory updates, vendor database changes, and integration upkeep for you.
+
+Building in-house is the opposite. The initial build might seem manageable, but the maintenance never stops: regulatory changes, vendor database updates, Google integration updates, new jurisdictions, new cookie types, and edge cases you didn't anticipate. A CMP externalises that maintenance burden so your team can focus on your product.
+
+## Get started
+
+Ready to set up CookieChimp? Head to the [installation guide](/installation/installation) to have your banner live in minutes.
+
+<Tip>
+Not sure what cookies your site is currently using? Run a free scan at [cookiechimp.com/scan-website](https://cookiechimp.com/scan-website).
+</Tip>
