@@ -58,6 +58,31 @@ window.addEventListener("cc:onUpdate", function (event) {
 
 ### Modal Events
 
+### `cc:beforeModalShow`
+
+Dispatched right before the consent modal is shown. This event is **cancelable** — call `event.preventDefault()` to prevent the banner from appearing. You can then show it later programmatically via `CookieChimp.show(true)`.
+
+```js
+window.addEventListener("cc:beforeModalShow", function (event) {
+  var detail = event.detail;
+  /**
+   * detail.modalName
+   */
+
+  // Example: prevent the banner from showing automatically
+  event.preventDefault();
+
+  // ... and show it later when you're ready
+  // CookieChimp.show(true);
+});
+```
+
+<Tip>
+  This is useful when you want to delay the consent banner — for example, to
+  wait until a user has completed onboarding, or to show it only after a certain
+  interaction.
+</Tip>
+
 ### `cc:onModalShow`
 
 The consent modal is visible.
