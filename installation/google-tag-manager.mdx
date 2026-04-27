@@ -33,15 +33,28 @@ You need to replace `abc123` with your website's unique CookieChimp ID.
 
   <Step title="Add/Edit Tag">
 
-    Create or update a tag and add any additional consent checks for the tag to fire.
+    Create or update a tag and add an additional consent check so the tag only fires once the matching vendor has consent.
 
-      Navigate to "Advanced Settings" > "Consent Settings". Check the "Require additional consent for tag to fire" button and add any additional consent checks from the dropdown of options.
-      This can be a service name as added on the platform.
+      Navigate to "Advanced Settings" > "Consent Settings". Select "Require additional consent for tag to fire" and enter the name of the category or service that the tag needs to fire on.
 
       <img
         src="/images/google-tag-manager/consent-settings.png"
         alt="Consent Settings"
       />
+
+      <Tabs>
+        <Tab title="Recommended">
+          Enter the exact vendor name as it appears in your CookieChimp [Vendor Library](/features/vendor-management#what-are-vendors), e.g `Google Analytics`, `Hotjar`, or `Facebook Pixel`. CookieChimp sends the consent state of each vendor to Google, so the tag will only fire when that specific vendor has been granted consent in the banner.
+
+          This is the recommended approach because your visitors can opt in or out of individual vendors inside a category, and a tag should usually only fire when its own vendor is allowed, not just when the broader category has consent.
+
+          <Tip>The vendor name must match the name configured in your CookieChimp Vendor Library exactly, including capitalisation and spacing.</Tip>
+        </Tab>
+
+        <Tab title="Alternative">
+          If you'd rather scope the additional consent to a whole category (so the tag fires whenever any vendor in that category has consent), you can use one of the Google consent types that CookieChimp maps your categories to. For example `analytics_storage` for the `analytics` category. See [the mapping below](#how-does-cookiechimp-map-to-google-consent-types) for the full list.
+        </Tab>
+      </Tabs>
   </Step>
 
   <Step title="Add a custom trigger">
@@ -80,4 +93,4 @@ This tag is now set up and will only fire when the required consent is granted.
 
   These categories are setup by default. When a user opts-in to a consent category or a Google service in the category is consented to, the linked Google consent type will change from 'denied' to 'granted' and vice versa.
 
-  Apart from the default 7 consent types, we will also send the consent state of your services to Google. e.g. When a user consents to a service named "Hotjar", the consent for this service is updated as 'granted'.
+  Apart from the default 7 consent types, we will also send the consent state of your services to Google. For example, when a user consents to a service named "Hotjar", the consent state for this service is updated as 'granted'. This is what allows you to use the vendor name directly in a tag's "Require additional consent for tag to fire" setting (the recommended approach in the [Add/Edit Tag](#how-do-i-block-tags-with-google-tag-manager) step), so the tag only fires when that specific vendor has been granted consent and not just the broader category.
