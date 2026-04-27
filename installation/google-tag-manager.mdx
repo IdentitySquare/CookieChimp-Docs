@@ -35,24 +35,26 @@ You need to replace `abc123` with your website's unique CookieChimp ID.
 
     Create or update a tag and add an additional consent check so the tag only fires once the matching vendor has consent.
 
-      Navigate to "Advanced Settings" > "Consent Settings". Select "Require additional consent for tag to fire" and enter the value you want to gate the tag on.
+      Navigate to "Advanced Settings" > "Consent Settings". Select "Require additional consent for tag to fire" and enter the name of the category or service that the tag needs to fire on.
 
       <img
         src="/images/google-tag-manager/consent-settings.png"
         alt="Consent Settings"
       />
 
-      **Recommended: gate the tag on the vendor name.**
+      <Tabs>
+        <Tab title="Recommended">
+          Enter the exact vendor name as it appears in your CookieChimp [Vendor Library](/features/vendor-management#what-are-vendors), e.g `Google Analytics`, `Hotjar`, or `Facebook Pixel`. CookieChimp sends the consent state of each vendor to Google, so the tag will only fire when that specific vendor has been granted consent in the banner.
 
-      Enter the exact vendor name as it appears in your CookieChimp [Vendor Library](/features/vendor-management) — for example, `Google Analytics`, `Hotjar`, or `Facebook Pixel`. CookieChimp sends the consent state of each vendor to Google, so the tag will only fire when that specific vendor has been granted consent in the banner.
+          This is the recommended approach because your visitors can opt in or out of individual vendors inside a category, and a tag should usually only fire when its own vendor is allowed, not just when the broader category has consent.
 
-      This is the recommended approach because your visitors can opt in or out of individual vendors inside a category, and a tag should usually only fire when its own vendor is allowed — not just when the broader category has consent.
+          <Tip>The vendor name must match the name configured in your CookieChimp Vendor Library exactly, including capitalisation and spacing.</Tip>
+        </Tab>
 
-      <Tip>The vendor name must match the name configured in your CookieChimp Vendor Library exactly, including capitalisation and spacing.</Tip>
-
-      **Alternative: gate the tag at the category level.**
-
-      If you'd rather scope the additional consent to a whole category (so the tag fires whenever any vendor in that category has consent), you can use one of the Google consent types that CookieChimp maps your categories to — for example `analytics_storage` for the `analytics` category. See [the mapping below](#how-does-cookiechimp-map-to-google-consent-types) for the full list.
+        <Tab title="Alternative">
+          If you'd rather scope the additional consent to a whole category (so the tag fires whenever any vendor in that category has consent), you can use one of the Google consent types that CookieChimp maps your categories to. For example `analytics_storage` for the `analytics` category. See [the mapping below](#how-does-cookiechimp-map-to-google-consent-types) for the full list.
+        </Tab>
+      </Tabs>
   </Step>
 
   <Step title="Add a custom trigger">
