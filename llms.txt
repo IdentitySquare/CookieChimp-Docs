@@ -13,6 +13,7 @@
 ## Platform Installation
 
 - [How do I use a consent banner with Google Tag Manager?](https://docs.cookiechimp.com/installation/google-tag-manager): Set up a consent banner with Google Tag Manager and Google Consent Mode.
+- [How do I use a consent banner with Adobe Launch?](https://docs.cookiechimp.com/installation/adobe-launch): Set up a consent banner with Adobe Launch (Adobe Experience Platform Tags).
 - [How do I add a consent banner to Next.js?](https://docs.cookiechimp.com/installation/nextjs): Install a consent banner in a Next.js application with the App Router or Pages Router.
 - [How do I add a consent banner to Shopify?](https://docs.cookiechimp.com/installation/shopify): Install a consent banner on your Shopify store.
 - [How do I add a consent banner to a Single Page Application?](https://docs.cookiechimp.com/installation/single-page-applications): Install a consent banner in JavaScript-powered SPAs like React, Astro, and more.

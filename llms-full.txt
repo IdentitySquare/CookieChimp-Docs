@@ -192,6 +192,43 @@ When a user opts-in to a consent category, the linked Google consent type change
 
 ---
 
+# How do I use CookieChimp with Adobe Launch?
+
+Adobe Launch (Adobe Experience Platform Tags) does not have a native consent mode, so consent is enforced inside each rule using a Data Element and a rule condition.
+
+Add the CookieChimp snippet **before** the Adobe Launch embed code in the `<head>`:
+
+```html
+<script src="https://cookiechimp.com/widget/abc123.js"></script>
+<script src="//assets.adobedtm.com/your-property/launch-XXXXXXX.min.js" async></script>
+```
+
+> Do not deploy CookieChimp through Adobe Launch. CookieChimp needs to run before any other script so it can block tags and set defaults before Launch initialises its extensions.
+
+CookieChimp exposes two integration points:
+
+- `window.cookieChimpConsentString` &mdash; a comma-separated string of consented categories and vendors (e.g. `essential,analytics,marketing,Google Analytics,Hotjar`).
+- `cc:consentStringUpdated` &mdash; a window event dispatched once consent is available and again on every preference change.
+
+## How do I block tags with Adobe Launch?
+
+1. **Create a Data Element**: Add a Custom Code Data Element named `CookieChimp Consent String` returning `window.cookieChimpConsentString || ""`. Reference it as `%CookieChimp Consent String%`.
+2. **Add a Custom Code Event to your rule**: Listen for consent and call `trigger()`:
+   ```js
+   if (window.cookieChimpConsentString) {
+     trigger();
+   }
+   window.addEventListener("cc:consentStringUpdated", function () {
+     trigger();
+   });
+   ```
+3. **Add a Value Comparison Condition**: Check `%CookieChimp Consent String%` Contains the exact vendor name (e.g. `Google Analytics`) or category ID (e.g. `analytics`).
+4. **Save, build, and publish** the library to your environment.
+
+Debug with `_satellite.setDebug(true);` in DevTools to see rule evaluation logs.
+
+---
+
 # How do I add CookieChimp to Next.js?
 
 Install CookieChimp in a Next.js application with the App Router or Pages Router.
