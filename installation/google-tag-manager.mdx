@@ -4,20 +4,44 @@ description: "Set up a consent banner with Google Tag Manager and Google Consent
 icon: "google"
 ---
 
-Add your website's CookieChimp JS snippet in the `<head>` tag of your HTML. 
+## How do I install the CookieChimp script?
 
-<Warning>Do not add our HTML code via Google Tag Manager since we set the default consent states before Google Tag Manager runs.</Warning>
+You can install CookieChimp two ways. **Direct HTML is the recommended approach** — it guarantees CookieChimp loads before Google Tag Manager and any other scripts, so it can set consent defaults before any tag fires.
 
-<Info>
-  The CookieChimp script needs to be added at the top of the `<head>` section, so that it can run first, in order to ensure other scripts are only run based on consent.
-  If other scripts are added before, they may set cookies and other storage items before consent is granted.
-</Info>
+<Tabs>
+  <Tab title="Direct HTML (Recommended)">
+    Add your website's CookieChimp JS snippet at the top of the `<head>` tag in your HTML, **before** the Google Tag Manager script and any other scripts.
 
-```html
-<script src="https://cookiechimp.com/widget/abc123.js"></script>
-```
+    ```html
+    <script src="https://cookiechimp.com/widget/abc123.js"></script>
+    ```
 
-You need to replace `abc123` with your website's unique CookieChimp ID.
+    Replace `abc123` with your website's unique CookieChimp ID.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Tab>
+
+  <Tab title="Via Google Tag Manager">
+    If you can't edit your site's HTML directly, you can install CookieChimp through GTM — but you must fire it from the **Consent Initialization - All Pages** trigger so it runs before any tag sets a consent state.
+
+    <Warning>
+      When installing via GTM, you **must** use the **Consent Initialization - All Pages** trigger. This is GTM's earliest trigger type — it fires before the **Initialization** and **Page View** triggers, ensuring CookieChimp sets consent defaults before any other tags run. If you use a different trigger, other tags can fire before consent is set.
+    </Warning>
+
+    **To add CookieChimp via GTM:**
+
+    1. In your GTM workspace, create a new tag and choose **Custom HTML**.
+    2. Paste the CookieChimp script into the tag:
+
+       ```html
+       <script src="https://cookiechimp.com/widget/abc123.js"></script>
+       ```
+
+       Replace `abc123` with your website's unique CookieChimp ID.
+    3. For the trigger, select **Consent Initialization - All Pages**.
+    4. Save the tag and **publish** your container.
+  </Tab>
+</Tabs>
 
 
 ## How do I block tags with Google Tag Manager?

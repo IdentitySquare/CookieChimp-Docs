@@ -1,0 +1,49 @@
+---
+title: "Squarespace"
+description: "Install a consent banner on your Squarespace site."
+icon: "squarespace"
+---
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet via Code Injection">
+    1. Log into your Squarespace dashboard.
+    2. Navigate to **Website → Pages** in the main menu.
+    3. Expand the **Utilities** (or **Website Tools**) section and select **Code Injection**.
+    4. Paste the CookieChimp snippet into the **Header** section. This ensures the script loads in the `<head>` of every page.
+    5. Click **Save** at the top of the page.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Disable Squarespace's built-in cookie banner">
+    Squarespace has a built-in cookie banner that will conflict with CookieChimp. Turn it off:
+
+    1. Go to **Settings → Cookies & Visitor Data**.
+    2. Disable the Squarespace **Cookie Banner**.
+
+    You'll now use CookieChimp as your single source of consent.
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      Common third-party tools on Squarespace include Google Analytics, Facebook Pixel, and chat widgets — these typically belong to the `analytics` or `marketing` categories. If you add them via Code Injection or Code blocks, update them to use `type="text/plain"` and a `data-category` attribute.
+    </Tip>
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- Make sure your Squarespace domain (including any custom domain you've connected) is allowed in the **Account Settings** in your CookieChimp dashboard.
+- Some Squarespace plans (notably the Personal plan) do not support Code Injection. You'll need the Business plan or higher to use CookieChimp.
+- Code Injection is **only applied on the live site** — it will not run inside the Squarespace editor preview.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

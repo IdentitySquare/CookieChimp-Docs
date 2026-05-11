@@ -1,0 +1,40 @@
+---
+title: "Webflow"
+description: "Install a consent banner on your Webflow site."
+icon: "webflow"
+---
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet to your Webflow project">
+    1. Log into your [Webflow dashboard](https://webflow.com/dashboard).
+    2. Select your project to open the **Designer**.
+    3. Navigate to **Project Settings** (gear icon at the bottom-left).
+    4. Open the **Custom Code** tab at the top.
+    5. In the **Head Code** section, paste the CookieChimp snippet.
+    6. Save the changes and click **Publish** at the top right of the Designer.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      If you embed third-party tools through Webflow's **Embed** elements (e.g. Hotjar, Intercom, custom pixels), update those embeds to use `type="text/plain"` and a `data-category` attribute so CookieChimp can manage them based on consent.
+    </Tip>
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- Make sure your **published** Webflow domain is allowed in the **Account Settings** in your CookieChimp dashboard. The `*.webflow.io` staging domain is not included by default — add it if you want to test the banner before publishing to a custom domain.
+- After saving custom code, you must **publish** the site again — changes do not appear on the staging or production URL until publish.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

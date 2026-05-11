@@ -1,0 +1,141 @@
+---
+title: "Angular"
+description: "Install a consent banner in an Angular application."
+icon: "angular"
+---
+
+Angular apps are typically single-page applications powered by the Angular Router. CookieChimp installs in `index.html` and reinitializes on route changes via the Router event stream.
+
+<Snippet file="install/account-id-prerequisites.mdx" />
+
+---
+
+## How do I load the CookieChimp script?
+
+Add the script tag to `src/index.html` inside `<head>`, before Angular's bundle is injected:
+
+```html
+<!-- src/index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>My App</title>
+    <script src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"></script>
+    <base href="/" />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>
+```
+
+<Snippet file="install/replace-account-id.mdx" />
+
+---
+
+## How do I handle client-side navigation?
+
+Angular Router replaces the view without a full page reload. Listen to `NavigationEnd` events and reinitialize the CookieChimp widget.
+
+If you're using a **standalone component** root (Angular 17+):
+
+```ts
+// src/app/app.component.ts
+import { Component, inject, OnInit } from "@angular/core";
+import { Router, NavigationEnd, RouterOutlet } from "@angular/router";
+import { filter } from "rxjs";
+
+declare global {
+  interface Window {
+    CookieChimp?: { reinitialize?: () => void };
+  }
+}
+
+@Component({
+  selector: "app-root",
+  standalone: true,
+  imports: [RouterOutlet],
+  template: `
+    <div id="cookiechimp-container"></div>
+    <router-outlet />
+  `,
+})
+export class AppComponent implements OnInit {
+  private router = inject(Router);
+
+  ngOnInit() {
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe(() => {
+        window.CookieChimp?.reinitialize?.();
+      });
+  }
+}
+```
+
+For an `NgModule`-based app, place the same logic in your `AppComponent`'s `ngOnInit`.
+
+---
+
+## How do I check consent status in code?
+
+Wrap the CookieChimp event listeners in an Angular service so any component can subscribe:
+
+```ts
+// src/app/consent.service.ts
+import { Injectable, NgZone } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
+
+declare global {
+  interface Window {
+    CookieConsent?: {
+      acceptedService?: (service: string, category: string) => boolean;
+    };
+  }
+}
+
+@Injectable({ providedIn: "root" })
+export class ConsentService {
+  private readonly state = new BehaviorSubject<Record<string, boolean>>({});
+  readonly state$ = this.state.asObservable();
+
+  constructor(private zone: NgZone) {
+    const update = () => {
+      this.zone.run(() => {
+        this.state.next({
+          analytics: !!window.CookieConsent?.acceptedService?.("Google Analytics", "analytics"),
+        });
+      });
+    };
+
+    update();
+    window.addEventListener("cc:onConsented", update);
+    window.addEventListener("cc:onUpdate", update);
+  }
+}
+```
+
+Use it in a component:
+
+```ts
+constructor(private consent: ConsentService) {}
+
+ngOnInit() {
+  this.consent.state$.subscribe((s) => {
+    console.log(s.analytics ? "✅ analytics allowed" : "❌ analytics blocked");
+  });
+}
+```
+
+<Snippet file="install/service-category-note.mdx" />
+
+<Snippet file="install/callbacks-events-link.mdx" />
+
+---
+
+## Troubleshooting
+
+- **Banner shows on first load but not after navigation** — make sure the `NavigationEnd` subscription is in your root component's `ngOnInit`, not a lazy-loaded module.
+- **Change detection issues with consent state** — wrap state updates inside `NgZone.run()` (shown above) so Angular re-renders.
+<Snippet file="install/spa-troubleshooting-base.mdx" />

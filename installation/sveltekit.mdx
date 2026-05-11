@@ -1,0 +1,112 @@
+---
+title: "SvelteKit"
+description: "Install a consent banner in a SvelteKit application."
+icon: "code"
+---
+
+SvelteKit uses client-side navigation by default. CookieChimp installs in `app.html` and reinitializes on every navigation via the `afterNavigate` lifecycle hook.
+
+<Snippet file="install/account-id-prerequisites.mdx" />
+
+---
+
+## How do I load the CookieChimp script?
+
+Add the script tag to `src/app.html` inside `<head>`, before `%sveltekit.head%` and any other tags so it loads first:
+
+```html
+<!-- src/app.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"></script>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
+```
+
+<Snippet file="install/replace-account-id.mdx" />
+
+---
+
+## How do I handle client-side navigation?
+
+SvelteKit transitions between pages without a full reload. Use `afterNavigate` in your root layout to reinitialize the CookieChimp widget on every navigation:
+
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script lang="ts">
+  import { afterNavigate } from "$app/navigation";
+  import { browser } from "$app/environment";
+
+  afterNavigate(() => {
+    if (browser) {
+      // @ts-ignore
+      window.CookieChimp?.reinitialize?.();
+    }
+  });
+</script>
+
+<div id="cookiechimp-container"></div>
+
+<slot />
+```
+
+<Info>
+  The `browser` check guards against SSR — `window.CookieChimp` doesn't exist on the server.
+</Info>
+
+---
+
+## How do I check consent status in code?
+
+Wrap the CookieChimp events in a Svelte store so any component can subscribe:
+
+```ts
+// src/lib/stores/consent.ts
+import { writable } from "svelte/store";
+import { browser } from "$app/environment";
+
+export const consent = writable<Record<string, boolean>>({});
+
+if (browser) {
+  function update() {
+    consent.set({
+      // @ts-ignore
+      analytics: !!window.CookieConsent?.acceptedService?.("Google Analytics", "analytics"),
+    });
+  }
+
+  update();
+  window.addEventListener("cc:onConsented", update);
+  window.addEventListener("cc:onUpdate", update);
+}
+```
+
+Use it in a component:
+
+```svelte
+<script lang="ts">
+  import { consent } from "$lib/stores/consent";
+</script>
+
+{#if $consent.analytics}
+  <p>Analytics is enabled.</p>
+{/if}
+```
+
+<Snippet file="install/service-category-note.mdx" />
+
+<Snippet file="install/callbacks-events-link.mdx" />
+
+---
+
+## Troubleshooting
+
+- **Banner shows on first load but not after navigation** — make sure `afterNavigate` is called from your **root** `+layout.svelte`, not from a nested layout.
+- **`window is not defined` errors** — wrap any `window.CookieChimp` access in a `browser` check from `$app/environment`.
+<Snippet file="install/spa-troubleshooting-base.mdx" />

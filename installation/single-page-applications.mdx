@@ -1,52 +1,204 @@
 ---
 title: "JS & Single Page Apps"
-description: "Install a consent banner in JavaScript-powered SPAs like React, Astro, and more."
+description: "Install a consent banner in JavaScript-powered SPAs like Astro, Vue, React Router, SvelteKit, and more."
 icon: "react"
 ---
 
-## How do I load CookieChimp in an SPA?
+Single Page Applications (SPAs) update the URL and the visible page **without a full page reload**. Because of this, a script tag added to `<head>` only runs once — on the first load — and the CookieChimp widget can be torn down or lost when the user navigates between routes.
 
-If you are using a Single Page Application (SPA), you need to ensure to reinitialize the CookieChimp widget on page navigation. You can do this by including the CookieChimp script in the following way (example is for Astro JS):
+This page covers two things:
+
+1. **How to load the CookieChimp script so it runs on every page**, framework by framework.
+2. **How to position the Privacy Trigger** so the floating icon survives client-side navigation.
+
+<Info>
+  We have dedicated guides for the most common frameworks — they're more detailed than this overview:
+  [Next.js](/installation/nextjs) ·
+  [React (Vite/CRA)](/installation/react) ·
+  [Remix](/installation/remix) ·
+  [Nuxt](/installation/nuxt) ·
+  [Angular](/installation/angular) ·
+  [Astro](/installation/astro) ·
+  [SvelteKit](/installation/sveltekit).
+  This page is the catch-all for any SPA that doesn't have its own guide.
+</Info>
+
+---
+
+## How do I install CookieChimp in an SPA?
+
+The pattern is the same across all SPA frameworks:
+
+1. **Inject the script** into `<head>` so it loads as early as possible — ideally before the framework hydrates.
+2. **Re-initialize** the widget on every client-side route change by listening to the framework's navigation event.
+
+The exact navigation event differs per framework. Pick yours below.
+
+### Astro
+
+Astro's [View Transitions](https://docs.astro.build/en/guides/view-transitions/) emit an `astro:page-load` event after every navigation (including the first). Use `is:inline` so Astro doesn't bundle the script.
+
+Add this to your root layout — typically `src/layouts/Layout.astro` — inside `<head>`:
 
 ```html
 <script is:inline>
   function runCookieChimp() {
+    // Don't re-inject if the script is already on the page.
+    if (document.getElementById("cookiechimp-js")) return;
+
     var script = document.createElement("script");
-    script.src = "https://cookiechimp.com/widget/K8ktWD.js";
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
     script.id = "cookiechimp-js";
     document.head.appendChild(script);
   }
 
-  // for Astro JS.
-  // listen for other events for different frameworks.
+  // Fires on first load AND after every Astro view transition.
   document.addEventListener("astro:page-load", runCookieChimp);
 </script>
 ```
 
+<Snippet file="install/replace-account-id.mdx" />
+
+<Tip>
+  **Not using View Transitions?** If you haven't enabled `<ViewTransitions />` in your layout, Astro performs a full page reload on each navigation — the standard `<script src="...">` install works without any re-initialization logic.
+</Tip>
+
+### Vue (Vue Router)
+
+Add the script tag in your `index.html` `<head>` and re-initialize on every route change from your router config (`src/router/index.js`):
+
+```js
+import { createRouter, createWebHistory } from "vue-router";
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [/* ... */],
+});
+
+router.afterEach(() => {
+  if (typeof window.CookieChimp?.reinitialize === "function") {
+    window.CookieChimp.reinitialize();
+  }
+});
+
+export default router;
+```
+
+### React (React Router v6+)
+
+Add the script tag in your `index.html` `<head>`, then create a tiny component that listens to location changes and mount it once at the top of your tree:
+
+```tsx
+// src/components/CookieChimpReinit.tsx
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+export default function CookieChimpReinit() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // @ts-ignore
+    window.CookieChimp?.reinitialize?.();
+  }, [pathname]);
+
+  return null;
+}
+```
+
+```tsx
+// src/main.tsx
+<BrowserRouter>
+  <CookieChimpReinit />
+  <App />
+</BrowserRouter>
+```
+
+### SvelteKit
+
+Add the script to `src/app.html` inside `<head>`, then re-initialize on navigation from your root layout:
+
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script>
+  import { afterNavigate } from "$app/navigation";
+
+  afterNavigate(() => {
+    if (typeof window !== "undefined") {
+      window.CookieChimp?.reinitialize?.();
+    }
+  });
+</script>
+
+<slot />
+```
+
+### Generic SPA (no router events)
+
+If your framework doesn't expose a router event you can hook into, listen for `history.pushState` and `popstate`:
+
+```html
+<script>
+  function runCookieChimp() {
+    if (typeof window.CookieChimp?.reinitialize === "function") {
+      window.CookieChimp.reinitialize();
+    } else if (!document.getElementById("cookiechimp-js")) {
+      var script = document.createElement("script");
+      script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+      script.id = "cookiechimp-js";
+      document.head.appendChild(script);
+    }
+  }
+
+  // Patch pushState/replaceState so we get notified on client-side navigation.
+  ["pushState", "replaceState"].forEach((method) => {
+    var original = history[method];
+    history[method] = function () {
+      var result = original.apply(this, arguments);
+      window.dispatchEvent(new Event("locationchange"));
+      return result;
+    };
+  });
+  window.addEventListener("popstate", () => window.dispatchEvent(new Event("locationchange")));
+  window.addEventListener("locationchange", runCookieChimp);
+
+  // First load.
+  runCookieChimp();
+</script>
+```
+
+---
+
 ## How do I position the Privacy Trigger in an SPA?
 
-You can specify location where the Privacy Trigger (floating icon to update preferences) is added to the DOM by placing a div with the ID `cookiechimp-container` on the page.
+The Privacy Trigger is the floating icon users click to update their consent preferences. By default it's appended to `<body>`, which is fine for traditional pages — but in an SPA, you usually want it in a **specific spot in your layout** and you want it to **survive route changes**.
+
+Place a `<div>` with the ID `cookiechimp-container` wherever you want the trigger rendered:
 
 ```html
 <div id="cookiechimp-container"></div>
 ```
 
-This is useful for single page applications (SPA) where you want the floating icon to be persistent across different pages.
-Ensure to add this in a location which does not get replaced when navigating between pages.
+Put this in a part of your layout that **doesn't unmount on navigation** — typically the root layout, just inside `<body>`.
 
-If you are using [Turbo](https://turbo.hotwired.dev/handbook/building#persisting-elements-across-page-loads) or [Astro JS with View Transitions](https://docs.astro.build/en/guides/view-transitions/), you can add specific attributes to the div to ensure it persists across navigations.
+### Persisting across view transitions
+
+Some frameworks tear down and recreate DOM nodes between routes, which would remove the Privacy Trigger. Use the framework's "persistent element" attribute to keep it:
 
 ```html
-<!-- For Turbo -->
-<div id="cookiechimp-container" data-turbo-permanent></div>
-
-<!-- For Astro JS -->
+<!-- Astro (View Transitions) -->
 <div id="cookiechimp-container" transition:persist></div>
+
+<!-- Hotwire Turbo -->
+<div id="cookiechimp-container" data-turbo-permanent></div>
 ```
+
+See the Astro docs on [persisting components](https://docs.astro.build/en/guides/view-transitions/#maintaining-state) and the Turbo docs on [persisting elements across page loads](https://turbo.hotwired.dev/handbook/building#persisting-elements-across-page-loads).
+
+---
 
 ## How do I run code based on consent?
 
-The `cc:onConsented` event can be used to execute code based on user consent.
+The `cc:onConsented` event fires once when the user has made an initial choice (and on subsequent page loads when consent is already stored).
 
 ```javascript
 window.addEventListener("cc:onConsented", function (event) {
@@ -60,7 +212,7 @@ window.addEventListener("cc:onConsented", function (event) {
 });
 ```
 
-The `cc:onUpdate` event can be used to execute code when the user changes their consent.
+The `cc:onUpdate` event fires when the user changes their consent from the preferences modal.
 
 ```javascript
 window.addEventListener("cc:onUpdate", function (event) {
@@ -90,4 +242,12 @@ window.addEventListener("cc:onUpdate", function (event) {
 });
 ```
 
-<Info>[View all available callbacks & events ›](/callback-events)</Info>
+<Snippet file="install/callbacks-events-link.mdx" />
+
+---
+
+## Troubleshooting
+
+- **Banner shows on first load but not after navigation** — your re-initialization listener isn't firing. Double-check the framework-specific event name (`astro:page-load`, `router.afterEach`, `useLocation`, `afterNavigate`).
+- **Privacy Trigger disappears after navigation** — add the framework's persistence attribute (`transition:persist`, `data-turbo-permanent`) to your `#cookiechimp-container` div.
+<Snippet file="install/spa-troubleshooting-base.mdx" />
