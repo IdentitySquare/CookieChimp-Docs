@@ -37,7 +37,7 @@ The `is:inline` directive tells Astro not to bundle, hash, or process the script
 
 ## How do I install CookieChimp with View Transitions?
 
-If your site uses Astro's `<ClientRouter />` (Astro 5+) or `<ViewTransitions />` (Astro 3-4), navigation happens **client-side** without a full reload. You need to reinitialize the CookieChimp widget after every transition.
+If your site uses Astro's `<ClientRouter />` (Astro 5+) or `<ViewTransitions />` (Astro 3-4), navigation happens **client-side** without a full reload. Re-inject the CookieChimp script after every transition so it rescans the newly rendered page. `astro:page-load` fires on the first page load as well, so this single handler covers both cases — no separate static script tag needed.
 
 ```astro
 ---
@@ -49,12 +49,9 @@ import { ClientRouter } from "astro:transitions";
     <ClientRouter />
     <script is:inline>
       function runCookieChimp() {
-        // Don't re-inject if the script is already on the page.
-        if (document.getElementById("cookiechimp-js")) {
-          // @ts-ignore
-          window.CookieChimp?.reinitialize?.();
-          return;
-        }
+        // Remove any previous CookieChimp script before appending a fresh one
+        // so we don't accumulate stale tags across navigations.
+        document.getElementById("cookiechimp-js")?.remove();
 
         var script = document.createElement("script");
         script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";

@@ -35,7 +35,7 @@ Add the script tag to `src/app.html` inside `<head>`, before `%sveltekit.head%` 
 
 ## How do I handle client-side navigation?
 
-SvelteKit transitions between pages without a full reload. Use `afterNavigate` in your root layout to reinitialize the CookieChimp widget on every navigation:
+SvelteKit transitions between pages without a full reload. Use `afterNavigate` in your root layout to re-inject the CookieChimp script on every navigation — this triggers a rescan of the newly mounted route's DOM. The static `<script>` tag in `app.html` handles the first page load, so we skip the initial `afterNavigate` call.
 
 ```svelte
 <!-- src/routes/+layout.svelte -->
@@ -43,11 +43,21 @@ SvelteKit transitions between pages without a full reload. Use `afterNavigate` i
   import { afterNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
 
+  let isInitial = true;
+
   afterNavigate(() => {
-    if (browser) {
-      // @ts-ignore
-      window.CookieChimp?.reinitialize?.();
+    if (!browser) return;
+    if (isInitial) {
+      isInitial = false;
+      return;
     }
+
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
   });
 </script>
 
@@ -57,7 +67,7 @@ SvelteKit transitions between pages without a full reload. Use `afterNavigate` i
 ```
 
 <Info>
-  The `browser` check guards against SSR — `window.CookieChimp` doesn't exist on the server.
+  The `browser` check guards against SSR — `document` and `window` don't exist on the server, so any DOM access must be wrapped.
 </Info>
 
 ---
@@ -108,5 +118,5 @@ Use it in a component:
 ## Troubleshooting
 
 - **Banner shows on first load but not after navigation** — make sure `afterNavigate` is called from your **root** `+layout.svelte`, not from a nested layout.
-- **`window is not defined` errors** — wrap any `window.CookieChimp` access in a `browser` check from `$app/environment`.
+- **`window is not defined` / `document is not defined` errors** — wrap any DOM or `window` access in a `browser` check from `$app/environment`.
 <Snippet file="install/spa-troubleshooting-base.mdx" />

@@ -63,19 +63,31 @@ CRA injects your bundle after the HTML is served, so a static `<script>` in `<he
 
 If your app uses **React Router** (v6+), pages don't reload on navigation — they swap components. CookieChimp needs to know about route changes so it can re-evaluate which scripts to allow.
 
-Create a small component that listens to location changes and reinitializes the widget:
+Create a small component that listens to location changes and re-injects the CookieChimp script. We skip the first render because the static `<script>` tag in `index.html` has already loaded CookieChimp on initial page load.
 
 ```tsx
 // src/components/CookieChimpReinit.tsx
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 export default function CookieChimpReinit() {
   const { pathname } = useLocation();
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    // @ts-ignore
-    window.CookieChimp?.reinitialize?.();
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    // Remove the previous script tag (if any) and append a fresh one
+    // so CookieChimp rescans the newly mounted route's DOM.
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
   }, [pathname]);
 
   return null;

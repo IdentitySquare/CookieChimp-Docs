@@ -48,21 +48,30 @@ The `suppressHydrationWarning` prop prevents React from warning about the third-
 
 ## How do I handle client-side navigation?
 
-Remix uses client-side transitions for in-app links. Reinitialize the CookieChimp widget on every navigation by listening to the location.
-
-Create a small component in `app/root.tsx` (or a separate file) and mount it once:
+Remix uses client-side transitions for in-app links. Re-inject the CookieChimp script on every navigation by listening to the location. The static `<script>` tag from server-rendered HTML handles the first load, so we skip the initial render.
 
 ```tsx
 // app/components/CookieChimpReinit.tsx
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "@remix-run/react";
 
 export default function CookieChimpReinit() {
   const location = useLocation();
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    // @ts-ignore
-    window.CookieChimp?.reinitialize?.();
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    // Re-inject the CookieChimp script so it rescans the new route's DOM.
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
   }, [location.pathname]);
 
   return null;

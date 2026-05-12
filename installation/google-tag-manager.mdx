@@ -22,10 +22,12 @@ You can install CookieChimp two ways. **Direct HTML is the recommended approach*
   </Tab>
 
   <Tab title="Via Google Tag Manager">
-    If you can't edit your site's HTML directly, you can install CookieChimp through GTM — but you must fire it from the **Consent Initialization - All Pages** trigger so it runs before any tag sets a consent state.
+    If you can't edit your site's HTML directly, you can install CookieChimp through GTM. Fire it from the **Consent Initialization - All Pages** trigger — this is the earliest trigger GTM exposes, so it gives CookieChimp the best chance of loading before other tags.
 
     <Warning>
-      When installing via GTM, you **must** use the **Consent Initialization - All Pages** trigger. This is GTM's earliest trigger type — it fires before the **Initialization** and **Page View** triggers, ensuring CookieChimp sets consent defaults before any other tags run. If you use a different trigger, other tags can fire before consent is set.
+      **This method does not guarantee strict ordering.** The Consent Initialization trigger controls when GTM **injects** the CookieChimp `<script>` tag — but the external script still has to download and execute asynchronously. On slower networks, other tags fired by Initialization or Page View triggers can run before CookieChimp has set its consent defaults, which can lead to cookies being set without consent.
+
+      If strict ordering matters (and for GDPR compliance it usually does), use the **Direct HTML** method instead.
     </Warning>
 
     **To add CookieChimp via GTM:**
@@ -40,6 +42,10 @@ You can install CookieChimp two ways. **Direct HTML is the recommended approach*
        Replace `abc123` with your website's unique CookieChimp ID.
     3. For the trigger, select **Consent Initialization - All Pages**.
     4. Save the tag and **publish** your container.
+
+    <Tip>
+      You can reduce the async-download race by configuring **Tag Sequencing** on your other tags so they wait for the CookieChimp tag to finish, or by gating downstream tags on the `cookiechimp_consent_update` custom event (covered in the section below). Direct HTML remains the most reliable option.
+    </Tip>
   </Tab>
 </Tabs>
 

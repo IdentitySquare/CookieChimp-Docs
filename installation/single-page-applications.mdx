@@ -34,17 +34,18 @@ The pattern is the same across all SPA frameworks:
 
 The exact navigation event differs per framework. Pick yours below.
 
+The reinit pattern is the same across frameworks: **remove the existing CookieChimp script tag (if any) and append a fresh one**. Loading the script again triggers CookieChimp to rescan the newly mounted DOM. There's no public `reinitialize()` API — script re-injection is the documented mechanism.
+
 ### Astro
 
-Astro's [View Transitions](https://docs.astro.build/en/guides/view-transitions/) emit an `astro:page-load` event after every navigation (including the first). Use `is:inline` so Astro doesn't bundle the script.
+Astro's [View Transitions](https://docs.astro.build/en/guides/view-transitions/) emit an `astro:page-load` event after every navigation **including the first**, so this single handler covers both initial load and subsequent transitions — no separate static `<script src>` needed. Use `is:inline` so Astro doesn't bundle the script.
 
 Add this to your root layout — typically `src/layouts/Layout.astro` — inside `<head>`:
 
 ```html
 <script is:inline>
   function runCookieChimp() {
-    // Don't re-inject if the script is already on the page.
-    if (document.getElementById("cookiechimp-js")) return;
+    document.getElementById("cookiechimp-js")?.remove();
 
     var script = document.createElement("script");
     script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
@@ -65,7 +66,7 @@ Add this to your root layout — typically `src/layouts/Layout.astro` — inside
 
 ### Vue (Vue Router)
 
-Add the script tag in your `index.html` `<head>` and re-initialize on every route change from your router config (`src/router/index.js`):
+Add the script tag in your `index.html` `<head>` for the initial load, then re-inject on every subsequent route change from your router config (`src/router/index.js`):
 
 ```js
 import { createRouter, createWebHistory } from "vue-router";
@@ -75,10 +76,19 @@ const router = createRouter({
   routes: [/* ... */],
 });
 
+let isInitial = true;
 router.afterEach(() => {
-  if (typeof window.CookieChimp?.reinitialize === "function") {
-    window.CookieChimp.reinitialize();
+  if (isInitial) {
+    isInitial = false;
+    return;
   }
+
+  document.getElementById("cookiechimp-js")?.remove();
+
+  const script = document.createElement("script");
+  script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+  script.id = "cookiechimp-js";
+  document.head.appendChild(script);
 });
 
 export default router;
@@ -86,19 +96,29 @@ export default router;
 
 ### React (React Router v6+)
 
-Add the script tag in your `index.html` `<head>`, then create a tiny component that listens to location changes and mount it once at the top of your tree:
+Add the script tag in your `index.html` `<head>` for the initial load, then mount a tiny component that re-injects on subsequent route changes:
 
 ```tsx
 // src/components/CookieChimpReinit.tsx
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 export default function CookieChimpReinit() {
   const { pathname } = useLocation();
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    // @ts-ignore
-    window.CookieChimp?.reinitialize?.();
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
   }, [pathname]);
 
   return null;
@@ -115,17 +135,29 @@ export default function CookieChimpReinit() {
 
 ### SvelteKit
 
-Add the script to `src/app.html` inside `<head>`, then re-initialize on navigation from your root layout:
+Add the script to `src/app.html` inside `<head>` for the initial load, then re-inject on subsequent navigations from your root layout:
 
 ```svelte
 <!-- src/routes/+layout.svelte -->
 <script>
   import { afterNavigate } from "$app/navigation";
+  import { browser } from "$app/environment";
+
+  let isInitial = true;
 
   afterNavigate(() => {
-    if (typeof window !== "undefined") {
-      window.CookieChimp?.reinitialize?.();
+    if (!browser) return;
+    if (isInitial) {
+      isInitial = false;
+      return;
     }
+
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
   });
 </script>
 
@@ -134,19 +166,17 @@ Add the script to `src/app.html` inside `<head>`, then re-initialize on navigati
 
 ### Generic SPA (no router events)
 
-If your framework doesn't expose a router event you can hook into, listen for `history.pushState` and `popstate`:
+If your framework doesn't expose a router event you can hook into, listen for `history.pushState` and `popstate` — this fires on both programmatic navigation and back/forward:
 
 ```html
 <script>
   function runCookieChimp() {
-    if (typeof window.CookieChimp?.reinitialize === "function") {
-      window.CookieChimp.reinitialize();
-    } else if (!document.getElementById("cookiechimp-js")) {
-      var script = document.createElement("script");
-      script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
-      script.id = "cookiechimp-js";
-      document.head.appendChild(script);
-    }
+    document.getElementById("cookiechimp-js")?.remove();
+
+    var script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
   }
 
   // Patch pushState/replaceState so we get notified on client-side navigation.

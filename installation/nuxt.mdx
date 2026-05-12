@@ -39,22 +39,32 @@ The `tagPriority: "critical"` hint asks Nuxt's `useHead` to render this script a
 
 ## How do I handle client-side navigation?
 
-Nuxt uses client-side routing for in-app navigation. Create a Nuxt plugin that reinitializes the CookieChimp widget on every route change:
+Nuxt uses client-side routing for in-app navigation. Create a Nuxt plugin that re-injects the CookieChimp script on every route change so it rescans the newly mounted route's DOM. The static script from `nuxt.config.ts` handles the initial page load, so we skip the first `afterEach` call.
 
 ```ts
 // plugins/cookiechimp.client.ts
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(() => {
   const router = useRouter();
+  let isInitial = true;
 
   router.afterEach(() => {
-    // @ts-ignore
-    window.CookieChimp?.reinitialize?.();
+    if (isInitial) {
+      isInitial = false;
+      return;
+    }
+
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
   });
 });
 ```
 
 <Info>
-  The `.client.ts` suffix tells Nuxt to only run this plugin in the browser — `window.CookieChimp` doesn't exist during server rendering.
+  The `.client.ts` suffix tells Nuxt to only run this plugin in the browser — `document` doesn't exist during server rendering.
 </Info>
 
 ---
