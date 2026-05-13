@@ -46,10 +46,13 @@ Together, these let any Launch rule (a) wait for consent to be available and (b)
     Paste the following into the code editor and save:
 
     ```js
-    return window.cookieChimpConsentString || "";
+    var consent = window.cookieChimpConsentString || "";
+    return consent ? "," + consent + "," : "";
     ```
 
-    This Data Element returns the latest comma-separated list of consented categories and vendors. You'll reference it as `%CookieChimp Consent String%` from your rule conditions.
+    This Data Element returns the latest comma-separated list of consented categories and vendors, wrapped with leading and trailing commas. You'll reference it as `%CookieChimp Consent String%` from your rule conditions.
+
+    <Tip>Wrapping the value with commas is important. It lets you match `,Hotjar,` exactly &mdash; without the commas, Launch's `Contains` operator would also match a different vendor that happens to include `Hotjar` as a substring (e.g. `Hotjar Surveys`).</Tip>
 
     <Tip>Keep `Force lowercase value` **off**. Vendor names in the consent string match the casing used in your CookieChimp [Vendor Library](/features/vendor-management#what-are-vendors), e.g. `Google Analytics`.</Tip>
   </Step>
@@ -99,11 +102,11 @@ Together, these let any Launch rule (a) wait for consent to be available and (b)
 
         - **Left operand:** `%CookieChimp Consent String%`
         - **Operator:** Contains
-        - **Right operand:** the exact vendor name as it appears in your CookieChimp [Vendor Library](/features/vendor-management#what-are-vendors), e.g. `Google Analytics`, `Hotjar`, or `Facebook Pixel`.
+        - **Right operand:** the exact vendor name as it appears in your CookieChimp [Vendor Library](/features/vendor-management#what-are-vendors), **wrapped with leading and trailing commas**, e.g. `,Google Analytics,`, `,Hotjar,`, or `,Facebook Pixel,`.
 
         This is the recommended approach because visitors can opt in or out of individual vendors within a category, and a tag should usually only fire when its own vendor is allowed &mdash; not just when the broader category has consent.
 
-        <Tip>The vendor name must match the name configured in your CookieChimp Vendor Library exactly, including capitalisation and spacing.</Tip>
+        <Tip>The vendor name must match the name configured in your CookieChimp Vendor Library exactly, including capitalisation and spacing. The surrounding commas ensure Launch's `Contains` operator only matches the whole token, not a substring of another vendor.</Tip>
       </Tab>
 
       <Tab title="Alternative">
@@ -111,11 +114,20 @@ Together, these let any Launch rule (a) wait for consent to be available and (b)
 
         - **Left operand:** `%CookieChimp Consent String%`
         - **Operator:** Contains
-        - **Right operand:** the category ID, e.g. `analytics`, `marketing`, or `personalization`.
+        - **Right operand:** the category ID wrapped with commas, e.g. `,analytics,`, `,marketing,`, or `,personalization,`.
+      </Tab>
+
+      <Tab title="Custom Code condition">
+        If you'd rather not wrap values with commas in the rule UI, you can use a **Custom Code** condition that splits the consent string and checks for an exact token:
+
+        ```js
+        var consent = window.cookieChimpConsentString || "";
+        return consent.split(",").indexOf("Google Analytics") !== -1;
+        ```
+
+        Replace `Google Analytics` with the vendor name or category ID you want to check for.
       </Tab>
     </Tabs>
-
-    <Warning>The consent string contains both category IDs and vendor names in the same comma-separated list. Avoid generic substrings (e.g. `ads`) that might accidentally match part of a longer vendor name. Use the exact category ID or vendor name to be safe.</Warning>
   </Step>
 
   <Step title="Save, build, and publish">

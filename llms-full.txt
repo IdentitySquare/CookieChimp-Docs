@@ -212,7 +212,12 @@ CookieChimp exposes two integration points:
 
 ## How do I block tags with Adobe Launch?
 
-1. **Create a Data Element**: Add a Custom Code Data Element named `CookieChimp Consent String` returning `window.cookieChimpConsentString || ""`. Reference it as `%CookieChimp Consent String%`.
+1. **Create a Data Element**: Add a Custom Code Data Element named `CookieChimp Consent String`. Return the consent string wrapped with leading/trailing commas so `Contains` checks match whole tokens, not substrings:
+   ```js
+   var consent = window.cookieChimpConsentString || "";
+   return consent ? "," + consent + "," : "";
+   ```
+   Reference it as `%CookieChimp Consent String%`.
 2. **Add a Custom Code Event to your rule**: Listen for consent and call `trigger()`:
    ```js
    if (window.cookieChimpConsentString) {
@@ -222,7 +227,7 @@ CookieChimp exposes two integration points:
      trigger();
    });
    ```
-3. **Add a Value Comparison Condition**: Check `%CookieChimp Consent String%` Contains the exact vendor name (e.g. `Google Analytics`) or category ID (e.g. `analytics`).
+3. **Add a Value Comparison Condition**: Check `%CookieChimp Consent String%` Contains the exact vendor name or category ID wrapped with commas (e.g. `,Google Analytics,` or `,analytics,`). Wrapping with commas prevents substring matches against other vendors. Alternatively, use a Custom Code condition: `return (window.cookieChimpConsentString || "").split(",").indexOf("Google Analytics") !== -1;`.
 4. **Save, build, and publish** the library to your environment.
 
 Debug with `_satellite.setDebug(true);` in DevTools to see rule evaluation logs.
