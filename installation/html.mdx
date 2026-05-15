@@ -1,0 +1,159 @@
+---
+title: "HTML"
+description: "Install a consent banner on any plain HTML website — no framework or build step required."
+icon: "code"
+---
+
+If your site is plain HTML — a static landing page, a hand-written multi-page site, or anything served as `.html` files — you can install CookieChimp by adding a single `<script>` tag to your `<head>`. This guide also doubles as a reference for understanding what every other platform guide ultimately does under the hood.
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet to every HTML page">
+    Paste the snippet inside the `<head>` of every HTML page on your site, as the **very first script**.
+
+    Here's a complete minimal HTML document with CookieChimp installed correctly:
+
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My Website</title>
+
+        <!-- CookieChimp must be the first script in <head> -->
+        <script src="https://cookiechimp.com/widget/abc123.js"></script>
+
+        <!-- Your other scripts go after CookieChimp -->
+        <link rel="stylesheet" href="/styles.css" />
+      </head>
+      <body>
+        <h1>Welcome to my website</h1>
+        <!-- Page content -->
+      </body>
+    </html>
+    ```
+
+    Replace `abc123` with your website's unique CookieChimp ID.
+
+    <Snippet file="install/script-first-warning.mdx" />
+
+    <Tip>
+      If you have many HTML pages, consider using a shared header include (via your static site generator, a server-side include, or a small build step) so you only have to update the snippet in one place.
+    </Tip>
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    The pattern is to change any third-party `<script>` tag from a regular script into a "blocked" script that CookieChimp will only activate once the user consents to the matching category.
+
+    **Before** — a Google Analytics tag that runs unconditionally:
+
+    ```html
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXX');
+    </script>
+    ```
+
+    **After** — the same tags blocked until the user accepts the `analytics` category:
+
+    ```html
+    <script
+      type="text/plain"
+      data-category="analytics"
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"
+    ></script>
+    <script type="text/plain" data-category="analytics">
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXX');
+    </script>
+    ```
+
+    Setting `type="text/plain"` stops the browser from executing the script. CookieChimp scans the page on load, watches for consent, and rewrites the `type` back to `text/javascript` on tags whose `data-category` the user has accepted.
+
+    See the [Scripts Management](/block-scripts-cookies/script-attributes) page for the full attribute reference, including how to block iframes, images, and inline event handlers.
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+
+    A full example with a footer link that opens the preferences modal:
+
+    ```html
+    <footer>
+      <nav>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <button type="button" data-cc="show-preferencesModal">
+          Manage cookie preferences
+        </button>
+      </nav>
+    </footer>
+    ```
+  </Step>
+</Steps>
+
+## How does the script work?
+
+When the browser loads `https://cookiechimp.com/widget/abc123.js`, CookieChimp:
+
+1. Reads your configuration (categories, services, banner copy and design) from your account.
+2. Scans the DOM for any `<script type="text/plain" data-category="...">` tags and keeps them blocked.
+3. Shows the consent banner if the user hasn't made a choice yet — or silently applies their stored consent if they have.
+4. When the user accepts a category, rewrites the matching blocked tags so the browser executes them.
+
+Because everything is driven by attributes on existing HTML, there's no JavaScript API you have to call from your pages — the script does the work as long as it's the first one in `<head>`.
+
+## Running code based on consent
+
+If you have custom code that should only run after the user has consented to a specific category, listen for the `cc:onConsented` event:
+
+```html
+<script>
+  window.addEventListener("cc:onConsented", function () {
+    if (CookieChimp.acceptedCategory("analytics")) {
+      // Initialize your own analytics code here.
+    }
+
+    if (CookieChimp.acceptedService("Google Analytics", "analytics")) {
+      // "Google Analytics" service was accepted.
+    }
+  });
+</script>
+```
+
+To react when the user changes their preferences later, listen for `cc:onUpdate`:
+
+```html
+<script>
+  window.addEventListener("cc:onUpdate", function (event) {
+    if (event.detail.changedCategories.includes("analytics")) {
+      if (CookieChimp.acceptedCategory("analytics")) {
+        // Analytics was just enabled.
+      } else {
+        // Analytics was just disabled — tear down your analytics here.
+      }
+    }
+  });
+</script>
+```
+
+<Snippet file="install/callbacks-events-link.mdx" />
+
+## Troubleshooting
+
+- Make sure your domain is allowed in the **Account Settings** in your CookieChimp dashboard. Local file URLs (`file://`) and `localhost` need to be explicitly added if you want to test before deploying.
+- The script must be the **first** script in `<head>`. If you see other scripts setting cookies before consent is granted, they were added above the CookieChimp tag.
+- Make sure you updated every HTML page on your site — pages without the snippet won't show the banner.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
