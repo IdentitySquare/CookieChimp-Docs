@@ -43,7 +43,8 @@
               "installation/nextjs",
               "installation/shopify",
               "installation/single-page-applications",
-              "installation/wordpress"
+              "installation/wordpress",
+              "installation/adobe-launch"
             ]
           },
           {

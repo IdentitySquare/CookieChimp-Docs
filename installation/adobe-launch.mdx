@@ -1,0 +1,171 @@
+---
+title: "Adobe Launch"
+description: "Set up a consent banner with Adobe Launch (Adobe Experience Platform Tags)."
+icon: "square-a"
+---
+
+Add your website's CookieChimp JS snippet in the `<head>` tag of your HTML, **before** the Adobe Launch embed code.
+
+<Warning>Do not deploy our HTML snippet through Adobe Launch. CookieChimp needs to run before any other script so it can block tags and set defaults before Launch initialises its extensions.</Warning>
+
+<Info>
+  The CookieChimp script needs to be added at the top of the `<head>` section, so that it can run first, in order to ensure other scripts are only run based on consent.
+  If other scripts are added before, they may set cookies and other storage items before consent is granted.
+</Info>
+
+```html
+<script src="https://cookiechimp.com/widget/abc123.js"></script>
+<script src="//assets.adobedtm.com/your-property/launch-XXXXXXX.min.js" async></script>
+```
+
+You need to replace `abc123` with your website's unique CookieChimp ID and the Adobe Launch URL with the embed code from your Launch property's [Environments](https://experienceleague.adobe.com/en/docs/experience-platform/tags/ui/publishing/environments) page.
+
+## How does CookieChimp work with Adobe Launch?
+
+Adobe Launch (now Adobe Experience Platform Tags) does not have a native consent mode like Google Tag Manager does, so consent is enforced inside each rule using a [Data Element](https://experienceleague.adobe.com/en/docs/experience-platform/tags/ui/data-elements) and a rule condition.
+
+CookieChimp exposes two things you'll wire into Launch:
+
+- **`window.cookieChimpConsentString`** &mdash; a comma-separated string of the categories and services the visitor has consented to, e.g. `essential,analytics,marketing,Google Analytics,Hotjar,Facebook Pixel`. You read this from a Data Element.
+- **`cc:consentStringUpdated`** &mdash; a window event that fires once consent has been granted and again every time the visitor changes their preferences. You listen for it from a rule's event.
+
+Together, these let any Launch rule (a) wait for consent to be available and (b) only run when the matching category or vendor was accepted.
+
+## How do I block tags with Adobe Launch?
+
+<Steps>
+  <Step title="Create a Data Element for the consent string">
+
+    In your Launch property, go to **Data Elements** and click **Add Data Element**.
+
+    - **Name:** `CookieChimp Consent String`
+    - **Extension:** Core
+    - **Data Element Type:** Custom Code
+    - **Storage Duration:** None (read it fresh on every reference)
+
+    Paste the following into the code editor and save:
+
+    ```js
+    var consent = window.cookieChimpConsentString || "";
+    return consent ? "," + consent + "," : "";
+    ```
+
+    This Data Element returns the latest comma-separated list of consented categories and vendors, wrapped with leading and trailing commas. You'll reference it as `%CookieChimp Consent String%` from your rule conditions.
+
+    <Tip>Wrapping the value with commas is important. It lets you match `,Hotjar,` exactly &mdash; without the commas, Launch's `Contains` operator would also match a different vendor that happens to include `Hotjar` as a substring (e.g. `Hotjar Surveys`).</Tip>
+
+    <Tip>Keep `Force lowercase value` **off**. Vendor names in the consent string match the casing used in your CookieChimp [Vendor Library](/features/vendor-management#what-are-vendors), e.g. `Google Analytics`.</Tip>
+  </Step>
+
+  <Step title="Add a custom event to listen for consent updates">
+
+    Open the rule for the tag you want to gate (or create a new rule), and add an **Event** of type **Custom Code** under the Core extension.
+
+    <Tabs>
+      <Tab title="Listen for consent on load and on change">
+        Use this when you want the rule to run as soon as the page loads (if consent has already been granted) and again whenever the visitor updates their preferences.
+
+        ```js
+        if (window.cookieChimpConsentString) {
+          trigger();
+        }
+
+        window.addEventListener("cc:consentStringUpdated", function () {
+          trigger();
+        });
+        ```
+      </Tab>
+
+      <Tab title="Only fire on consent changes">
+        Use this when the rule should only run after the consent state changes &mdash; for example, a tag that should not re-fire on every page load.
+
+        ```js
+        window.addEventListener("cc:consentStringUpdated", function () {
+          trigger();
+        });
+        ```
+      </Tab>
+    </Tabs>
+
+    `trigger()` is a function Adobe Launch injects into Custom Code events. Calling it tells Launch to evaluate the rule's conditions and run its actions.
+
+    <Info>The `cc:consentStringUpdated` event is dispatched on `window` after CookieChimp has read the visitor's choices and rebuilt the consent string, so it's safe to read `window.cookieChimpConsentString` from inside the listener.</Info>
+  </Step>
+
+  <Step title="Add a condition to gate the tag on consent">
+
+    Add a **Condition** to the rule of type **Value Comparison** under the Core extension.
+
+    <Tabs>
+      <Tab title="Recommended">
+        Gate the tag on a specific vendor.
+
+        - **Left operand:** `%CookieChimp Consent String%`
+        - **Operator:** Contains
+        - **Right operand:** the exact vendor name as it appears in your CookieChimp [Vendor Library](/features/vendor-management#what-are-vendors), **wrapped with leading and trailing commas**, e.g. `,Google Analytics,`, `,Hotjar,`, or `,Facebook Pixel,`.
+
+        This is the recommended approach because visitors can opt in or out of individual vendors within a category, and a tag should usually only fire when its own vendor is allowed &mdash; not just when the broader category has consent.
+
+        <Tip>The vendor name must match the name configured in your CookieChimp Vendor Library exactly, including capitalisation and spacing. The surrounding commas ensure Launch's `Contains` operator only matches the whole token, not a substring of another vendor.</Tip>
+      </Tab>
+
+      <Tab title="Alternative">
+        Gate the tag on a whole category instead, so it fires whenever any vendor in that category has consent.
+
+        - **Left operand:** `%CookieChimp Consent String%`
+        - **Operator:** Contains
+        - **Right operand:** the category ID wrapped with commas, e.g. `,analytics,`, `,marketing,`, or `,personalization,`.
+      </Tab>
+
+      <Tab title="Custom Code condition">
+        If you'd rather not wrap values with commas in the rule UI, you can use a **Custom Code** condition that splits the consent string and checks for an exact token:
+
+        ```js
+        var consent = window.cookieChimpConsentString || "";
+        return consent.split(",").indexOf("Google Analytics") !== -1;
+        ```
+
+        Replace `Google Analytics` with the vendor name or category ID you want to check for.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Save, build, and publish">
+    Save the rule, add it to a Library, build the library, and publish to your environment as you normally would in Launch.
+
+    Repeat the **event** and **condition** steps for any other rule that loads a tag requiring consent. The Data Element only needs to be created once and can be reused across every rule.
+  </Step>
+</Steps>
+
+Your tags are now consent-aware. They will:
+
+1. Wait until CookieChimp has determined the visitor's consent state.
+2. Only fire when the required category or vendor is in the consent string.
+3. Re-evaluate automatically whenever the visitor updates their preferences from the banner or privacy trigger.
+
+## How do I debug my Adobe Launch setup?
+
+Adobe Launch ships with a debug mode that logs every rule evaluation to the browser console. Enable it by running the following in your DevTools console:
+
+```js
+_satellite.setDebug(true);
+```
+
+Reload the page and you'll see each rule's events, conditions, and actions logged as they run. You can also inspect the consent string directly:
+
+```js
+window.cookieChimpConsentString;
+// => 'essential,analytics,marketing,personalization,Cloudflare,CookieChimp,Google Analytics,Hotjar,Facebook Pixel'
+```
+
+If a rule is not firing as expected:
+
+- Confirm the Data Element returns a non-empty string after consent is granted.
+- Confirm the vendor or category name in your condition matches what appears in the consent string exactly.
+- Confirm the CookieChimp snippet is loaded **before** the Launch embed code in your `<head>`.
+
+## What about the Adobe Web SDK and Consent Mode?
+
+If you are using the **Adobe Experience Platform Web SDK** (`alloy`), it has its own [consent command](https://experienceleague.adobe.com/en/docs/experience-platform/edge/consent/supporting-consent) that accepts an IAB TCF string or the Adobe consent standard. The pattern above &mdash; reading `window.cookieChimpConsentString` from a Data Element and listening for `cc:consentStringUpdated` &mdash; works for any Web SDK rule too: call `alloy("setConsent", ...)` from the rule's action, mapping CookieChimp's categories to the consent object Adobe expects.
+
+If you need help wiring CookieChimp into a specific Adobe Web SDK setup, [get in touch](https://cookiechimp.com) and we'll work through it with you.
