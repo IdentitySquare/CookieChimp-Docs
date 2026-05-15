@@ -1,8 +1,16 @@
 ---
 title: "Webflow"
-description: "Install a consent banner on your Webflow site."
+sidebarTitle: "Webflow"
+description: "Add a GDPR & CCPA compliant cookie consent banner to your Webflow site with CookieChimp. Step-by-step Custom Code installation in Project Settings."
 icon: "webflow"
+keywords: ["Webflow cookie banner", "Webflow cookie consent", "Webflow GDPR", "Webflow CCPA", "cookie banner for Webflow", "Webflow consent management", "Webflow privacy banner", "CookieChimp Webflow", "Webflow custom code cookie banner"]
+og:title: "Webflow Cookie Banner – Install GDPR Consent on Webflow | CookieChimp"
+og:description: "Add a fully GDPR-compliant cookie consent banner to your Webflow site in minutes. Custom Code setup, script blocking, and Google Consent Mode v2 support."
+twitter:title: "Webflow Cookie Banner – CookieChimp"
+twitter:description: "Install a GDPR-compliant cookie consent banner on your Webflow site in minutes with CookieChimp."
 ---
+
+Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) to your Webflow site. CookieChimp installs as a single line of Custom Code in your Webflow Project Settings — no plugins, no rebuild required.
 
 <Steps>
   <Step title="Copy your CookieChimp snippet">
@@ -38,3 +46,17 @@ icon: "webflow"
 - Make sure your **published** Webflow domain is allowed in the **Account Settings** in your CookieChimp dashboard. The `*.webflow.io` staging domain is not included by default — add it if you want to test the banner before publishing to a custom domain.
 - After saving custom code, you must **publish** the site again — changes do not appear on the staging or production URL until publish.
 <Snippet file="install/cms-troubleshooting-footer.mdx" />
+
+## Webflow cookie banner FAQ
+
+<AccordionGroup>
+  <Accordion title="Does CookieChimp work with Webflow CMS Collections?">
+    Yes. CookieChimp runs in the `<head>` of every page Webflow renders, including CMS Collection pages, dynamic templates and category pages. No per-page setup is needed.
+  </Accordion>
+
+  <Accordion title="Does it block Webflow's built-in form analytics?">
+    Webflow's form submissions don't set tracking cookies by themselves. If you've connected Google Analytics, Facebook Pixel or similar through Custom Code or an Embed, those scripts will be blocked until consent — see the [Scripts Management](/block-scripts-cookies/script-attributes) page.
+  </Accordion>
+
+  <Snippet file="install/cms-common-faqs.mdx" />
+</AccordionGroup>

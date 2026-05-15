@@ -1,0 +1,77 @@
+---
+title: "Duda"
+sidebarTitle: "Duda"
+description: "Add a GDPR & CCPA compliant cookie consent banner to your Duda site with CookieChimp. Install via Site-Wide Code in seconds."
+icon: "layout-template"
+keywords: ["Duda cookie banner", "Duda cookie consent", "Duda GDPR", "Duda CCPA", "cookie banner for Duda", "Duda site-wide code cookie banner", "Duda consent management", "CookieChimp Duda"]
+og:title: "Duda Cookie Banner – Install GDPR Consent on Duda | CookieChimp"
+og:description: "Add a GDPR-compliant cookie consent banner to your Duda site in minutes. Works on all Duda plans that support Site-Wide Code injection."
+twitter:title: "Duda Cookie Banner – CookieChimp"
+twitter:description: "Install a GDPR-compliant cookie consent banner on your Duda site in minutes with CookieChimp."
+---
+
+Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) to your Duda site. CookieChimp installs as Site-Wide Code from the Duda editor — works on agency, team and white-label setups.
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet via Duda's Site-Wide Code">
+    1. Open your site in the Duda editor.
+    2. Click the **Settings** icon in the left sidebar (or **Site → Settings** at the top).
+    3. Open **Site-Wide Code** under **SEO & Settings**.
+    4. Paste the CookieChimp snippet into the **Header** section. This injects it into `<head>` on every page.
+    5. Click **Save**, then **Publish** your site.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Disable Duda's built-in cookie banner">
+    Duda offers a built-in cookie notification widget that will conflict with CookieChimp:
+
+    1. Go to **Settings → Cookie Policy** (or **Privacy** depending on your Duda version).
+    2. Disable Duda's **Cookie Notification** widget.
+
+    CookieChimp now handles consent end-to-end.
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      Duda integrations like Google Analytics, Facebook Pixel and HubSpot are typically added via **Site-Wide Code → Header / Body** or through the **Apps** marketplace. For any `<script>` tags you've pasted into Site-Wide Code, set `type="text/plain"` and add a `data-category` attribute so CookieChimp can release them once consent is given.
+    </Tip>
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+
+    Duda widgets like buttons and text links support custom HTML attributes — add `data-cc="show-preferencesModal"` to any button to make it open the preferences modal.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- **Banner doesn't appear** — make sure your Duda domain (both the `*.editmysite.com` preview URL and any custom domain) is allowed in **Account Settings → Additional Domains** in your CookieChimp dashboard.
+- **Site-Wide Code option is missing** — head injection is available on most paid Duda plans. Some white-label/reseller setups restrict it; check with your agency administrator.
+- **Both Duda's banner and CookieChimp appear** — re-check that Duda's Cookie Notification widget is disabled under **Settings → Cookie Policy**.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
+
+## Duda cookie banner FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I install CookieChimp across all sites in my Duda account?">
+    Yes. Duda allows site templates to include Site-Wide Code, so you can pre-install CookieChimp in a template and roll it out across every site your agency builds. Each site uses its own CookieChimp ID for separate consent records.
+  </Accordion>
+
+  <Accordion title="Does CookieChimp work with Duda's Multilingual feature?">
+    Yes. CookieChimp's banner supports [40+ languages](/features/multilingual-banners) and detects the active language from the page's `<html lang>` attribute, which Duda sets automatically per locale.
+  </Accordion>
+
+  <Accordion title="Is this compatible with Duda's white-label / agency offering?">
+    Yes. CookieChimp also offers white-label and partner features — see the [Partner API](/api-reference/partner-api) and [Whitelabeling](/api-reference/whitelabeling) docs.
+  </Accordion>
+
+  <Snippet file="install/cms-common-faqs.mdx" />
+</AccordionGroup>

@@ -1,0 +1,71 @@
+---
+title: "Ghost"
+sidebarTitle: "Ghost"
+description: "Install a GDPR-compliant cookie consent banner on your Ghost blog or publication with CookieChimp. Works with Ghost(Pro) and self-hosted Ghost via Code Injection."
+icon: "ghost"
+keywords: ["Ghost cookie banner", "Ghost cookie consent", "Ghost CMS GDPR", "Ghost code injection cookie banner", "cookie banner for Ghost", "Ghost privacy banner", "Ghost consent management", "CookieChimp Ghost"]
+og:title: "Ghost Cookie Banner – Install GDPR Consent on Ghost CMS | CookieChimp"
+og:description: "Add a GDPR-compliant cookie consent banner to your Ghost blog or publication in minutes. Works with Ghost(Pro), self-hosted Ghost and every theme via Code Injection."
+twitter:title: "Ghost Cookie Banner – CookieChimp"
+twitter:description: "Install a GDPR-compliant cookie consent banner on your Ghost site in minutes with CookieChimp."
+---
+
+Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) to your Ghost blog or publication. CookieChimp installs through Ghost's built-in Code Injection — no theme edits, works on Ghost(Pro) and self-hosted Ghost alike.
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet via Ghost Code Injection">
+    1. Sign in to your Ghost admin (e.g. `your-site.com/ghost`).
+    2. Open **Settings → Code Injection** from the left sidebar.
+    3. Paste the CookieChimp snippet into the **Site Header** field. This injects it into the `<head>` of every page Ghost renders.
+    4. Click **Save**.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      Common Ghost integrations — Google Analytics, Plausible, Fathom, Mailchimp, Disqus, Hotjar — are usually added in the same Code Injection panel. Update those `<script>` tags to use `type="text/plain"` and a matching `data-category` so CookieChimp can release them after consent.
+    </Tip>
+  </Step>
+
+  <Step title="Disable Ghost's built-in privacy features that conflict">
+    Ghost's [native member features](https://ghost.org/docs/) and built-in newsletter signup set first-party cookies. These are typically classified as **essential / functional** (the user is actively signing up), so they don't need to be blocked. However, if your theme bundles analytics out of the box, disable them in **Settings → Code Injection** or your theme settings and re-add them through CookieChimp so consent is enforced.
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+
+    Add the preferences button to your footer by editing your theme's `default.hbs` (self-hosted) or by adding the HTML directly in the **Site Footer** field of **Code Injection**.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- **Banner doesn't appear** — make sure your Ghost domain is allowed in **Account Settings → Additional Domains** in your CookieChimp dashboard.
+- **Banner only shows on the homepage** — re-check that the snippet is in **Site Header** (not just on a single page's code injection). Site Header applies globally.
+- **Banner shows but scripts still fire** — Ghost themes sometimes inline analytics directly in `default.hbs`. Inline scripts must also be tagged with `type="text/plain"` and `data-category` to be blocked.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
+
+## Ghost cookie banner FAQ
+
+<AccordionGroup>
+  <Accordion title="Does CookieChimp work with Ghost(Pro)?">
+    Yes. Code Injection works identically on Ghost(Pro) and self-hosted Ghost. No server access or theme changes are required.
+  </Accordion>
+
+  <Accordion title="Will the banner appear on AMP and email versions of my posts?">
+    The banner appears on the standard web rendering of your Ghost posts. AMP pages and emailed newsletters do not run JavaScript, so the banner is not needed there — Ghost handles consent for newsletter subscriptions separately at sign-up time.
+  </Accordion>
+
+  <Accordion title="Does the banner block Ghost's member login cookie?">
+    No, and it shouldn't. Login and membership cookies are strictly necessary under GDPR — they are set in response to a user action (signing in or subscribing) and don't require prior consent.
+  </Accordion>
+
+  <Snippet file="install/cms-common-faqs.mdx" />
+</AccordionGroup>

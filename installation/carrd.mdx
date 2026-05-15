@@ -1,0 +1,68 @@
+---
+title: "Carrd"
+sidebarTitle: "Carrd"
+description: "Add a GDPR & CCPA compliant cookie consent banner to your Carrd one-page site with CookieChimp. Works with Carrd Pro using the Embed widget."
+icon: "credit-card"
+keywords: ["Carrd cookie banner", "Carrd cookie consent", "Carrd GDPR", "Carrd CCPA", "cookie banner for Carrd", "Carrd Pro embed cookie banner", "Carrd consent management", "CookieChimp Carrd"]
+og:title: "Carrd Cookie Banner – Install GDPR Consent on Carrd | CookieChimp"
+og:description: "Add a GDPR-compliant cookie consent banner to your Carrd one-page site in minutes with CookieChimp. Works with any Carrd Pro plan via the Embed widget."
+twitter:title: "Carrd Cookie Banner – CookieChimp"
+twitter:description: "Install a GDPR-compliant cookie consent banner on your Carrd site in minutes."
+---
+
+Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) to your Carrd one-page site. CookieChimp installs as a single Embed widget in the page head.
+
+<Info>
+  Custom code is available on **Carrd Pro Standard, Plus and Pro** plans. The free Carrd plan does not allow embedded scripts.
+</Info>
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet via a Carrd Embed widget">
+    1. Open your site in the Carrd editor.
+    2. Click the **+** (Add) button and choose **Embed**.
+    3. In the Embed settings, set **Type** to **Code** and **Style** to **Head**. Setting it to **Head** places the script in `<head>` so it loads before the rest of the page.
+    4. Paste the CookieChimp snippet into the **Code** field.
+    5. Click **Done**, then publish your Carrd site from the top toolbar.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      Carrd's built-in **Analytics** field (Google Analytics, Plausible, Fathom etc. under **Site Settings → Analytics**) injects pixels server-side. To enforce consent, disable Carrd's built-in analytics and re-add them as Embed widgets with `type="text/plain"` and `data-category="analytics"` so CookieChimp can manage them.
+    </Tip>
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+
+    On Carrd, the simplest pattern is to enable CookieChimp's built-in floating Privacy Trigger. If you want a "Cookie settings" link in your footer, add a Text element with an inline link and the `data-cc="show-preferencesModal"` attribute via an Embed.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- **"Embed → Code" option is not available** — you're on the free Carrd plan. Upgrade to Carrd Pro to unlock custom code.
+- **Banner doesn't appear on the published site** — make sure your Carrd domain (both the `*.carrd.co` URL and any custom domain) is allowed in **Account Settings → Additional Domains** in your CookieChimp dashboard.
+- **Banner shows in preview but not after publish** — Carrd caches published sites aggressively. Hard refresh (Cmd/Ctrl + Shift + R) and check on a fresh incognito window.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
+
+## Carrd cookie banner FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need Carrd Pro to use CookieChimp?">
+    Yes. Embedding third-party scripts requires a Carrd Pro plan (Standard, Plus, or Pro). The free plan does not allow custom code.
+  </Accordion>
+
+  <Accordion title="Does CookieChimp work with Carrd's form submissions?">
+    Yes. Form submissions are user-initiated actions and the data they collect is covered by your form's own privacy notice, not the cookie banner. CookieChimp only governs storage and tracking scripts.
+  </Accordion>
+
+  <Snippet file="install/cms-common-faqs.mdx" />
+</AccordionGroup>
