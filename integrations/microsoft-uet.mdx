@@ -1,0 +1,34 @@
+---
+title: "Microsoft UET Consent Mode"
+description: "Pass consent to Microsoft's Universal Event Tracking tag for Microsoft Advertising."
+icon: "target"
+---
+
+Microsoft Universal Event Tracking (UET) is the tag used by Microsoft Advertising for conversion tracking and remarketing audiences. With UET Consent Mode, the tag adjusts what it tracks based on the visitor's consent.
+
+When the integration is enabled, CookieChimp calls UET's consent API (`uetq.push('consent', ...)`) automatically as the user's preferences change.
+
+## Prerequisites
+
+- A Microsoft Advertising account with a UET tag installed on your site.
+- A category or service in CookieChimp that represents advertising consent (most accounts map this to the **marketing** category or a **Microsoft Ads** vendor).
+
+## How do I enable it?
+
+<Steps>
+  <Step title="Open the Integrations page">
+    Go to **Integrations** in your CookieChimp dashboard and find the Microsoft UET Consent Mode card.
+  </Step>
+
+  <Step title="Toggle it on">
+    CookieChimp will push consent state to UET on page load and whenever the visitor updates their choices.
+  </Step>
+</Steps>
+
+## How do I verify it's working?
+
+1. Open your site with browser DevTools open on the **Network** tab and filter for `bat.bing.com`.
+2. Decline advertising consent — no requests to `bat.bing.com` should be sent (or they should be sent with `ad_storage=denied`).
+3. Accept advertising consent and reload — UET requests should now fire with consent granted.
+
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

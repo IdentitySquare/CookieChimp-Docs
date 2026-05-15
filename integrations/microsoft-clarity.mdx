@@ -1,0 +1,33 @@
+---
+title: "Microsoft Clarity Consent Mode"
+description: "Allow or block Microsoft Clarity session recordings and heatmaps based on consent."
+icon: "chart-bar"
+---
+
+Microsoft Clarity is a free product-analytics tool that captures session recordings and heatmaps. With Consent Mode enabled, Clarity only collects data once the visitor has consented to analytics tracking.
+
+When the integration is enabled, CookieChimp calls Clarity's consent API (`clarity('consent')`) automatically as the user's preferences change.
+
+## Prerequisites
+
+- A Microsoft Clarity project with its tracking snippet installed on your site.
+- A category or service in CookieChimp that represents analytics consent (most accounts map this to the **analytics** category or a **Microsoft Clarity** vendor).
+
+## How do I enable it?
+
+<Steps>
+  <Step title="Open the Integrations page">
+    Go to **Integrations** in your CookieChimp dashboard and find the Microsoft Clarity Consent Mode card.
+  </Step>
+
+  <Step title="Toggle it on">
+    CookieChimp will push consent state to Clarity on page load and whenever the visitor updates their choices.
+  </Step>
+</Steps>
+
+## How do I verify it's working?
+
+1. Open your site in a private window and **decline** analytics consent. No session recordings should appear in your Clarity dashboard.
+2. Reload, **accept** analytics, and browse your site. After a few minutes a new session should show up in Clarity.
+
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

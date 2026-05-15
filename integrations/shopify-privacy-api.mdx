@@ -1,0 +1,40 @@
+---
+title: "Shopify Customer Privacy API"
+description: "Sync consent with Shopify's storefront so first-party pixels and Shop Pay respect the visitor's choices."
+icon: "shopify"
+---
+
+Shopify's [Customer Privacy API](https://shopify.dev/docs/api/customer-privacy) is the framework Shopify and its apps use to check whether a visitor has consented to tracking. When the integration is enabled, CookieChimp updates the API as the user's preferences change, so Shopify's analytics, Shop Pay tracking, and any privacy-aware Shopify apps adjust automatically.
+
+## Prerequisites
+
+- The CookieChimp snippet installed on your Shopify theme — see the [Shopify installation guide](/installation/shopify) if you haven't done this yet.
+- Shopify's built-in cookie banner disabled at **Settings → Customer privacy → Cookie banner** (it conflicts with CookieChimp).
+
+## How do I enable it?
+
+<Steps>
+  <Step title="Open the Integrations page">
+    Go to **Integrations** in your CookieChimp dashboard and find the Shopify Customer Privacy API card.
+  </Step>
+
+  <Step title="Toggle it on">
+    CookieChimp will start signalling consent to Shopify's Customer Privacy API on page load and whenever the visitor updates their choices.
+  </Step>
+</Steps>
+
+## How do I verify it's working?
+
+Open your storefront in a browser console and check Shopify's API directly:
+
+```javascript
+// After accepting marketing consent
+window.Shopify.customerPrivacy.userCanBeTracked();        // true
+window.Shopify.customerPrivacy.getTrackingConsent();      // "yes"
+
+// After declining marketing consent
+window.Shopify.customerPrivacy.userCanBeTracked();        // false
+window.Shopify.customerPrivacy.getTrackingConsent();      // "no"
+```
+
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

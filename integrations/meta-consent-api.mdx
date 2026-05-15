@@ -1,0 +1,32 @@
+---
+title: "Meta Consent API"
+description: "Send consent state to the Meta (Facebook/Instagram) Pixel."
+icon: "facebook"
+---
+
+The Meta Consent API integration tells the Meta Pixel — used by Facebook and Instagram ads — whether the visitor has consented to advertising tracking. When the integration is enabled, CookieChimp calls `fbq('consent', 'grant')` or `fbq('consent', 'revoke')` automatically as the user's preferences change.
+
+## Prerequisites
+
+- A Meta Pixel installed on your site.
+- A category or service in CookieChimp that represents Meta advertising consent (most accounts map this to the **marketing** category or a **Facebook Pixel** vendor).
+
+## How do I enable it?
+
+<Steps>
+  <Step title="Open the Integrations page">
+    Go to **Integrations** in your CookieChimp dashboard and find the Meta Consent API card.
+  </Step>
+
+  <Step title="Toggle it on">
+    CookieChimp will push consent state to the Meta Pixel on page load and whenever the visitor updates their choices.
+  </Step>
+</Steps>
+
+## How do I verify it's working?
+
+1. Install Meta's [Pixel Helper](https://www.facebook.com/business/help/198406697184603) browser extension.
+2. Open your site and decline marketing consent. Pixel Helper should show the pixel in a **consent revoked** state and no events should fire.
+3. Accept marketing consent and reload. The pixel should now report as **active** and events should fire normally.
+
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
