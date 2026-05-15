@@ -1,0 +1,66 @@
+---
+title: "Wix"
+description: "Install a consent banner on your Wix site."
+icon: "globe"
+---
+
+Wix lets you inject custom code into the `<head>` of every page from the site dashboard. CookieChimp drops in as a single script.
+
+<Info>
+  Custom code injection is available on **Wix Premium** plans. Free Wix sites cannot install third-party scripts.
+</Info>
+
+---
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet to your Wix site">
+    1. In your Wix dashboard, go to **Settings → Custom Code** (under the "Advanced" section).
+    2. Click **+ Add Custom Code**.
+    3. Paste the CookieChimp snippet into the code field.
+    4. Under **Add Code to Pages**, choose **All pages** and check **Load code once**.
+    5. Under **Place Code in**, select **Head**.
+    6. Give it a name (e.g. "CookieChimp") and click **Apply**.
+
+    <Warning>
+      Wix Custom Code only runs on your **published** site — not in the Wix Editor preview. Publish your site to test the banner.
+    </Warning>
+  </Step>
+
+  <Step title="Disable Wix's built-in cookie banner">
+    Wix shows its own consent banner by default, which will conflict with CookieChimp:
+
+    1. Go to **Settings → Cookies & Privacy** (or **Settings → Privacy** depending on your dashboard version).
+    2. Turn off the Wix **Cookie Consent Banner**.
+
+    CookieChimp now handles consent end-to-end.
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    Wix injects several first-party scripts (Wix Analytics, chat widgets, marketing tools) that fall under analytics/marketing categories. Some of these are managed through Wix's own settings — disable them in **Settings → Marketing & SEO** if you want CookieChimp to be the sole consent gate.
+
+    For any third-party scripts you've added through Custom Code, use the standard CookieChimp blocking attributes — see our [Scripts Management Section](/block-scripts-cookies/script-attributes).
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    Enable the floating Privacy Trigger from CookieChimp's banner settings.
+
+    To open the preferences modal from a custom Wix button, you'll need to add an HTML element (Wix's "Embed Code → Embed HTML") with:
+
+    ```html
+    <button type="button" data-cc="show-preferencesModal">
+      Manage cookie preferences
+    </button>
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- **Banner doesn't appear** — make sure your **published** Wix domain (not the `*.wixsite.com` editor URL) is allowed in your CookieChimp dashboard under **Account Settings → Additional Domains**.
+- **Custom Code option is missing** — you're on a Free Wix plan. Upgrade to a Premium plan to enable custom code injection.
+- **Wix banner still shows** — double-check that the Wix Cookie Consent Banner is disabled in **Settings → Cookies & Privacy**.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

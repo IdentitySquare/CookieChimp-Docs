@@ -41,9 +41,18 @@
             "pages": [
               "installation/google-tag-manager",
               "installation/nextjs",
-              "installation/shopify",
+              "installation/react",
+              "installation/remix",
+              "installation/nuxt",
+              "installation/angular",
+              "installation/astro",
+              "installation/sveltekit",
               "installation/single-page-applications",
+              "installation/shopify",
               "installation/wordpress",
+              "installation/webflow",
+              "installation/squarespace",
+              "installation/wix",
               "installation/adobe-launch"
             ]
           },

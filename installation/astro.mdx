@@ -1,0 +1,121 @@
+---
+title: "Astro"
+description: "Install a consent banner in an Astro site, with or without View Transitions."
+icon: "rocket"
+---
+
+Astro builds static-by-default sites, but the install pattern depends on whether you're using **View Transitions**. With View Transitions enabled, Astro behaves like a single-page app and the script needs to be reinitialized on each navigation. Without them, a standard script tag is enough.
+
+<Snippet file="install/account-id-prerequisites.mdx" />
+
+---
+
+## How do I install CookieChimp in a standard Astro site?
+
+If you're **not** using `<ClientRouter />` (formerly `<ViewTransitions />`), every navigation is a full page load — a single script tag in your root layout works:
+
+```astro
+---
+// src/layouts/Layout.astro
+---
+<html lang="en">
+  <head>
+    <script is:inline src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"></script>
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+<Snippet file="install/replace-account-id.mdx" />
+
+The `is:inline` directive tells Astro not to bundle, hash, or process the script — it ships exactly as written so it runs as the first thing in `<head>`.
+
+---
+
+## How do I install CookieChimp with View Transitions?
+
+If your site uses Astro's `<ClientRouter />` (Astro 5+) or `<ViewTransitions />` (Astro 3-4), navigation happens **client-side** without a full reload. Re-inject the CookieChimp script after every transition so it rescans the newly rendered page. `astro:page-load` fires on the first page load as well, so this single handler covers both cases — no separate static script tag needed.
+
+```astro
+---
+// src/layouts/Layout.astro
+import { ClientRouter } from "astro:transitions";
+---
+<html lang="en">
+  <head>
+    <ClientRouter />
+    <script is:inline>
+      function runCookieChimp() {
+        // Remove any previous CookieChimp script before appending a fresh one
+        // so we don't accumulate stale tags across navigations.
+        document.getElementById("cookiechimp-js")?.remove();
+
+        var script = document.createElement("script");
+        script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+        script.id = "cookiechimp-js";
+        document.head.appendChild(script);
+      }
+
+      // Fires on the first page load AND after every view transition.
+      document.addEventListener("astro:page-load", runCookieChimp);
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+---
+
+## How do I position the Privacy Trigger?
+
+Add a `<div id="cookiechimp-container">` somewhere in your layout, and mark it with `transition:persist` so View Transitions don't tear it down between routes:
+
+```astro
+<!-- src/layouts/Layout.astro -->
+<body>
+  <div id="cookiechimp-container" transition:persist></div>
+  <slot />
+</body>
+```
+
+See the Astro docs on [maintaining state with `transition:persist`](https://docs.astro.build/en/guides/view-transitions/#maintaining-state) for more.
+
+---
+
+## How do I run code based on consent?
+
+Inline Astro scripts run on every page (or just once with View Transitions). Listen for CookieChimp events:
+
+```astro
+<script is:inline>
+  window.addEventListener("cc:onConsented", function () {
+    if (window.CookieChimp.acceptedService("Google Analytics", "analytics")) {
+      // load your analytics SDK
+    }
+  });
+
+  window.addEventListener("cc:onUpdate", function (event) {
+    if (event.detail.changedCategories.includes("analytics")) {
+      // user toggled analytics on or off
+    }
+  });
+</script>
+```
+
+<Snippet file="install/service-category-note.mdx" />
+
+<Snippet file="install/callbacks-events-link.mdx" />
+
+---
+
+## Troubleshooting
+
+- **Banner shows on first load but disappears after navigation** — you're using View Transitions but the `astro:page-load` listener isn't wired up. Use the View Transitions install pattern above.
+- **Privacy Trigger flashes or disappears between pages** — add `transition:persist` to your `#cookiechimp-container` div.
+- **Script doesn't run first** — make sure you used `is:inline` on the script tag so Astro doesn't defer it.
+<Snippet file="install/spa-troubleshooting-base.mdx" />

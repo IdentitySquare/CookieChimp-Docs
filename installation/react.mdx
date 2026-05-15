@@ -1,0 +1,173 @@
+---
+title: "React"
+description: "Install a consent banner in a React app built with Vite or Create React App."
+icon: "react"
+---
+
+This guide covers plain React apps — bundled with **Vite** or **Create React App (CRA)**. If you're using **Next.js**, follow our [Next.js guide](/installation/nextjs). If you're using **Remix**, follow our [Remix guide](/installation/remix).
+
+<Snippet file="install/account-id-prerequisites.mdx" />
+
+---
+
+## How do I install CookieChimp in a Vite + React app?
+
+Add the script tag to `index.html` (at the project root) inside `<head>`, **before** any module scripts so it loads first:
+
+```html
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"></script>
+    <!-- Vite injects your module script here -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+```
+
+<Warning>
+  Vite serves `index.html` as the entry point in both dev and production. The script tag goes here once — there's no separate build step needed.
+</Warning>
+
+---
+
+## How do I install CookieChimp in a Create React App?
+
+Add the script tag to `public/index.html` inside `<head>`, before any other scripts:
+
+```html
+<!-- public/index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"></script>
+    <!-- %PUBLIC_URL% references and other CRA tags can follow -->
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+```
+
+CRA injects your bundle after the HTML is served, so a static `<script>` in `<head>` runs before React mounts.
+
+---
+
+## How do I handle client-side routing (React Router)?
+
+If your app uses **React Router** (v6+), pages don't reload on navigation — they swap components. CookieChimp needs to know about route changes so it can re-evaluate which scripts to allow.
+
+Create a small component that listens to location changes and re-injects the CookieChimp script. We skip the first render because the static `<script>` tag in `index.html` has already loaded CookieChimp on initial page load.
+
+```tsx
+// src/components/CookieChimpReinit.tsx
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+
+export default function CookieChimpReinit() {
+  const { pathname } = useLocation();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    // Remove the previous script tag (if any) and append a fresh one
+    // so CookieChimp rescans the newly mounted route's DOM.
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
+  }, [pathname]);
+
+  return null;
+}
+```
+
+Mount it once at the top of your app, inside the router:
+
+```tsx
+// src/main.tsx
+import { BrowserRouter } from "react-router-dom";
+import CookieChimpReinit from "./components/CookieChimpReinit";
+import App from "./App";
+
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
+    <CookieChimpReinit />
+    <App />
+  </BrowserRouter>
+);
+```
+
+---
+
+## How do I add a Privacy Trigger container?
+
+Place a `<div>` with the ID `cookiechimp-container` somewhere in your layout that **doesn't unmount on navigation** — typically your root layout or `App.tsx`:
+
+```tsx
+// src/App.tsx
+export default function App() {
+  return (
+    <>
+      <div id="cookiechimp-container" />
+      {/* the rest of your app */}
+    </>
+  );
+}
+```
+
+---
+
+## How do I check consent status in code?
+
+Listen for the `cc:onConsented` event (fires once when consent has been given) and `cc:onUpdate` (fires when the user changes their preferences).
+
+```tsx
+// src/components/ConsentLogger.tsx
+import { useEffect } from "react";
+
+export default function ConsentLogger() {
+  useEffect(() => {
+    function logConsent() {
+      // @ts-ignore
+      const allowed = window.CookieConsent?.acceptedService?.("Google Analytics", "analytics");
+      console.log(allowed ? "✅ analytics allowed" : "❌ analytics blocked");
+    }
+
+    logConsent();
+    window.addEventListener("cc:onConsented", logConsent);
+    window.addEventListener("cc:onUpdate", logConsent);
+
+    return () => {
+      window.removeEventListener("cc:onConsented", logConsent);
+      window.removeEventListener("cc:onUpdate", logConsent);
+    };
+  }, []);
+
+  return null;
+}
+```
+
+<Snippet file="install/service-category-note.mdx" />
+
+<Snippet file="install/callbacks-events-link.mdx" />
+
+---
+
+## Troubleshooting
+
+- **Banner shows on first load but not after navigation** — make sure `CookieChimpReinit` is mounted **inside** `<BrowserRouter>`.
+- **Privacy Trigger disappears** — keep `#cookiechimp-container` in a layout component that stays mounted across routes.
+<Snippet file="install/spa-troubleshooting-base.mdx" />

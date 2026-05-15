@@ -1,0 +1,139 @@
+---
+title: "Nuxt"
+description: "Install a consent banner in a Nuxt 3 application."
+icon: "vuejs"
+---
+
+Nuxt is the most popular Vue framework. CookieChimp installs via the `app.head` config so the script lands in `<head>` on every server-rendered page, then reinitializes on client-side navigation.
+
+<Snippet file="install/account-id-prerequisites.mdx" />
+
+---
+
+## How do I load the CookieChimp script?
+
+Add the script to `nuxt.config.ts` under `app.head.script`. Set it to render at the **top** of `<head>` so nothing else runs first.
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  app: {
+    head: {
+      script: [
+        {
+          src: "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js",
+          tagPosition: "head",
+          tagPriority: "critical",
+        },
+      ],
+    },
+  },
+});
+```
+
+<Snippet file="install/replace-account-id.mdx" />
+
+The `tagPriority: "critical"` hint asks Nuxt's `useHead` to render this script as early as possible in `<head>`, before other third-party tags.
+
+---
+
+## How do I handle client-side navigation?
+
+Nuxt uses client-side routing for in-app navigation. Create a Nuxt plugin that re-injects the CookieChimp script on every route change so it rescans the newly mounted route's DOM. The static script from `nuxt.config.ts` handles the initial page load, so we skip the first `afterEach` call.
+
+```ts
+// plugins/cookiechimp.client.ts
+export default defineNuxtPlugin(() => {
+  const router = useRouter();
+  let isInitial = true;
+
+  router.afterEach(() => {
+    if (isInitial) {
+      isInitial = false;
+      return;
+    }
+
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
+  });
+});
+```
+
+<Info>
+  The `.client.ts` suffix tells Nuxt to only run this plugin in the browser — `document` doesn't exist during server rendering.
+</Info>
+
+---
+
+## How do I add a Privacy Trigger container?
+
+Add a `<div id="cookiechimp-container">` to your root layout (`layouts/default.vue` or `app.vue`) so it stays mounted across all pages:
+
+```vue
+<!-- app.vue -->
+<template>
+  <div>
+    <div id="cookiechimp-container"></div>
+    <NuxtPage />
+  </div>
+</template>
+```
+
+---
+
+## How do I check consent status in code?
+
+Use a composable that listens for `cc:onConsented` and `cc:onUpdate`:
+
+```ts
+// composables/useConsent.ts
+export function useConsent(service: string, category: string) {
+  const allowed = ref(false);
+
+  onMounted(() => {
+    function check() {
+      // @ts-ignore
+      allowed.value = !!window.CookieConsent?.acceptedService?.(service, category);
+    }
+
+    check();
+    window.addEventListener("cc:onConsented", check);
+    window.addEventListener("cc:onUpdate", check);
+
+    onUnmounted(() => {
+      window.removeEventListener("cc:onConsented", check);
+      window.removeEventListener("cc:onUpdate", check);
+    });
+  });
+
+  return allowed;
+}
+```
+
+Use it in a component:
+
+```vue
+<script setup lang="ts">
+const analyticsAllowed = useConsent("Google Analytics", "analytics");
+</script>
+
+<template>
+  <p v-if="analyticsAllowed">Analytics is enabled.</p>
+</template>
+```
+
+<Snippet file="install/service-category-note.mdx" />
+
+<Snippet file="install/callbacks-events-link.mdx" />
+
+---
+
+## Troubleshooting
+
+- **Banner shows on first load but not after navigation** — make sure your `cookiechimp.client.ts` plugin is in the `plugins/` directory and uses the `.client.ts` suffix.
+- **Script loads too late** — keep `tagPriority: "critical"` and make sure no other third-party scripts use a higher priority.
+<Snippet file="install/spa-troubleshooting-base.mdx" />

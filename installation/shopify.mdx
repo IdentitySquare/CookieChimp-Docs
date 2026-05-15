@@ -6,13 +6,7 @@ icon: "shopify"
 
 <Steps>
   <Step title="Copy your CookieChimp snippet">
-    Log in to your [CookieChimp dashboard](https://app.cookiechimp.com) and copy your website's JS snippet. It looks like this:
-
-    ```html
-    <script src="https://cookiechimp.com/widget/abc123.js"></script>
-    ```
-
-    Replace `abc123` with your website's unique CookieChimp ID.
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
   </Step>
 
   <Step title="Add the snippet to your Shopify theme">
@@ -22,36 +16,44 @@ icon: "shopify"
     4. Find the opening `<head>` tag and paste the CookieChimp snippet directly after it, before any other scripts.
     5. Click **Save**.
 
-    <Info>
-      The CookieChimp script needs to be the first script in the `<head>` section so it can block other scripts before they run and set cookies without consent.
-    </Info>
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Disable Shopify's built-in cookie banner">
+    Shopify's Customer Privacy banner will conflict with CookieChimp. Turn it off:
+
+    1. Go to **Settings → Customer privacy → Cookie banner**.
+    2. Disable the cookie banner (or set it to inactive on the regions where you'll use CookieChimp).
+
+    CookieChimp now handles consent end-to-end and signals consent to Shopify's [Customer Privacy API](https://shopify.dev/docs/api/customer-privacy) so first-party Shopify pixels and Shop Pay tracking respect the user's choice.
   </Step>
 
   <Step title="Block scripts & cookies">
-    To ensure compliance with privacy regulations, you need to block non-essential scripts and cookies until the user gives consent.
-    Refer to our [Scripts Management Section](/block-scripts-cookies/script-attributes) for detailed instructions.
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      Common third-party tools added through Shopify apps (Klaviyo, Hotjar, TikTok Pixel, Meta Pixel, etc.) are usually injected as `<script>` tags into `theme.liquid` or via App Embed Blocks. Update those embeds with `type="text/plain"` and the matching `data-category` attribute so CookieChimp can manage them.
+    </Tip>
+  </Step>
+
+  <Step title="Configure checkout scripts (Shopify Plus)">
+    Shopify's checkout pages live on a separate domain and template. If you're on **Shopify Plus** and have edited `checkout.liquid`, repeat step 2 there as well so CookieChimp runs on the checkout flow.
+
+    <Info>
+      On non-Plus plans, Shopify renders checkout from a managed template you can't edit. Consent is enforced through the Customer Privacy API, which CookieChimp talks to automatically when installed on your storefront.
+    </Info>
   </Step>
 
   <Step title="Allow users to update their preferences">
-    CookieChimp provides a floating privacy icon (Privacy Trigger) that allows users to manage their cookie preferences at any time.
-    You can enable this in the banner settings.
+    <Snippet file="install/cms-preferences-step.mdx" />
 
-    Optionally, you can open the preferences modal with a custom link or button by adding a button with the data attribute `data-cc="show-preferencesModal"`:
-
-    ```html
-    <button type="button" data-cc="show-preferencesModal">
-      Manage cookie preferences
-    </button>
-    ```
+    A common pattern is to link to it from your footer menu — Shopify lets you add custom links to menus from **Online Store → Navigation**.
   </Step>
 </Steps>
 
 ## Troubleshooting
 
-- Make sure the domain is allowed in the Settings page on the CookieChimp dashboard.
+- Make sure the domain is allowed in the Settings page on the CookieChimp dashboard. Both your `*.myshopify.com` domain and your custom domain should be listed if you want to test on either.
+- If both Shopify's banner and CookieChimp appear, the Shopify Customer Privacy banner isn't fully disabled — re-check **Settings → Customer privacy → Cookie banner**.
 - Clear your browser cache and cookies, then reload your store.
-- Enable "Debug mode" from the CookieChimp dashboard and check the browser JS console for errors.
-
-<Note>
-  If you encounter any issues or need further assistance, please reach out to us via our chat.
-</Note>
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

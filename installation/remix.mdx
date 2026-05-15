@@ -1,0 +1,135 @@
+---
+title: "Remix"
+description: "Install a consent banner in a Remix application."
+icon: "react"
+---
+
+Remix is a full-stack React framework with server rendering and client-side navigation. CookieChimp installs in your root document and re-evaluates on each client transition.
+
+<Snippet file="install/account-id-prerequisites.mdx" />
+
+---
+
+## How do I load the CookieChimp script?
+
+Add the script tag to `app/root.tsx` inside `<head>` — **before** Remix's `<Links />`, `<Meta />`, and `<Scripts />` components so it runs first:
+
+```tsx
+// app/root.tsx
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
+
+export default function App() {
+  return (
+    <html lang="en">
+      <head>
+        <script
+          src="https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js"
+          suppressHydrationWarning
+        />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div id="cookiechimp-container" />
+        <Outlet />
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+```
+
+<Snippet file="install/replace-account-id.mdx" />
+
+The `suppressHydrationWarning` prop prevents React from warning about the third-party script mutating `<head>` after server render.
+
+---
+
+## How do I handle client-side navigation?
+
+Remix uses client-side transitions for in-app links. Re-inject the CookieChimp script on every navigation by listening to the location. The static `<script>` tag from server-rendered HTML handles the first load, so we skip the initial render.
+
+```tsx
+// app/components/CookieChimpReinit.tsx
+import { useEffect, useRef } from "react";
+import { useLocation } from "@remix-run/react";
+
+export default function CookieChimpReinit() {
+  const location = useLocation();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    // Re-inject the CookieChimp script so it rescans the new route's DOM.
+    document.getElementById("cookiechimp-js")?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://cookiechimp.com/widget/YOUR_ACCOUNT_ID.js";
+    script.id = "cookiechimp-js";
+    document.head.appendChild(script);
+  }, [location.pathname]);
+
+  return null;
+}
+```
+
+Add it to your root layout:
+
+```tsx
+// app/root.tsx
+<body>
+  <div id="cookiechimp-container" />
+  <CookieChimpReinit />
+  <Outlet />
+  {/* ... */}
+</body>
+```
+
+---
+
+## How do I check consent status in code?
+
+Listen for the `cc:onConsented` and `cc:onUpdate` events inside a client-only effect:
+
+```tsx
+// app/components/ConsentLogger.tsx
+import { useEffect } from "react";
+
+export default function ConsentLogger() {
+  useEffect(() => {
+    function logConsent() {
+      // @ts-ignore
+      const allowed = window.CookieConsent?.acceptedService?.("Google Analytics", "analytics");
+      console.log(allowed ? "✅ analytics allowed" : "❌ analytics blocked");
+    }
+
+    logConsent();
+    window.addEventListener("cc:onConsented", logConsent);
+    window.addEventListener("cc:onUpdate", logConsent);
+
+    return () => {
+      window.removeEventListener("cc:onConsented", logConsent);
+      window.removeEventListener("cc:onUpdate", logConsent);
+    };
+  }, []);
+
+  return null;
+}
+```
+
+<Snippet file="install/service-category-note.mdx" />
+
+<Snippet file="install/callbacks-events-link.mdx" />
+
+---
+
+## Troubleshooting
+
+- **Hydration warnings** — make sure the CookieChimp script tag uses `suppressHydrationWarning`.
+- **Banner shows on first load but not after navigation** — verify `CookieChimpReinit` is mounted inside the `<body>` of `root.tsx`.
+<Snippet file="install/spa-troubleshooting-base.mdx" />
