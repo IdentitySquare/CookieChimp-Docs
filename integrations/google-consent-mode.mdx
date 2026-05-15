@@ -1,0 +1,39 @@
+---
+title: "Google Consent Mode"
+description: "Send consent state to Google's tags for Analytics, Ads, and other Google services."
+icon: "google"
+---
+
+Google Consent Mode lets Google's tags (Google Analytics 4, Google Ads, Floodlight, and others) adjust their behaviour based on the visitor's consent. When the integration is enabled, CookieChimp updates Google's consent state automatically as the user accepts or rejects categories and services.
+
+If you're using Google Tag Manager, follow our full [Google Tag Manager guide](/installation/google-tag-manager) — it covers Consent Mode plus how to gate individual tags on specific vendors.
+
+## How do I enable it?
+
+<Steps>
+  <Step title="Open the Integrations page">
+    Go to **Integrations** in your CookieChimp dashboard.
+    <img src="/images/google-tag-manager/enable-gcm.png" alt="Enable Google Consent Mode" />
+  </Step>
+
+  <Step title="Toggle Google Consent Mode on">
+    CookieChimp will start pushing consent state to the `dataLayer` using Google's `gtag('consent', ...)` API on page load and whenever the user updates their choices.
+  </Step>
+</Steps>
+
+## How does CookieChimp map to Google consent types?
+
+GTM supports 7 default consent types. CookieChimp maps them to your categories as follows:
+
+| CookieChimp Category ID | Google Consent Type                          |
+| ----------------------- | -------------------------------------------- |
+| essential               | functionality_storage, security_storage      |
+| marketing               | ad_storage, ad_user_data, ad_personalization |
+| analytics               | analytics_storage                            |
+| personalization         | personalization_storage                      |
+
+When a user opts in to a category — or to a specific Google service in that category — the linked Google consent type flips from `denied` to `granted` (and vice versa).
+
+CookieChimp also pushes the consent state of individual services. For example, granting consent to a service named **"Google Analytics"** sets that vendor's state to `granted`, which lets you gate a tag on the specific vendor rather than the whole category. See the [GTM guide](/installation/google-tag-manager#how-do-i-block-tags-with-google-tag-manager) for how to wire this into a tag.
+
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
