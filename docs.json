@@ -40,11 +40,11 @@
             "group": "Platform Specific Installation",
             "pages": [
               "installation/google-tag-manager",
-              "installation/adobe-launch",
               "installation/nextjs",
               "installation/shopify",
               "installation/single-page-applications",
-              "installation/wordpress"
+              "installation/wordpress",
+              "installation/adobe-launch"
             ]
           },
           {
