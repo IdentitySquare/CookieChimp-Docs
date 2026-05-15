@@ -39,6 +39,7 @@
           {
             "group": "Platform Specific Installation",
             "pages": [
+              "installation/html",
               "installation/google-tag-manager",
               "installation/wordpress",
               "installation/shopify",
