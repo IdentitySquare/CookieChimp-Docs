@@ -1,0 +1,74 @@
+---
+title: "Framer"
+sidebarTitle: "Framer"
+description: "Add a GDPR & CCPA compliant cookie consent banner to your Framer site with CookieChimp. Step-by-step custom code installation for Framer projects."
+icon: "framer"
+keywords: ["Framer cookie banner", "Framer cookie consent", "Framer GDPR", "Framer CCPA", "cookie banner for Framer", "Framer consent management", "Framer privacy banner", "CookieChimp Framer"]
+og:title: "Framer Cookie Banner – Install GDPR Consent on Framer | CookieChimp"
+og:description: "Add a fully GDPR-compliant cookie consent banner to your Framer site in minutes. Block scripts, store consent records, and pass Google Consent Mode v2 signals — all from your Framer project settings."
+twitter:title: "Framer Cookie Banner – CookieChimp"
+twitter:description: "Install a GDPR-compliant cookie consent banner on your Framer site in minutes with CookieChimp."
+---
+
+Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) to your Framer site. CookieChimp installs as a single line of custom code in your Framer project settings — no plugins, no rebuild required.
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet to your Framer project">
+    1. Open your project in the [Framer editor](https://framer.com/projects).
+    2. Click the **Settings** icon (cog) in the top-left, then choose **Site Settings**.
+    3. Open the **General** tab and scroll down to **Custom Code**.
+    4. Paste the CookieChimp snippet into the **Start of `<head>` tag** field. Pasting it here (rather than "End of `<body>`") ensures the script runs before any tracking pixels load.
+    5. Click **Save**, then **Publish** your site from the top-right of the editor.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      Framer ships built-in integrations for Google Analytics, Google Tag Manager, Meta Pixel and others, which inject their own scripts. If you've enabled these in **Site Settings → Analytics & SEO**, prefer routing them through CookieChimp instead — either disable Framer's built-in version and re-add via Custom Code with `type="text/plain"` and `data-category`, or route them through GTM and use our [Google Tag Manager guide](/installation/google-tag-manager).
+    </Tip>
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+
+    In Framer, you can wire any button to open the preferences modal by adding an **Embed** layer with HTML, or by using the **Link** field with the URL `#cc-preferences` if you've configured that as a trigger. For most cases, enabling CookieChimp's built-in floating Privacy Trigger is enough.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- **Banner doesn't appear on the published site** — make sure your published Framer domain (e.g. `your-site.framer.website` and any custom domain) is allowed in **Account Settings → Additional Domains** in your CookieChimp dashboard.
+- **Banner appears in preview but not on the live site** — Framer requires you to **Publish** after any change to Site Settings. The editor preview uses a separate environment.
+- **Snippet field is missing in Site Settings** — Custom Code is available on Framer's paid plans. The free plan does not allow head injection.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
+
+## Framer cookie banner FAQ
+
+<AccordionGroup>
+  <Accordion title="Does CookieChimp work with Framer's CMS?">
+    Yes. CookieChimp runs in the `<head>` of every page Framer renders, including CMS-driven blog posts, collection pages and dynamic routes. No per-page setup is needed.
+  </Accordion>
+
+  <Accordion title="Will CookieChimp slow down my Framer site?">
+    No. The CookieChimp script is under 30KB gzipped, loads asynchronously, and is served from a global CDN. It doesn't block rendering and won't affect Framer's Lighthouse scores in any meaningful way.
+  </Accordion>
+
+  <Accordion title="Does CookieChimp support Google Consent Mode v2 on Framer?">
+    Yes. CookieChimp pushes the correct `gtag('consent', ...)` calls automatically. See [Google Consent Mode](/integrations/google-consent-mode) for the full setup, which works the same on Framer as on any other site.
+  </Accordion>
+
+  <Accordion title="Can I customize the cookie banner to match my Framer design?">
+    Yes. The banner is fully themable from the [Banner Designer](/features/banner-designer) — colors, typography, corner radius, button styles and copy can all be matched to your Framer brand.
+  </Accordion>
+
+  <Accordion title="Is CookieChimp free for Framer sites?">
+    CookieChimp has a free tier suitable for small Framer sites, with paid plans for higher traffic and additional features. See [pricing](https://cookiechimp.com/pricing).
+  </Accordion>
+</AccordionGroup>

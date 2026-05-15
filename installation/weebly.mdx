@@ -1,0 +1,75 @@
+---
+title: "Weebly"
+sidebarTitle: "Weebly"
+description: "Add a GDPR & CCPA compliant cookie consent banner to your Weebly site with CookieChimp. Install via Header Code in Weebly's SEO settings."
+icon: "globe"
+keywords: ["Weebly cookie banner", "Weebly cookie consent", "Weebly GDPR", "Weebly CCPA", "cookie banner for Weebly", "Weebly header code cookie banner", "Weebly consent management", "CookieChimp Weebly"]
+og:title: "Weebly Cookie Banner – Install GDPR Consent on Weebly | CookieChimp"
+og:description: "Add a GDPR-compliant cookie consent banner to your Weebly site in minutes with CookieChimp. Works on paid Weebly plans with Header Code support."
+twitter:title: "Weebly Cookie Banner – CookieChimp"
+twitter:description: "Install a GDPR-compliant cookie consent banner on your Weebly site in minutes."
+---
+
+Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) to your Weebly site. CookieChimp installs from Weebly's SEO Header Code settings — no theme edits required.
+
+<Info>
+  Header Code is available on Weebly's paid plans. The free plan does not allow third-party script injection.
+</Info>
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet to your Weebly site">
+    1. Sign in to your Weebly editor.
+    2. Open the **Settings** tab at the top.
+    3. Click **SEO** in the left sidebar.
+    4. Scroll to the **Header Code** field.
+    5. Paste the CookieChimp snippet there. Header Code is injected globally into `<head>`.
+    6. Click **Save**, then **Publish** your site.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      If you've added Google Analytics, Facebook Pixel or other trackers through Weebly's Embed Code element or directly in **SEO → Header Code**, update those tags to use `type="text/plain"` and a `data-category` attribute so CookieChimp can manage them based on consent.
+    </Tip>
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+
+    To add a "Cookie preferences" link to your footer, drag in an **Embed Code** element and use the `data-cc="show-preferencesModal"` attribute on a button or link.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- **Banner doesn't appear** — make sure your Weebly domain (both the `*.weebly.com` URL and any custom domain) is allowed in **Account Settings → Additional Domains** in your CookieChimp dashboard.
+- **"Header Code" field is missing** — you're on a free Weebly plan. Upgrade to a paid plan to unlock custom code.
+- **Changes don't appear on the live site** — Weebly only updates the live site after you click **Publish**. The editor preview uses cached state.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
+
+## Weebly cookie banner FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need a paid Weebly plan to install CookieChimp?">
+    Yes. Adding scripts to `<head>` requires Weebly's paid plans (Personal, Professional or Performance). The free plan blocks third-party code.
+  </Accordion>
+
+  <Accordion title="Does CookieChimp work with Weebly's eCommerce / Square Online?">
+    Yes. The same Header Code setup works on Weebly's eCommerce stores. CookieChimp will appear on storefront and checkout pages.
+  </Accordion>
+
+  <Accordion title="Does CookieChimp support Google Consent Mode v2 on Weebly?">
+    Yes. CookieChimp pushes the correct consent signals to Google tags. See [Google Consent Mode](/integrations/google-consent-mode).
+  </Accordion>
+
+  <Accordion title="Can I customize the banner to match my Weebly site's design?">
+    Yes. Use the [Banner Designer](/features/banner-designer) to match colors, fonts and styles to your Weebly theme.
+  </Accordion>
+</AccordionGroup>

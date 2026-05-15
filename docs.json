@@ -59,8 +59,15 @@
                 "group": "Website Builders",
                 "pages": [
                   "installation/webflow",
+                  "installation/framer",
                   "installation/wix",
-                  "installation/squarespace"
+                  "installation/squarespace",
+                  "installation/ghost",
+                  "installation/carrd",
+                  "installation/duda",
+                  "installation/bubble",
+                  "installation/weebly",
+                  "installation/hostinger"
                 ]
               },
               {

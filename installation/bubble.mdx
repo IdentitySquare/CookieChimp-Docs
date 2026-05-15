@@ -1,0 +1,71 @@
+---
+title: "Bubble"
+sidebarTitle: "Bubble"
+description: "Add a GDPR & CCPA compliant cookie consent banner to your Bubble.io no-code app with CookieChimp. Install via SEO/metatags settings."
+icon: "circle-dot"
+keywords: ["Bubble cookie banner", "Bubble.io cookie consent", "Bubble GDPR", "Bubble CCPA", "cookie banner for Bubble", "Bubble no-code GDPR", "Bubble consent management", "CookieChimp Bubble"]
+og:title: "Bubble.io Cookie Banner – Install GDPR Consent on Bubble | CookieChimp"
+og:description: "Add a GDPR-compliant cookie consent banner to your Bubble.io app in minutes. Works with any Bubble plan that supports the SEO/metatags header injection."
+twitter:title: "Bubble.io Cookie Banner – CookieChimp"
+twitter:description: "Install a GDPR-compliant cookie consent banner on your Bubble.io app in minutes."
+---
+
+Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) to your Bubble.io app. CookieChimp installs from Bubble's SEO/metatags settings — no plugin install, no workflow changes.
+
+<Steps>
+  <Step title="Copy your CookieChimp snippet">
+    <Snippet file="install/cms-copy-snippet-step.mdx" />
+  </Step>
+
+  <Step title="Add the snippet to your Bubble app">
+    1. Open your app in the Bubble editor.
+    2. In the left sidebar, click **Settings**.
+    3. Go to the **SEO / metatags** tab.
+    4. Scroll to the **Script/meta tags in header** field.
+    5. Paste the CookieChimp snippet there. Bubble injects everything in this field into the `<head>` of every page your app renders.
+    6. Click outside the field to save, then **Deploy** your app to live.
+
+    <Snippet file="install/script-first-warning.mdx" />
+  </Step>
+
+  <Step title="Block scripts & cookies">
+    <Snippet file="install/cms-block-scripts-step.mdx" />
+
+    <Tip>
+      Bubble plugins (Google Analytics, Facebook Pixel, Hotjar, Intercom, Mixpanel etc.) inject their own scripts. The cleanest setup is to disable the plugin's auto-tracking, then add the tracking script manually in **Script/meta tags in header** with `type="text/plain"` and a `data-category` attribute so CookieChimp gates it.
+    </Tip>
+  </Step>
+
+  <Step title="Allow users to update their preferences">
+    <Snippet file="install/cms-preferences-step.mdx" />
+
+    In Bubble, you can attach a workflow to a button that triggers HTML with `data-cc="show-preferencesModal"`, or simply enable CookieChimp's built-in floating Privacy Trigger for a no-code solution.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+- **Banner doesn't appear** — make sure both your `bubbleapps.io` subdomain and any custom domain are listed in **Account Settings → Additional Domains** in your CookieChimp dashboard.
+- **Banner shows in development but not in live** — Bubble requires you to **Deploy to live** after editing Settings. Verify the snippet exists on the live version, not just the development version.
+- **Banner appears twice** — you've likely added the snippet both in **SEO / metatags** and on an individual page's HTML element. Remove the duplicate.
+<Snippet file="install/cms-troubleshooting-footer.mdx" />
+
+## Bubble cookie banner FAQ
+
+<AccordionGroup>
+  <Accordion title="Does CookieChimp work with single-page Bubble apps?">
+    Yes. Bubble apps are single-page applications under the hood — CookieChimp handles the URL changes automatically and won't re-show the banner on internal navigation. See our [SPA guide](/installation/single-page-applications) for advanced patterns.
+  </Accordion>
+
+  <Accordion title="Will CookieChimp affect my Bubble app's performance?">
+    No. CookieChimp is a small (~30KB gzipped) async-loaded script served from a global CDN and runs before Bubble's own JavaScript has fully booted, so it doesn't compete for main-thread time.
+  </Accordion>
+
+  <Accordion title="Can I capture consent records in my Bubble database?">
+    Yes — CookieChimp stores [consent records](/features/consent-records) on its own backend with a proof-grade audit trail. If you also need a copy inside Bubble, you can listen to CookieChimp's [callback events](/advanced/callbacks-events) and write to your Bubble database from a custom workflow.
+  </Accordion>
+
+  <Accordion title="Does CookieChimp support Google Consent Mode v2 on Bubble?">
+    Yes. CookieChimp pushes the correct consent signals to Google tags. See [Google Consent Mode](/integrations/google-consent-mode).
+  </Accordion>
+</AccordionGroup>
