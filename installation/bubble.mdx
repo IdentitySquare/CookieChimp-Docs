@@ -57,15 +57,9 @@ Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) 
     Yes. Bubble apps are single-page applications under the hood — CookieChimp handles the URL changes automatically and won't re-show the banner on internal navigation. See our [SPA guide](/installation/single-page-applications) for advanced patterns.
   </Accordion>
 
-  <Accordion title="Will CookieChimp affect my Bubble app's performance?">
-    No. CookieChimp is a small (~30KB gzipped) async-loaded script served from a global CDN and runs before Bubble's own JavaScript has fully booted, so it doesn't compete for main-thread time.
-  </Accordion>
-
   <Accordion title="Can I capture consent records in my Bubble database?">
     Yes — CookieChimp stores [consent records](/features/consent-records) on its own backend with a proof-grade audit trail. If you also need a copy inside Bubble, you can listen to CookieChimp's [callback events](/advanced/callbacks-events) and write to your Bubble database from a custom workflow.
   </Accordion>
 
-  <Accordion title="Does CookieChimp support Google Consent Mode v2 on Bubble?">
-    Yes. CookieChimp pushes the correct consent signals to Google tags. See [Google Consent Mode](/integrations/google-consent-mode).
-  </Accordion>
+  <Snippet file="install/cms-common-faqs.mdx" />
 </AccordionGroup>

@@ -54,19 +54,9 @@ Add a GDPR, ePrivacy and CCPA compliant [cookie consent banner](/why-use-a-cmp) 
     Yes. CookieChimp runs in the `<head>` of every page Webflow renders, including CMS Collection pages, dynamic templates and category pages. No per-page setup is needed.
   </Accordion>
 
-  <Accordion title="Will CookieChimp affect my Webflow site's PageSpeed score?">
-    No. The CookieChimp script is under 30KB gzipped, loads asynchronously, and is served from a global CDN. Webflow's Lighthouse scores stay essentially unchanged.
-  </Accordion>
-
-  <Accordion title="Does CookieChimp support Google Consent Mode v2 on Webflow?">
-    Yes. CookieChimp pushes the correct `gtag('consent', ...)` calls automatically, including the new `ad_user_data` and `ad_personalization` signals required by Consent Mode v2. See [Google Consent Mode](/integrations/google-consent-mode).
-  </Accordion>
-
-  <Accordion title="Can I customize the cookie banner to match my Webflow brand?">
-    Yes. The banner is fully themable from the [Banner Designer](/features/banner-designer) — colors, typography, corner radius, button styles and copy can all be matched to your Webflow style guide.
-  </Accordion>
-
   <Accordion title="Does it block Webflow's built-in form analytics?">
     Webflow's form submissions don't set tracking cookies by themselves. If you've connected Google Analytics, Facebook Pixel or similar through Custom Code or an Embed, those scripts will be blocked until consent — see the [Scripts Management](/block-scripts-cookies/script-attributes) page.
   </Accordion>
+
+  <Snippet file="install/cms-common-faqs.mdx" />
 </AccordionGroup>
