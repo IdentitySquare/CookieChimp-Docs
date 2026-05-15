@@ -40,20 +40,35 @@
             "group": "Platform Specific Installation",
             "pages": [
               "installation/google-tag-manager",
-              "installation/nextjs",
-              "installation/react",
-              "installation/remix",
-              "installation/nuxt",
-              "installation/angular",
-              "installation/astro",
-              "installation/sveltekit",
-              "installation/single-page-applications",
-              "installation/shopify",
               "installation/wordpress",
-              "installation/webflow",
-              "installation/squarespace",
-              "installation/wix",
-              "installation/adobe-launch"
+              "installation/shopify",
+              {
+                "group": "JavaScript Frameworks",
+                "pages": [
+                  "installation/nextjs",
+                  "installation/react",
+                  "installation/nuxt",
+                  "installation/angular",
+                  "installation/astro",
+                  "installation/sveltekit",
+                  "installation/remix",
+                  "installation/single-page-applications"
+                ]
+              },
+              {
+                "group": "Website Builders",
+                "pages": [
+                  "installation/webflow",
+                  "installation/wix",
+                  "installation/squarespace"
+                ]
+              },
+              {
+                "group": "Other Tag Managers",
+                "pages": [
+                  "installation/adobe-launch"
+                ]
+              }
             ]
           },
           {
