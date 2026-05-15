@@ -86,13 +86,28 @@
             "group": "Integrations",
             "pages": [
               "integrations/overview",
-              "integrations/global-privacy-control",
-              "integrations/google-consent-mode",
-              "integrations/meta-consent-api",
-              "integrations/microsoft-clarity",
-              "integrations/microsoft-uet",
-              "integrations/shopify-privacy-api",
-              "integrations/wordpress-consent-api"
+              {
+                "group": "Analytics & Advertising",
+                "pages": [
+                  "integrations/google-consent-mode",
+                  "integrations/meta-consent-api",
+                  "integrations/microsoft-clarity",
+                  "integrations/microsoft-uet"
+                ]
+              },
+              {
+                "group": "Platform APIs",
+                "pages": [
+                  "integrations/shopify-privacy-api",
+                  "integrations/wordpress-consent-api"
+                ]
+              },
+              {
+                "group": "Privacy Standards",
+                "pages": [
+                  "integrations/global-privacy-control"
+                ]
+              }
             ]
           },
           {
