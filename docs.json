@@ -42,11 +42,11 @@
               "installation/google-tag-manager",
               "installation/wordpress",
               "installation/shopify",
+              "installation/nextjs",
+              "installation/react",
               {
                 "group": "JavaScript Frameworks",
                 "pages": [
-                  "installation/nextjs",
-                  "installation/react",
                   "installation/nuxt",
                   "installation/angular",
                   "installation/astro",
