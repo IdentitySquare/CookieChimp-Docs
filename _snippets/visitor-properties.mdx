@@ -1,0 +1,42 @@
+### `CookieChimp.visitorCountry`
+
+The ISO 3166-1 alpha-2 country code of the visitor (e.g. `"GB"`, `"US"`, `"CN"`, `"DE"`).
+
+```js
+CookieChimp.visitorCountry; // 'GB'
+```
+
+### `CookieChimp.visitorRegion`
+
+The region/subdivision code of the visitor (e.g. `"ENG"` for England, `"CA"` for California). Useful when compliance rules differ by region within a country — for example, US state privacy laws.
+
+```js
+CookieChimp.visitorRegion; // 'ENG'
+```
+
+### `CookieChimp.visitorNeedsConsent`
+
+`true` if a consent banner was shown to the visitor (either an opt-in or opt-out banner), `false` if the visitor's location does not require one.
+
+```js
+CookieChimp.visitorNeedsConsent; // true
+```
+
+### `CookieChimp.getConfig()['mode']`
+
+Returns the consent mode that was applied to the visitor based on your geolocation rules:
+
+- `"opt-in"` — the visitor was shown an opt-in banner (e.g. EU/EEA visitors under GDPR).
+- `"opt-out"` — the visitor was shown an opt-out banner (e.g. US visitors under CCPA-style regulations).
+
+```js
+CookieChimp.getConfig().mode; // 'opt-in'
+```
+
+<Warning>
+  These properties are populated once the CookieChimp script has initialised.
+  If you read them before initialisation — for example, at the very top of the
+  page — they may be `undefined`. Read them inside a [callback or event
+  handler](/advanced/callbacks-events) such as `cc:onModalReady`,
+  `cc:onConsented`, or after a check for `window.CookieChimp`.
+</Warning>
