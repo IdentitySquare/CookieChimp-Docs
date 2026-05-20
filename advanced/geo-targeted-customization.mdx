@@ -1,0 +1,113 @@
+---
+title: "Geo-Targeted Customization"
+description: "Customize the banner and your tags per country, region, or consent mode without duplicating banners."
+---
+
+CookieChimp serves a single banner that already adapts to the visitor's location based on your geolocation rules. Sometimes, though, you'll want to layer **additional** behaviour on top of that — for example, hiding a UI element only for visitors from one country, or firing your analytics tags differently for opt-in vs. opt-out regions.
+
+You can do this by reading visitor and config properties directly from the `window.CookieChimp` object — no need to maintain a second banner.
+
+## What properties are available?
+
+<Snippet file="visitor-properties.mdx" />
+
+## Example: hide the close button for one country
+
+Some advertising platforms (e.g. WeChat Search Ads in China) require that the landing page does not "block the UX" with a forced-consent prompt. The cleanest fix is to expose a close (`×`) button on the banner — but only for visitors from that country, so you don't drop opt-in rates elsewhere.
+
+You can keep a single banner and toggle the close button visibility with a small CSS rule that's only applied when `visitorCountry` matches.
+
+### Option 1 — Inject a style tag
+
+```js
+window.addEventListener("cc:onModalReady", function () {
+  if (CookieChimp.visitorCountry === "CN") {
+    const style = document.createElement("style");
+    style.textContent = `#cc-main .cm__btn.cm__btn--close { display: none !important; }`;
+    document.head.appendChild(style);
+  }
+});
+```
+
+### Option 2 — Toggle a class on `<html>` and scope the CSS
+
+```js
+window.addEventListener("cc:onModalReady", function () {
+  if (CookieChimp.visitorCountry === "CN") {
+    document.documentElement.classList.add("cc-cn");
+  }
+});
+```
+
+```css
+.cc-cn #cc-main .cm__btn.cm__btn--close {
+  display: none !important;
+}
+```
+
+<Tip>
+  We wrap the check in `cc:onModalReady` so `CookieChimp.visitorCountry` is
+  guaranteed to be populated before we read it. See [Callbacks &
+  Events](/advanced/callbacks-events) for other events you can hook into.
+</Tip>
+
+## Example: fire analytics in opt-out regions even without consent
+
+If you've configured CookieChimp with **two consent modes** — opt-in for strict-consent countries (e.g. EU/EEA under GDPR) and opt-out for regions where pre-consent tracking is allowed (e.g. many US states) — you can use `getConfig().mode` to decide whether your analytics tag should fire before consent is granted.
+
+In opt-out regions, you'll typically want tags to fire immediately (relying on Google Consent Mode to anonymise data until the user opts out). In opt-in regions, tags should only fire after the user grants consent for the relevant category.
+
+### Push a dataLayer event when the banner is in opt-out mode
+
+```js
+document.addEventListener("cc:onModalReady", function () {
+  if (window.CookieChimp.getConfig().mode === "opt-out") {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: "cookiechimp_opt_out_mode" });
+  }
+});
+```
+
+### Wire it into your tag firing condition
+
+In Google Tag Manager (or Adobe Launch), add the `cookiechimp_opt_out_mode` event as an **OR** condition on your analytics tag's trigger, alongside your existing category-consent condition:
+
+1. Fire the tag **if** `CookieChimp.getConfig().mode === 'opt-out'` (the event above), **OR**
+2. Fire the tag **if** consent has been granted to the analytics category.
+
+This sends data immediately for visitors in opt-out regions while still respecting consent for visitors in opt-in regions. Because Google Consent Mode is already wired up by CookieChimp, no personal information is shared until the visitor explicitly opts in.
+
+<Warning>
+  For this to work reliably, the CookieChimp script must load **before** your
+  tag manager runs — not from inside GTM itself. See the [installation
+  guide](/installation/installation) for the recommended placement.
+</Warning>
+
+## Example: branch behaviour by US state
+
+`visitorRegion` lets you treat visitors from specific US states (or other subdivisions) differently. For example, you might want to log a custom event only for visitors from California:
+
+```js
+window.addEventListener("cc:onModalReady", function () {
+  if (
+    CookieChimp.visitorCountry === "US" &&
+    CookieChimp.visitorRegion === "CA"
+  ) {
+    // California-specific logic, e.g. show a "Do Not Sell" link
+  }
+});
+```
+
+## When should I use these properties vs. multiple banners?
+
+Use these properties when:
+
+- The cookies, services, and banner text are the **same** across regions, but you need a small UI or tag-firing tweak per region.
+- You want to keep a **single source of truth** for banner content and avoid maintaining duplicates.
+
+Configure separate banners (via geolocation rules in the dashboard) when:
+
+- The set of categories, services, or legal text genuinely differs between regions.
+- You need different default consent states (opt-in vs. opt-out) — this is already handled by CookieChimp's geolocation rules and surfaced via `getConfig().mode`.
+
+<Snippet file="install/cms-troubleshooting-footer.mdx" />

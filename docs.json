@@ -126,6 +126,7 @@
               "advanced/custom-update-consent-button",
               "advanced/custom-css",
               "advanced/callbacks-events",
+              "advanced/geo-targeted-customization",
               "advanced/content-security-policy"
             ]
           }
