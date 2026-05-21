@@ -57,41 +57,29 @@ window.addEventListener("cc:onModalReady", function () {
   Events](/advanced/callbacks-events) for other events you can hook into.
 </Tip>
 
-## Example: fire analytics in opt-out regions even without consent
+## Example: tag your own analytics with the visitor's consent mode
 
-If you've configured CookieChimp with **two consent modes** — opt-in for strict-consent countries (e.g. EU/EEA under GDPR) and opt-out for regions where pre-consent tracking is allowed (e.g. many US states) — you can use `getConfig().mode` to decide whether your analytics tag should fire before consent is granted.
+CookieChimp already handles tag-firing correctly for both opt-in and opt-out banners out of the box — opt-out banners fire analytics natively without waiting for consent, and Google Consent Mode is wired up automatically. You don't need to write code for that.
 
-In opt-out regions, you'll typically want tags to fire immediately (relying on Google Consent Mode to anonymise data until the user opts out). In opt-in regions, tags should only fire after the user grants consent for the relevant category.
-
-### Push a dataLayer event when the banner is in opt-out mode
+What you **may** want to do is segment your own product analytics by consent mode so you can build internal dashboards — for example, comparing engagement between visitors who saw an opt-in banner vs. an opt-out banner, or tracking consent rates by country for compliance reporting.
 
 ```js
-document.addEventListener("cc:onModalReady", function () {
-  if (window.CookieChimp.getConfig().mode === "opt-out") {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: "cookiechimp_opt_out_mode" });
-  }
+window.addEventListener("cc:onModalReady", function () {
+  if (!window.analytics) return;
+
+  window.analytics.identify({
+    consent_mode: CookieChimp.getConfig().mode, // 'opt-in' or 'opt-out'
+    visitor_country: CookieChimp.visitorCountry,
+    visitor_region: CookieChimp.visitorRegion,
+  });
 });
 ```
 
-### Wire it into your tag firing condition
+Swap `window.analytics.identify` for whichever analytics or CDP SDK you use (Segment, Amplitude, Mixpanel, PostHog, etc.). Once these properties are attached to the visitor, every downstream event can be filtered or grouped by consent mode and region.
 
-In Google Tag Manager (or Adobe Launch), add the `cookiechimp_opt_out_mode` event as an **OR** condition on your analytics tag's trigger, alongside your existing category-consent condition:
+## Example: show a "Do Not Sell" link for California visitors
 
-1. Fire the tag **if** `CookieChimp.getConfig().mode === 'opt-out'` (the event above), **OR**
-2. Fire the tag **if** consent has been granted to the analytics category.
-
-This sends data immediately for visitors in opt-out regions while still respecting consent for visitors in opt-in regions. Because Google Consent Mode is already wired up by CookieChimp, no personal information is shared until the visitor explicitly opts in.
-
-<Warning>
-  For this to work reliably, the CookieChimp script must load **before** your
-  tag manager runs — not from inside GTM itself. See the [installation
-  guide](/installation/installation) for the recommended placement.
-</Warning>
-
-## Example: branch behaviour by US state
-
-`visitorRegion` lets you treat visitors from specific US states (or other subdivisions) differently. For example, you might want to log a custom event only for visitors from California:
+Some US state laws (like CCPA in California) require a "Do Not Sell My Personal Information" link in your site footer. You can render this link conditionally based on `visitorRegion`, so it only appears for visitors who actually need it:
 
 ```js
 window.addEventListener("cc:onModalReady", function () {
@@ -99,9 +87,15 @@ window.addEventListener("cc:onModalReady", function () {
     CookieChimp.visitorCountry === "US" &&
     CookieChimp.visitorRegion === "CA"
   ) {
-    // California-specific logic, e.g. show a "Do Not Sell" link
+    document.getElementById("do-not-sell-link").style.display = "inline";
   }
 });
+```
+
+```html
+<a id="do-not-sell-link" href="#" style="display: none" data-cc="show-preferencesModal">
+  Do Not Sell My Personal Information
+</a>
 ```
 
 ## When should I override vs. configure another banner?
