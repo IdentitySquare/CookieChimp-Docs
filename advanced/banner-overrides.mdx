@@ -1,11 +1,17 @@
 ---
-title: "Geo-Targeted Customization"
-description: "Customize the banner and your tags per country, region, or consent mode without duplicating banners."
+title: "Advanced Banner Overrides"
+description: "Programmatically override the banner for advanced customization — geo-targeted tweaks, conditional UI changes, and custom tag-firing logic."
 ---
 
-CookieChimp serves a single banner that already adapts to the visitor's location based on your geolocation rules. Sometimes, though, you'll want to layer **additional** behaviour on top of that — for example, hiding a UI element only for visitors from one country, or firing your analytics tags differently for opt-in vs. opt-out regions.
+Most banner customization should happen in the CookieChimp dashboard. You can create **multiple banners** targeting different geolocation rules — country, US state, or other region — each with its own categories, translations, and consent mode (opt-in or opt-out). If you need a different legal text in California, a separate banner for visitors from Germany, or a translated version for visitors from Japan, that's all configured without writing code.
 
-You can do this by reading visitor and config properties directly from the `window.CookieChimp` object — no need to maintain a second banner.
+This page covers the cases that **go beyond** dashboard configuration: programmatic overrides where you reach into `window.CookieChimp` from your own JavaScript or CSS to tweak the banner that's already been served. Common reasons to do this include:
+
+- Hiding or showing a UI element on the banner for visitors from one country only.
+- Firing analytics or marketing tags differently based on the consent mode that was applied.
+- Branching custom site logic on the visitor's region (e.g. showing a "Do Not Sell" link for California visitors).
+
+Geo-targeted customization is the most common use case, so most examples below are geo-based — but the same pattern works for any condition you can read from `window.CookieChimp`.
 
 ## What properties are available?
 
@@ -98,16 +104,17 @@ window.addEventListener("cc:onModalReady", function () {
 });
 ```
 
-## When should I use these properties vs. multiple banners?
+## When should I override vs. configure another banner?
 
-Use these properties when:
-
-- The cookies, services, and banner text are the **same** across regions, but you need a small UI or tag-firing tweak per region.
-- You want to keep a **single source of truth** for banner content and avoid maintaining duplicates.
-
-Configure separate banners (via geolocation rules in the dashboard) when:
+Configure a **separate banner** in the dashboard (via geolocation rules) when:
 
 - The set of categories, services, or legal text genuinely differs between regions.
-- You need different default consent states (opt-in vs. opt-out) — this is already handled by CookieChimp's geolocation rules and surfaced via `getConfig().mode`.
+- You need different default consent states (opt-in vs. opt-out) — CookieChimp surfaces the applied mode via `getConfig().mode`.
+- You need a translated version of the banner for a specific country or region.
+
+Use a **programmatic override** (as shown above) when:
+
+- The cookies, services, and banner text are the **same** across regions, but you need a small UI tweak or different tag-firing behaviour for one segment.
+- You want to keep a **single source of truth** for banner content and avoid maintaining duplicates just to flip one CSS rule or push one event.
 
 <Snippet file="install/cms-troubleshooting-footer.mdx" />
