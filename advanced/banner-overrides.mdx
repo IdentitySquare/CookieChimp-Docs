@@ -5,13 +5,13 @@ description: "Programmatically override the banner for advanced customization �
 
 Most banner customization should happen in the CookieChimp dashboard. You can create **multiple banners** targeting different geolocation rules — country, US state, or other region — each with its own categories, translations, and consent mode (opt-in or opt-out). If you need a different legal text in California, a separate banner for visitors from Germany, or a translated version for visitors from Japan, that's all configured without writing code.
 
-This page covers the cases that **go beyond** dashboard configuration: programmatic overrides where you reach into `window.CookieChimp` from your own JavaScript or CSS to tweak the banner that's already been served. Common reasons to do this include:
+This page covers the cases that **go beyond** dashboard configuration: programmatic overrides where you reach into `window.CookieChimp` (or its CSS variables) from your own JavaScript or CSS to tweak the banner that's already been served. Common reasons to do this include:
 
 - Hiding or showing a UI element on the banner for visitors from one country only.
-- Firing analytics or marketing tags differently based on the consent mode that was applied.
-- Branching custom site logic on the visitor's region (e.g. showing a "Do Not Sell" link for California visitors).
+- Tagging your own analytics or CRM events with the consent mode that was applied, for internal reporting.
+- Giving the banner different branding on each of your domains while sharing a single CookieChimp account.
 
-Geo-targeted customization is the most common use case, so most examples below are geo-based — but the same pattern works for any condition you can read from `window.CookieChimp`.
+Geo-targeted customization is the most common reason to drop down to code, but the same pattern works for any condition you can read from `window.CookieChimp` or the current page.
 
 ## What properties are available?
 
@@ -77,26 +77,53 @@ window.addEventListener("cc:onModalReady", function () {
 
 Swap `window.analytics.identify` for whichever analytics or CDP SDK you use (Segment, Amplitude, Mixpanel, PostHog, etc.). Once these properties are attached to the visitor, every downstream event can be filtered or grouped by consent mode and region.
 
-## Example: show a "Do Not Sell" link for California visitors
+## Example: per-domain branding when sharing one account
 
-Some US state laws (like CCPA in California) require a "Do Not Sell My Personal Information" link in your site footer. You can render this link conditionally based on `visitorRegion`, so it only appears for visitors who actually need it:
+If you run multiple domains from a single CookieChimp account — for example, a brand and its regional subsidiaries — you can keep one set of categories, vendor lists, and consent records, while still giving each domain its own banner colours. The dashboard sets the global theme; a tiny CSS override on each domain swaps the variables that need to differ.
+
+Add the override directly in each site's stylesheet (or inject it from your tag manager):
+
+```css
+/* brand-a.com */
+#cc-main {
+  --cc-btn-primary-bg: #ff5a5f;
+  --cc-btn-primary-hover-bg: #e0484d;
+  --cc-link-color: #ff5a5f;
+}
+```
+
+```css
+/* brand-b.com */
+#cc-main {
+  --cc-btn-primary-bg: #2ec27e;
+  --cc-btn-primary-hover-bg: #26a868;
+  --cc-link-color: #2ec27e;
+}
+```
+
+If you'd rather have the variables live in one shared stylesheet and branch at runtime — for example, when you serve the same JS bundle across all domains — switch on `location.hostname`:
 
 ```js
-window.addEventListener("cc:onModalReady", function () {
-  if (
-    CookieChimp.visitorCountry === "US" &&
-    CookieChimp.visitorRegion === "CA"
-  ) {
-    document.getElementById("do-not-sell-link").style.display = "inline";
-  }
-});
+const themes = {
+  "brand-a.com": { primary: "#ff5a5f", hover: "#e0484d" },
+  "brand-b.com": { primary: "#2ec27e", hover: "#26a868" },
+};
+
+const theme = themes[location.hostname];
+if (theme) {
+  const style = document.createElement("style");
+  style.textContent = `
+    #cc-main {
+      --cc-btn-primary-bg: ${theme.primary};
+      --cc-btn-primary-hover-bg: ${theme.hover};
+      --cc-link-color: ${theme.primary};
+    }
+  `;
+  document.head.appendChild(style);
+}
 ```
 
-```html
-<a id="do-not-sell-link" href="#" style="display: none" data-cc="show-preferencesModal">
-  Do Not Sell My Personal Information
-</a>
-```
+See [Custom CSS](/advanced/custom-css) for the full list of CSS variables you can override.
 
 ## When should I override vs. configure another banner?
 
