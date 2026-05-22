@@ -129,13 +129,12 @@ See [Custom CSS](/advanced/custom-css) for the full list of CSS variables you ca
 
 Configure a **separate banner** in the dashboard (via geolocation rules) when:
 
-- The set of categories, services, or legal text genuinely differs between regions.
-- You need different default consent states (opt-in vs. opt-out) — CookieChimp surfaces the applied mode via `getConfig().mode`.
-- You need a translated version of the banner for a specific country or region.
+- You want different banner text, design, or configuration for a region — each banner has its own copy, styling, and consent mode (opt-in or opt-out), with translations built in.
+- The applied consent mode needs to differ between regions — CookieChimp surfaces the applied mode via `getConfig().mode`.
 
 Use a **programmatic override** (as shown above) when:
 
-- The cookies, services, and banner text are the **same** across regions, but you need a small UI tweak or different tag-firing behaviour for one segment.
+- The banner content is the **same** across regions, but you need a small UI tweak, a per-domain colour change, or different tag-firing behaviour for one segment.
 - You want to keep a **single source of truth** for banner content and avoid maintaining duplicates just to flip one CSS rule or push one event.
 
 <Snippet file="install/cms-troubleshooting-footer.mdx" />
