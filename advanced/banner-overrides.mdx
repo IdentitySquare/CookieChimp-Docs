@@ -19,7 +19,7 @@ Geo-targeted customization is the most common reason to drop down to code, but t
 
 ## Example: hide the close button for one country
 
-Some advertising platforms (e.g. WeChat Search Ads in China) require that the landing page does not "block the UX" with a forced-consent prompt. The cleanest fix is to expose a close (`×`) button on the banner — but only for visitors from that country, so you don't drop opt-in rates elsewhere.
+Some jurisdictions treat a close (`×`) button as an ambiguous signal — a visitor who dismisses the banner without an explicit accept or reject hasn't made a clear consent choice, and regulators may not consider that a valid interaction. If your default banner shows a close button, the cleanest fix is to hide it — but only for visitors from those countries, so the easier dismissal flow is preserved elsewhere.
 
 You can keep a single banner and toggle the close button visibility with a small CSS rule that's only applied when `visitorCountry` matches.
 
