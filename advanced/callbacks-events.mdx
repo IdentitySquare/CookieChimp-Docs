@@ -1,73 +1,217 @@
 ---
-title: "Callbacks & Events"
-description: "Listen for consent events and control the banner programmatically."
+title: "JavaScript SDK"
+description: "The complete client-side API — read the visitor's consent and the banner that was served, listen for consent events, and control the banner programmatically. Everything you can do from your own JavaScript, on one page."
 ---
 
-## What events can I listen for?
+When the CookieChimp script loads, it exposes a global `CookieChimp` object (also available as `window.CookieChimp`). Everything on this page is read from — or called on — that object. Use it to:
 
-<Info>
-  You can use this to read user's consent to cookie categories and services.
-  View our docs on [Consent Callbacks & Events
-  ›](/block-scripts-cookies/callbacks-events)
-</Info>
+- **Read data** — what the visitor consented to, and which banner was served to them (country, region, consent mode).
+- **Listen for events** — react the moment consent is given, changed, or the modal is shown or hidden.
+- **Control the banner** — show, hide, accept, reject, or reset consent programmatically.
 
-### Consent Events
+<Warning>
+  The `CookieChimp` object and its properties are populated once the script has
+  initialised. If you read them too early — for example, at the very top of the
+  page — they may be `undefined`. Read them inside an [event
+  handler](#listening-for-events) such as `cc:onModalReady` or `cc:onConsented`,
+  or after a check for `window.CookieChimp`.
+</Warning>
 
-### `cc:onFirstConsent`
+## Reading visitor & banner data
 
-Triggered the first time user expresses their choice of consent (accept/reject).
+CookieChimp exposes properties on the `CookieChimp` object that tell you about the visitor's location and the banner that was served to them. They're useful when you want to customise behaviour or tags based on country, region, or consent mode — without duplicating banners.
+
+<Snippet file="visitor-properties.mdx" />
+
+### `getConfig()`
+
+Returns the resolved configuration for the banner that was served to the current visitor. The most commonly read field is `mode`:
+
+```js
+CookieChimp.getConfig(); // { mode: 'opt-in', ... }
+
+// the consent mode applied to this visitor
+CookieChimp.getConfig().mode; // 'opt-in' or 'opt-out'
+```
+
+| Field  | Type     | Description                                                                                                                      |
+| ------ | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `mode` | `string` | The consent mode applied to the visitor based on your geolocation rules — `'opt-in'` (e.g. GDPR) or `'opt-out'` (e.g. CCPA-style). |
+
+<Tip>
+  For end-to-end recipes that use these properties — hiding a button for
+  visitors from one country, firing analytics tags by consent mode, or
+  per-domain branding — see [Advanced Banner
+  Overrides](/advanced/banner-overrides).
+</Tip>
+
+## Reading the visitor's consent
+
+### `getUserPreferences`
+
+Returns the visitor's accepted/rejected categories and services. This is the primary way to read what the user consented to.
+
+Type: `function(): object`
+
+```typescript
+function(): {
+    acceptType: string,
+    acceptedCategories: string[],
+    rejectedCategories: string[],
+    acceptedServices: { [category: string]: string[] },
+    rejectedServices: { [category: string]: string[] }
+}
+```
+
+| Field                | Type                            | Description                                                                       |
+| -------------------- | ------------------------------- | --------------------------------------------------------------------------------- |
+| `acceptType`         | `string`                        | The type of consent given — `'all'`, `'custom'`, `'necessary'`, or `''` if none yet. |
+| `acceptedCategories` | `string[]`                      | Names of the categories the visitor accepted.                                     |
+| `rejectedCategories` | `string[]`                      | Names of the categories the visitor rejected.                                     |
+| `acceptedServices`   | `{ [category]: string[] }`      | Accepted services, keyed by the category they belong to.                          |
+| `rejectedServices`   | `{ [category]: string[] }`      | Rejected services, keyed by the category they belong to.                          |
+
+```js
+// the full preferences object
+CookieChimp.getUserPreferences();
+
+// type of consent given ('', 'all', 'necessary' or 'custom')
+CookieChimp.getUserPreferences().acceptType;
+
+// accepted categories (array of accepted category names)
+CookieChimp.getUserPreferences().acceptedCategories;
+
+// rejected categories (array of rejected category names)
+CookieChimp.getUserPreferences().rejectedCategories;
+
+// accepted services (object of accepted services, keyed by category)
+CookieChimp.getUserPreferences().acceptedServices;
+
+// rejected services (object of rejected services, keyed by category)
+CookieChimp.getUserPreferences().rejectedServices;
+```
+
+```js
+var preferences = CookieChimp.getUserPreferences();
+
+if (preferences.acceptType === "all") {
+  console.log("Everything has been accepted!");
+}
+
+if (preferences.acceptedCategories.includes("analytics")) {
+  console.log("The analytics category was accepted!");
+}
+```
+
+### `acceptedCategory`
+
+Returns `true` if the specified category was accepted by the user, otherwise `false`.
+
+```js
+if (CookieChimp.acceptedCategory("analytics")) {
+  // "analytics" category was accepted
+} else {
+  // not accepted
+}
+```
+
+### `acceptedService`
+
+Returns `true` if the specified service was accepted by the user, otherwise `false`.
+
+```js
+if (CookieChimp.acceptedService("Google Analytics", "analytics")) {
+  // "Google Analytics" service was accepted
+} else {
+  // not accepted
+}
+```
+
+### `validConsent`
+
+Returns `true` if consent is valid.
+
+Consent is **NOT** valid when at least one of following situations occurs:
+
+- consent is missing (e.g. user has not yet made a choice)
+- CookieChimp's cookie does not exist/has expired
+- CookieChimp's cookie is structurally not valid (e.g. empty)
+
+```js
+if (CookieChimp.validConsent()) {
+  // consent is valid
+} else {
+  // consent is not valid
+}
+```
+
+## Listening for events
+
+Every event is a standard DOM event dispatched on `window`. Subscribe with `window.addEventListener` and read the data from `event.detail`.
+
+### Consent events
+
+#### `cc:onFirstConsent`
+
+Triggered the first time the user expresses their choice of consent (accept/reject).
 
 ```js
 window.addEventListener("cc:onFirstConsent", function (event) {
   var detail = event.detail;
-  // detail.cookie
+  // detail.cookie — the saved consent object (see getUserPreferences for parsed preferences)
 
   // do something
 });
 ```
 
-### `cc:onConsented`
+#### `cc:onConsented`
 
-This event is triggered the very first time the user expresses their choice of consent — just like `onFirstConsent` — but also on every subsequent page load.
+Triggered the very first time the user expresses their choice of consent — just like `onFirstConsent` — but also on every subsequent page load.
 
 ```js
 window.addEventListener("cc:onConsented", function (event) {
   var detail = event.detail;
-  // detail.cookie
+  // detail.cookie — the saved consent object
 
   // do something
 });
 ```
 
-### `cc:onUpdate`
+#### `cc:onUpdate`
 
-This event is triggered when the user modifies their preferences and only if consent has already been provided.
+Triggered when the user modifies their preferences, and only if consent has already been provided.
 
 ```js
 window.addEventListener("cc:onUpdate", function (event) {
   var detail = event.detail;
   /**
-   * detail.cookie
-   * detail.changedCategories
-   * detail.changedServices
+   * detail.cookie             — the saved consent object
+   * detail.changedCategories  — array of category names that changed
+   * detail.changedServices    — object of services that changed, keyed by category
    */
 
   // do something
 });
 ```
 
-### Modal Events
+The data carried by each consent event:
 
-### `cc:beforeModalShow`
+| Property                  | Available on                | Description                                                              |
+| ------------------------- | --------------------------- | ------------------------------------------------------------------------ |
+| `detail.cookie`           | all consent events          | The saved consent object. Use `getUserPreferences()` for parsed preferences. |
+| `detail.changedCategories`| `cc:onUpdate`               | Array of category names whose acceptance changed.                        |
+| `detail.changedServices`  | `cc:onUpdate`               | Object of services whose acceptance changed, keyed by category.          |
+
+### Modal events
+
+#### `cc:beforeModalShow`
 
 Dispatched right before the consent modal is shown. This event is **cancelable** — call `event.preventDefault()` to prevent the banner from appearing. You can then show it later programmatically via `CookieChimp.show(true)`.
 
 ```js
 window.addEventListener("cc:beforeModalShow", function (event) {
   var detail = event.detail;
-  /**
-   * detail.modalName
-   */
+  // detail.modalName
 
   // Example: prevent the banner from showing automatically
   event.preventDefault();
@@ -83,52 +227,52 @@ window.addEventListener("cc:beforeModalShow", function (event) {
   interaction.
 </Tip>
 
-### `cc:onModalShow`
+#### `cc:onModalShow`
 
 The consent modal is visible.
 
 ```js
 window.addEventListener("cc:onModalShow", function (event) {
   var detail = event.detail;
-  /**
-   * detail.modalName
-   */
+  // detail.modalName
 
   // do something
 });
 ```
 
-### `cc:onModalHide`
+#### `cc:onModalHide`
 
 The consent modal is hidden.
 
 ```js
 window.addEventListener("cc:onModalHide", function (event) {
   var detail = event.detail;
-  /**
-   * detail.modalName
-   */
+  // detail.modalName
 
   // do something
 });
 ```
 
-### `cc:onModalReady`
+#### `cc:onModalReady`
 
-The consent modal is created and appended to the DOM.
+The consent modal is created and appended to the DOM. This is the safest place to read [visitor & banner data](#reading-visitor--banner-data), because those properties are guaranteed to be populated by the time it fires.
 
 ```js
 window.addEventListener("cc:onModalReady", function (event) {
   var detail = event.detail;
-  /**
-   * detail.modalName
-   */
+  // detail.modalName
 
   // do something
 });
 ```
 
-## What actions can I call programmatically?
+The data carried by each modal event:
+
+| Property           | Description                                                       |
+| ------------------ | ----------------------------------------------------------------- |
+| `detail.modalName` | The name of the modal that triggered the event (e.g. the consent or preferences modal). |
+
+## Controlling the banner
 
 ### `show`
 
@@ -165,28 +309,6 @@ Hides the preferences modal.
 CookieChimp.hidePreferences();
 ```
 
-### `getUserPreferences`
-
-```js
-// see all user preferences
-CookieChimp.getUserPreferences();
-
-// see type of consent given (returns '', all, necessary or custom )
-CookieChimp.getUserPreferences().accpetType;
-
-// see accepted categories (returns array of accepted category names)
-CookieChimp.getUserPreferences().acceptedCategories;
-
-// see rejected categories (returns array of rejected category names)
-CookieChimp.getUserPreferences().rejectedCategories;
-
-// see accepted services (returns an object with accepted services)
-CookieChimp.getUserPreferences().acceptedServices;
-
-// see rejected services (returns an object with rejected services)
-CookieChimp.getUserPreferences().rejectedServices;
-```
-
 ### `acceptCategory`
 
 Programmatically accept or reject a cookie category.
@@ -214,23 +336,11 @@ CookieChimp.acceptCategory("all", ["analytics"]);
 CookieChimp.acceptCategory("all", ["analytics", "marketing"]);
 ```
 
-### `acceptedCategory`
-
-Returns `true` if the specified category was accepted by the user, otherwise `false`.
-
-```javascript
-if (CookieChimp.acceptedCategory("analytics")) {
-  // "analytics" category was accepted
-} else {
-  // not accepted
-}
-```
-
 ### `acceptService`
 
 Accepts or rejects services.
 
-```javascript
+```js
 // accept all services in the 'analytics' category
 CookieChimp.acceptService("all", "analytics");
 
@@ -242,70 +352,6 @@ CookieChimp.acceptService("Google Analytics", "analytics");
 
 // accept only these 2 services and reject all the others
 CookieChimp.acceptService(["service1", "service2"], "analytics");
-```
-
-### `acceptedService`
-
-Returns `true` if the specified service was accepted by the user, otherwise `false`.
-
-```javascript
-if (CookieChimp.acceptedService("Google Analytics", "analytics")) {
-  // "Google Analytics" service was accepted
-} else {
-  // not accepted
-}
-```
-
-### `validConsent`
-
-Returns `true` if consent is valid.
-
-Consent is **NOT** valid when at least one of following situations occurs:
-
-- consent is missing (e.g. user has not yet made a choice)
-- CookieChimp's cookie does not exist/has expired
-- CookieChimp's cookie is structurally not valid (e.g. empty)
-
-```javascript
-if (CookieChimp.validConsent()) {
-  // consent is valid
-} else {
-  // consent is not valid
-}
-```
-
-### `getUserPreferences`
-
-Returns user's preferences of accepted/rejected categories and services.
-
-Type: `function(): object`
-
-```typescript
-function(): {
-    acceptType: string,
-    acceptedCategories: string[],
-    rejectedCategories: string[],
-    acceptedServices: {[category: string]: string[]}
-    rejectedServices: {[category: string]: string[]}
-}
-```
-
-Possible acceptType values:
-
-- `'all'`
-- `'custom'`
-- `'necessary'`
-
-```javascript
-var preferences = CookieChimp.getUserPreferences();
-
-if (preferences.acceptType === "all") {
-  console.log("Everything has been accepted!");
-}
-
-if (preferences.acceptedCategories.includes("analytics")) {
-  console.log("The analytics category was accepted!");
-}
 ```
 
 ### `reset`
@@ -324,10 +370,8 @@ CookieChimp.reset(true);
 window.location.reload();
 ```
 
-## What visitor & banner properties can I read?
+## Next steps
 
-CookieChimp exposes properties on the `window.CookieChimp` object that tell you about the visitor's location and the banner that was served. They're useful when you want to customise behaviour or tags based on country, region, or consent mode — without duplicating banners.
-
-<Snippet file="visitor-properties.mdx" />
-
-For full end-to-end examples — including hiding a button for visitors from a specific country and firing analytics tags in opt-out regions — see [Advanced Banner Overrides](/advanced/banner-overrides).
+- [Advanced Banner Overrides](/advanced/banner-overrides) — full end-to-end recipes built on the properties and events above.
+- [Custom Update Consent Button](/advanced/custom-update-consent-button) — wire `showPreferences` to your own button.
+- [Custom CSS](/advanced/custom-css) — the full list of CSS variables you can override.
