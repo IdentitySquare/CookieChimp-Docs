@@ -155,11 +155,11 @@ CookieChimp dispatches three families of events:
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | [Consent events](#consent-events)                 | `cc:onFirstConsent`, `cc:onConsented`, `cc:onUpdate`                                            | When the visitor accepts, rejects, or changes preferences. |
 | [Modal events](#modal-events)                     | `cc:beforeModalShow`, `cc:onModalShow`, `cc:onModalHide`, `cc:onModalReady`                     | At each stage of the banner / preferences modal lifecycle. |
-| [Consent string events](#consent-string-events)   | `cc:consentStringUpdated`                                                                       | When `window.cookieChimpConsentString` is (re)built — useful for tag managers like Adobe Launch and GTM. |
+| [Consent string events](#consent-string-events)   | `cc:consentStringUpdated`                                                                       | When `window.cookieChimpConsentString` is (re)built — useful for tag managers like Adobe Launch and Google Tag Manager. |
 
 ### Consent events
 
-These fire whenever the visitor's consent state changes — give consent, reload the page with stored consent, or change their preferences from the privacy trigger.
+These fire whenever the visitor's consent state changes. For example, when the visitor gives consent for the first time, reloads a page on which consent is already stored, or changes their preferences from the privacy trigger.
 
 #### `cc:onFirstConsent`
 
