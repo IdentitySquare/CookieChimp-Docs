@@ -155,7 +155,7 @@ CookieChimp dispatches three families of events:
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | [Consent events](#consent-events)                 | `cc:onFirstConsent`, `cc:onConsented`, `cc:onUpdate`                                            | When the visitor accepts, rejects, or changes preferences. |
 | [Modal events](#modal-events)                     | `cc:beforeModalShow`, `cc:onModalShow`, `cc:onModalHide`, `cc:onModalReady`                     | At each stage of the banner / preferences modal lifecycle. |
-| [Consent string events](#consent-string-events)   | `cc:consentStringUpdated`                                                                       | When `window.cookieChimpConsentString` is (re)built — useful for tag managers like Adobe Launch and Google Tag Manager. |
+| [Consent string events](#consent-string-events)   | `cc:consentStringUpdated`                                                                       | When `window.cookieChimpConsentString` is (re)built — used by the [Adobe Launch](/installation/adobe-launch) integration. |
 
 ### Consent events
 
@@ -286,7 +286,13 @@ The data carried by each modal event:
 
 ### Consent string events
 
-CookieChimp also publishes the visitor's choices as a flat, comma-separated string on `window.cookieChimpConsentString`. This is the easiest way to gate tags in Adobe Launch, Google Tag Manager, or any other tag manager that prefers a single value over the structured `getUserPreferences()` object.
+CookieChimp also publishes the visitor's choices as a flat, comma-separated string on `window.cookieChimpConsentString`. The [Adobe Launch](/installation/adobe-launch) integration is built on this property and the matching event below — it pairs well with any setup that prefers a single value over the structured `getUserPreferences()` object.
+
+<Note>
+  Google Tag Manager uses its own consent signal — a `cookiechimp_consent_update`
+  push on `dataLayer`, not this DOM event. See the [Google Tag
+  Manager](/installation/google-tag-manager) guide for the GTM-specific setup.
+</Note>
 
 #### `window.cookieChimpConsentString`
 
