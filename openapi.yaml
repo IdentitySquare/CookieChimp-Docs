@@ -1778,6 +1778,10 @@ components:
         - `code_installed`: The script has been installed on the user's website.
         - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
         - `live`: The account is live and operational.
+
+        Accounts whose status could not be determined are excluded from a
+        filtered listing, since their status is unknown rather than any
+        particular value.
       required: false
       schema:
         type: string
@@ -2925,7 +2929,7 @@ components:
           readOnly: true
           description: ID of the account user that owns the account
         onboarding_status:
-          type: string
+          type: [string, "null"]
           readOnly: true
           description: |
             The status of the account, where:
@@ -2934,6 +2938,11 @@ components:
             - `code_installed`: The script has been installed on the user's website.
             - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
             - `live`: The account is live and operational.
+
+            `null` means the status could not be determined — the analytics store
+            behind it was unreachable when the response was built. It is not a
+            statement about the account, and the request itself still succeeded.
+            Treat it as "unknown" and retry rather than as a downgrade in status.
         visitor_stats:
           $ref: "#/components/schemas/VisitorStats"
         created_at:
