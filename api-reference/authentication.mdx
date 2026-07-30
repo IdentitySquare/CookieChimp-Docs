@@ -141,8 +141,9 @@ The API returns standard HTTP status codes.
 |-------------|-------------|
 | `200` | Success |
 | `201` | Created |
-| `400` | Bad request — an invalid `page` parameter |
+| `400` | Bad request — an invalid `page` parameter, or a write from a user key that can reach more than one account without an `account_id` |
 | `401` | Unauthorized — invalid or missing API token, or a token of the wrong type |
+| `403` | Forbidden — the key resolved to a user who is not an admin of the account, on a change the dashboard reserves for admins |
 | `404` | Not found |
 | `422` | Validation error |
 | `429` | Rate limit exceeded |

@@ -3177,129 +3177,182 @@ components:
     ConsentBannerWrite:
       type: object
       description: |
-        The banner attributes the dashboard's banner designer can set. The full
-        set is large; the commonly used ones are listed here, and any other
-        attribute the designer exposes is accepted too.
+        Every setting the banner designer exposes. The response returns the same
+        set, so a banner can be read, edited and sent back unchanged.
       properties:
-        name:
+        banner_accept_btn_text:
           type: string
-        enabled:
-          type: boolean
-          description: Whether the banner is live. New banners are always created disabled.
-        enable_tcf:
-          type: boolean
-          description: Whether the banner runs in IAB TCF mode
-        force_consent:
-          type: boolean
-          description: Whether the page is blocked until the visitor chooses
-        consent_mode:
+        banner_accept_necessary_btn_text:
           type: string
-          description: e.g. `opt_in`, `opt_out`
+        banner_footer_content:
+          type: string
+        banner_preferences_btn_text:
+          type: string
+        btn_border_radius:
+          type: string
+        consent_additional_description:
+          type: string
+        consent_button_placement:
+          type: string
+        consent_description:
+          type: string
         consent_duration_days:
           type: integer
           description: How long a visitor's choice is remembered
         consent_layout:
           type: string
           description: e.g. `box`, `bar`
+        consent_mode:
+          type: string
+          description: e.g. `opt_in`, `opt_out`
         consent_position:
           type: string
           description: e.g. `bottom_center`
         consent_title:
           type: string
-        consent_description:
+        dark_mode:
           type: string
-        privacy_policy_url:
+          description: e.g. `light`, `dark`, `auto`
+        do_not_sell_description:
+          type: string
+        do_not_sell_title:
+          type: string
+        enable_banner_footer:
+          type: boolean
+        enable_tcf:
+          type: boolean
+          description: Whether the banner runs in IAB TCF mode
+        enabled:
+          type: boolean
+          description: Whether the banner is live. New banners are always created disabled.
+        equal_weight_buttons:
+          type: boolean
+        floating_preferences_icon_position:
+          type: string
+        force_consent:
+          type: boolean
+          description: Whether the page is blocked until the visitor chooses
+        language_autodetect:
+          type: string
+        logo_url_dark:
+          type: string
+        logo_url_light:
+          type: string
+        modal_border_radius:
+          type: string
+        name:
+          type: string
+        preferences_accept_btn_text:
+          type: string
+        preferences_accept_necessary_btn_text:
           type: string
         preferences_control_level:
           type: string
           description: How granular the preferences modal is
-        dark_mode:
+        privacy_policy_url:
           type: string
-          description: e.g. `light`, `dark`, `auto`
-        language_autodetect:
+        save_preferences_btn_text:
           type: string
+        settings_description:
+          type: string
+        settings_layout:
+          type: string
+        settings_more_info:
+          type: string
+        settings_more_info_title:
+          type: string
+        settings_position_x:
+          type: string
+        settings_title:
+          type: string
+        show_banner_accept_btn:
+          type: boolean
+        show_banner_accept_necessary_btn:
+          type: boolean
+        show_banner_close_btn:
+          type: boolean
+        show_banner_preferences_btn:
+          type: boolean
+        show_floating_preferences_icon:
+          type: boolean
+        show_preferences_accept_btn:
+          type: boolean
+        show_preferences_accept_necessary_btn:
+          type: boolean
+        show_save_preferences_btn:
+          type: boolean
+        show_services:
+          type: boolean
+        swap_buttons:
+          type: boolean
         target_type:
           type: string
           description: Who sees the banner, e.g. `worldwide`, `selected_countries`
-        target_countries:
-          type: array
-          items:
-            type: string
-          description: ISO 3166-1 alpha-2 codes
-        target_us_states:
-          type: array
-          items:
-            type: string
-        target_canadian_regions:
-          type: array
-          items:
-            type: string
-          description: |
-            Province and territory codes, used when `target_type` is
-            `selected_canadian_provinces`.
+
     ConsentBannerUpdate:
       description: |
         Everything a banner accepts on update, including its translations.
       allOf:
         - $ref: "#/components/schemas/ConsentBannerWrite"
-      properties:
-        banner_languages_attributes:
-          type: object
-          description: |
-            Create, update or discard translations. Not accepted when creating a
-            banner — add them by updating it, which is where the account's
-            language entitlement is enforced.
+        - type: object
+          properties:
+            banner_languages_attributes:
+              type: object
+              description: |
+                Create, update or discard translations. Not accepted when creating a
+                banner — add them by updating it, which is where the account's
+                language entitlement is enforced.
 
-            Keys are arbitrary indices. Omit `id` to add a translation; pass the
-            `id` from the banner's `translations` array to change an existing
-            one, and set `discarded_at` to remove it.
-          additionalProperties:
-            type: object
-            properties:
-              id:
-                type: string
-                description: From the banner's `translations` array
-              language_code:
-                type: string
-                description: ISO 639-1 code
-              consent_title:
-                type: string
-              consent_description:
-                type: string
-              banner_accept_btn_text:
-                type: string
-              banner_accept_necessary_btn_text:
-                type: string
-              banner_preferences_btn_text:
-                type: string
-              settings_title:
-                type: string
-              settings_description:
-                type: string
-              privacy_policy_url:
-                type: string
-              save_preferences_btn_text:
-                type: string
-              consent_additional_description:
-                type: string
-              banner_footer_content:
-                type: string
-              settings_more_info_title:
-                type: string
-              settings_more_info:
-                type: string
-              do_not_sell_title:
-                type: string
-              do_not_sell_description:
-                type: string
-              preferences_accept_btn_text:
-                type: string
-              preferences_accept_necessary_btn_text:
-                type: string
-              discarded_at:
-                type: [string, "null"]
-                format: date-time
-                description: Set to remove this translation
+                Keys are arbitrary indices. Omit `id` to add a translation; pass the
+                `id` from the banner's `translations` array to change an existing
+                one, and set `discarded_at` to remove it.
+              additionalProperties:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: From the banner's `translations` array
+                  language_code:
+                    type: string
+                    description: ISO 639-1 code
+                  consent_title:
+                    type: [string, "null"]
+                  consent_description:
+                    type: [string, "null"]
+                  banner_accept_btn_text:
+                    type: [string, "null"]
+                  banner_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  banner_preferences_btn_text:
+                    type: [string, "null"]
+                  settings_title:
+                    type: [string, "null"]
+                  settings_description:
+                    type: [string, "null"]
+                  privacy_policy_url:
+                    type: [string, "null"]
+                  save_preferences_btn_text:
+                    type: [string, "null"]
+                  consent_additional_description:
+                    type: [string, "null"]
+                  banner_footer_content:
+                    type: [string, "null"]
+                  settings_more_info_title:
+                    type: [string, "null"]
+                  settings_more_info:
+                    type: [string, "null"]
+                  do_not_sell_title:
+                    type: [string, "null"]
+                  do_not_sell_description:
+                    type: [string, "null"]
+                  preferences_accept_btn_text:
+                    type: [string, "null"]
+                  preferences_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  discarded_at:
+                    type: [string, "null"]
+                    format: date-time
+                    description: Set to remove this translation
 
     ConsentBannerCreateRequest:
       type: object
@@ -3328,121 +3381,127 @@ components:
           target_countries: ["DE", "FR"]
 
     ConsentBanner:
-      type: object
-      properties:
-        id:
-          type: string
-          readOnly: true
-        name:
-          type: string
-        enabled:
-          type: boolean
-        enable_tcf:
-          type: boolean
-        force_consent:
-          type: boolean
-        consent_mode:
-          type: string
-        consent_duration_days:
-          type: integer
-        consent_layout:
-          type: string
-        consent_position:
-          type: string
-        consent_title:
-          type: [string, "null"]
-        consent_description:
-          type: [string, "null"]
-        privacy_policy_url:
-          type: [string, "null"]
-        preferences_control_level:
-          type: string
-        dark_mode:
-          type: string
-        language_autodetect:
-          type: string
-        revision:
-          type: integer
-          readOnly: true
-          description: Bumped when a change requires visitors to consent again
-        targeting:
-          type: object
+      description: |
+        Every setting the update endpoint accepts, plus the read-only fields
+        below — the response is derived from the same list the API permits, so a
+        banner can be read, edited and sent back unchanged.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerWrite"
+        - type: object
           properties:
-            target_type:
+            id:
               type: string
-            target_countries:
+              readOnly: true
+            name:
+              type: string
+            enabled:
+              type: boolean
+            enable_tcf:
+              type: boolean
+            force_consent:
+              type: boolean
+            consent_mode:
+              type: string
+            consent_duration_days:
+              type: integer
+            consent_layout:
+              type: string
+            consent_position:
+              type: string
+            consent_title:
+              type: [string, "null"]
+            consent_description:
+              type: [string, "null"]
+            privacy_policy_url:
+              type: [string, "null"]
+            preferences_control_level:
+              type: string
+            dark_mode:
+              type: string
+            language_autodetect:
+              type: string
+            revision:
+              type: integer
+              readOnly: true
+              description: Bumped when a change requires visitors to consent again
+            targeting:
+              type: object
+              properties:
+                target_type:
+                  type: string
+                target_countries:
+                  type: array
+                  items:
+                    type: string
+                target_us_states:
+                  type: array
+                  items:
+                    type: string
+                target_canadian_regions:
+                  type: array
+                  items:
+                    type: string
+                  description: |
+                    Populated instead of `target_us_states` when `target_type` is
+                    `selected_canadian_provinces`; the two share a column.
+            translations:
               type: array
-              items:
-                type: string
-            target_us_states:
-              type: array
-              items:
-                type: string
-            target_canadian_regions:
-              type: array
-              items:
-                type: string
+              readOnly: true
               description: |
-                Populated instead of `target_us_states` when `target_type` is
-                `selected_canadian_provinces`; the two share a column.
-        translations:
-          type: array
-          readOnly: true
-          description: |
-            The banner's translations, each with its localized copy alongside
-            its `id` — so a client can read what it is allowed to write rather
-            than overwriting fields it cannot see. The `id` is what you send
-            back in `banner_languages_attributes` to update or discard one.
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              language_code:
-                type: string
-                description: ISO 639-1 code
-              consent_title:
-                type: [string, "null"]
-              consent_description:
-                type: [string, "null"]
-              consent_additional_description:
-                type: [string, "null"]
-              banner_accept_btn_text:
-                type: [string, "null"]
-              banner_accept_necessary_btn_text:
-                type: [string, "null"]
-              banner_preferences_btn_text:
-                type: [string, "null"]
-              banner_footer_content:
-                type: [string, "null"]
-              settings_title:
-                type: [string, "null"]
-              settings_description:
-                type: [string, "null"]
-              settings_more_info_title:
-                type: [string, "null"]
-              settings_more_info:
-                type: [string, "null"]
-              privacy_policy_url:
-                type: [string, "null"]
-              do_not_sell_title:
-                type: [string, "null"]
-              do_not_sell_description:
-                type: [string, "null"]
-              preferences_accept_btn_text:
-                type: [string, "null"]
-              preferences_accept_necessary_btn_text:
-                type: [string, "null"]
-              save_preferences_btn_text:
-                type: [string, "null"]
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
+                The banner's translations, each with its localized copy alongside
+                its `id` — so a client can read what it is allowed to write rather
+                than overwriting fields it cannot see. The `id` is what you send
+                back in `banner_languages_attributes` to update or discard one.
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  language_code:
+                    type: string
+                    description: ISO 639-1 code
+                  consent_title:
+                    type: [string, "null"]
+                  consent_description:
+                    type: [string, "null"]
+                  consent_additional_description:
+                    type: [string, "null"]
+                  banner_accept_btn_text:
+                    type: [string, "null"]
+                  banner_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  banner_preferences_btn_text:
+                    type: [string, "null"]
+                  banner_footer_content:
+                    type: [string, "null"]
+                  settings_title:
+                    type: [string, "null"]
+                  settings_description:
+                    type: [string, "null"]
+                  settings_more_info_title:
+                    type: [string, "null"]
+                  settings_more_info:
+                    type: [string, "null"]
+                  privacy_policy_url:
+                    type: [string, "null"]
+                  do_not_sell_title:
+                    type: [string, "null"]
+                  do_not_sell_description:
+                    type: [string, "null"]
+                  preferences_accept_btn_text:
+                    type: [string, "null"]
+                  preferences_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  save_preferences_btn_text:
+                    type: [string, "null"]
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+            updated_at:
+              type: string
+              format: date-time
+              readOnly: true
       example:
         id: "ban1"
         name: "EU banner"
