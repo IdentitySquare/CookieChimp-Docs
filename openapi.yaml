@@ -2878,6 +2878,37 @@ components:
           type: string
           readOnly: true
           description: Domain of the account
+        account_type:
+          type: string
+          enum: [website, mobile_app]
+          readOnly: true
+        domain:
+          type: [string, "null"]
+        subdomain:
+          type: [string, "null"]
+        default_language:
+          type: string
+          description: ISO 639-1 code the banner falls back to
+        auto_translate:
+          type: boolean
+        translations:
+          type: array
+          items:
+            type: string
+          description: ISO 639-1 codes the banner is translated into
+        industry:
+          type: [string, "null"]
+        description:
+          type: [string, "null"]
+        support_email:
+          type: [string, "null"]
+        banner_debug_mode:
+          type: boolean
+        blocking_mode:
+          type: [string, "null"]
+        retain_consent_duration:
+          type: integer
+          description: Years consent records are retained
         allowed_domains:
           type: array
           items:
@@ -2965,7 +2996,9 @@ components:
           description: ISO 639-1 codes the banner is translated into
         allowed_domains_list:
           type: string
-          description: Comma-separated list of domains the script may run on
+          description: |
+            Comma-separated list of domains the script may run on. Write-only —
+            responses return the parsed `allowed_domains` array instead.
         industry:
           type: string
         description:
@@ -3340,8 +3373,10 @@ components:
           type: array
           readOnly: true
           description: |
-            The banner's translations. The `id` is what you send back in
-            `banner_languages_attributes` to update or discard one.
+            The banner's translations, each with its localized copy alongside
+            its `id` — so a client can read what it is allowed to write rather
+            than overwriting fields it cannot see. The `id` is what you send
+            back in `banner_languages_attributes` to update or discard one.
           items:
             type: object
             properties:
@@ -3350,6 +3385,40 @@ components:
               language_code:
                 type: string
                 description: ISO 639-1 code
+              consent_title:
+                type: [string, "null"]
+              consent_description:
+                type: [string, "null"]
+              consent_additional_description:
+                type: [string, "null"]
+              banner_accept_btn_text:
+                type: [string, "null"]
+              banner_accept_necessary_btn_text:
+                type: [string, "null"]
+              banner_preferences_btn_text:
+                type: [string, "null"]
+              banner_footer_content:
+                type: [string, "null"]
+              settings_title:
+                type: [string, "null"]
+              settings_description:
+                type: [string, "null"]
+              settings_more_info_title:
+                type: [string, "null"]
+              settings_more_info:
+                type: [string, "null"]
+              privacy_policy_url:
+                type: [string, "null"]
+              do_not_sell_title:
+                type: [string, "null"]
+              do_not_sell_description:
+                type: [string, "null"]
+              preferences_accept_btn_text:
+                type: [string, "null"]
+              preferences_accept_necessary_btn_text:
+                type: [string, "null"]
+              save_preferences_btn_text:
+                type: [string, "null"]
         created_at:
           type: string
           format: date-time
