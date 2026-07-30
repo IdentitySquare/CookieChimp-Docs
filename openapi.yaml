@@ -143,7 +143,6 @@ paths:
       tags:
         - Categories
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -168,8 +167,6 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
-      parameters:
-        - $ref: "#/components/parameters/account_id"
       summary: Create category
       description: Create a new category for the current account.
       operationId: createCategory
@@ -204,7 +201,6 @@ paths:
       tags:
         - Categories
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -227,7 +223,6 @@ paths:
       tags:
         - Categories
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Category to update
@@ -259,7 +254,6 @@ paths:
       tags:
         - Categories
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -286,7 +280,6 @@ paths:
       tags:
         - Storage Items
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -311,8 +304,6 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
-      parameters:
-        - $ref: "#/components/parameters/account_id"
       summary: Create storage item
       description: Create a new storage item for the current account.
       operationId: createStorageItem
@@ -353,7 +344,6 @@ paths:
       tags:
         - Storage Items
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -376,7 +366,6 @@ paths:
       tags:
         - Storage Items
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Storage item to update
@@ -408,7 +397,6 @@ paths:
       tags:
         - Storage Items
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -554,7 +542,6 @@ paths:
       tags:
         - Consents
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -586,7 +573,6 @@ paths:
       tags:
         - Consents
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -613,7 +599,6 @@ paths:
       tags:
         - AI Actions
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -645,7 +630,6 @@ paths:
       tags:
         - AI Actions
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -774,7 +758,6 @@ paths:
       tags:
         - Account Users
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -806,7 +789,6 @@ paths:
       tags:
         - Account Users
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -829,7 +811,6 @@ paths:
       tags:
         - Account Users
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Account user to update
@@ -863,7 +844,6 @@ paths:
       tags:
         - Account Users
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -899,7 +879,6 @@ paths:
       tags:
         - Account Invitations
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -924,8 +903,6 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
-      parameters:
-        - $ref: "#/components/parameters/account_id"
       summary: Create account invitation
       description: |
         Invite someone to the current account and email them the invitation.
@@ -972,7 +949,6 @@ paths:
       tags:
         - Account Invitations
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -995,7 +971,6 @@ paths:
       tags:
         - Account Invitations
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Invitation to update
@@ -1027,7 +1002,6 @@ paths:
       tags:
         - Account Invitations
       parameters:
-        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1747,6 +1721,9 @@ components:
         Which account to act on, as the account's API id. Only meaningful for a
         user API key, which may reach several accounts — an account key already
         identifies exactly one and ignores this.
+
+        Accepted by the endpoints that declare it; others act on the account the
+        key resolves to on its own.
 
         Optional for reads, where it narrows the request to that account.
         Required for writes when the key can reach more than one account:
@@ -3217,6 +3194,54 @@ components:
           type: array
           items:
             type: string
+        target_canadian_regions:
+          type: array
+          items:
+            type: string
+          description: |
+            Province and territory codes, used when `target_type` is
+            `selected_canadian_provinces`.
+        banner_languages_attributes:
+          type: object
+          description: |
+            Create, update or discard translations. Not accepted when creating a
+            banner — add them by updating it, which is where the account's
+            language entitlement is enforced.
+
+            Keys are arbitrary indices. Omit `id` to add a translation; pass the
+            `id` from the banner's `translations` array to change an existing
+            one, and set `discarded_at` to remove it.
+          additionalProperties:
+            type: object
+            properties:
+              id:
+                type: string
+                description: From the banner's `translations` array
+              language_code:
+                type: string
+                description: ISO 639-1 code
+              consent_title:
+                type: string
+              consent_description:
+                type: string
+              banner_accept_btn_text:
+                type: string
+              banner_accept_necessary_btn_text:
+                type: string
+              banner_preferences_btn_text:
+                type: string
+              settings_title:
+                type: string
+              settings_description:
+                type: string
+              privacy_policy_url:
+                type: string
+              save_preferences_btn_text:
+                type: string
+              discarded_at:
+                type: [string, "null"]
+                format: date-time
+                description: Set to remove this translation
 
     ConsentBannerWriteRequest:
       type: object
@@ -3284,6 +3309,13 @@ components:
               type: array
               items:
                 type: string
+            target_canadian_regions:
+              type: array
+              items:
+                type: string
+              description: |
+                Populated instead of `target_us_states` when `target_type` is
+                `selected_canadian_provinces`; the two share a column.
         translations:
           type: array
           readOnly: true
