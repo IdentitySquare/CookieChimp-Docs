@@ -704,6 +704,48 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
+    patch:
+      summary: Update account
+      description: |
+        Update an account's settings — the same fields the dashboard's account
+        settings screens expose.
+
+        An account token carries the account's own authority. A user token must
+        belong to an admin of the account, mirroring the web UI, and a
+        non-admin member gets a `403`.
+
+        `account_type` cannot be changed here, as on the web form: mobile app
+        accounts are only created through the admin panel.
+      operationId: updateAccount
+      tags:
+        - Accounts
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Account settings to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountWriteRequest"
+      responses:
+        "200":
+          description: Updated account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
   # account user endpoints - index, GET, PUT & DELETE
   /account-users:
     get:
@@ -974,6 +1016,635 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
+  # site service endpoints - index, GET, POST, PUT & DELETE
+  /services:
+    get:
+      summary: List services
+      description: |
+        List the services configured on the current account, in name order.
+        Requires an account-scoped API token.
+      operationId: listServices
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SiteService"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    post:
+      summary: Create service
+      description: |
+        Create a service under one of the account's categories. `category_id`
+        is required and must belong to this account.
+      operationId: createService
+      tags:
+        - Services
+      requestBody:
+        description: Service to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteServiceWriteRequest"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteServiceResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          description: The referenced `category_id` does not belong to this account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /services/{id}:
+    get:
+      summary: Get service
+      description: Get service by ID
+      operationId: getService
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteServiceResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    put:
+      summary: Update service
+      description: |
+        Update a service. Passing `category_id` moves the service to that
+        category; omitting it leaves the service where it is.
+      operationId: updateService
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Service to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteServiceWriteRequest"
+      responses:
+        "200":
+          description: Updated service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteServiceResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    delete:
+      summary: Delete service
+      description: Delete a service. It is soft-deleted and stops appearing in listings.
+      operationId: deleteService
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Service deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Service was deleted successfully"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # consent banner endpoints - index, GET, POST, PUT, DELETE & duplicate
+  /consent-banners:
+    get:
+      summary: List consent banners
+      description: |
+        List the account's consent banners, newest first. Requires an
+        account-scoped API token.
+      operationId: listConsentBanners
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of consent banners
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ConsentBanner"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    post:
+      summary: Create consent banner
+      description: |
+        Create a consent banner. It inherits the design of the account's most
+        recently updated banner, the same way the dashboard's new-banner flow
+        does, and is always created disabled — enable it once its content and
+        targeting are set. A name is generated if you don't supply one.
+      operationId: createConsentBanner
+      tags:
+        - Consent Banners
+      requestBody:
+        description: Consent banner to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsentBannerWriteRequest"
+      responses:
+        "201":
+          description: Created consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /consent-banners/{id}:
+    get:
+      summary: Get consent banner
+      description: Get consent banner by ID
+      operationId: getConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    put:
+      summary: Update consent banner
+      description: |
+        Update a consent banner's content, appearance or targeting. Set
+        `enabled` to `true` to make it live.
+      operationId: updateConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Consent banner to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsentBannerWriteRequest"
+      responses:
+        "200":
+          description: Updated consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    delete:
+      summary: Delete consent banner
+      description: Delete a consent banner. It is soft-deleted and stops appearing in listings.
+      operationId: deleteConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Consent banner deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Consent banner was deleted successfully"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /consent-banners/{id}/duplicate:
+    post:
+      summary: Duplicate consent banner
+      description: |
+        Copy a consent banner, including its design and targeting. The copy is
+        named after the original and is always created disabled.
+      operationId: duplicateConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "201":
+          description: The duplicated consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # integration endpoints - index, GET & PUT
+  /integrations:
+    get:
+      summary: List integrations
+      description: |
+        List every integration available to the account, active and inactive.
+        Integrations the account has never opened are created inactive on first
+        listing, so the collection is always the full set you can enable.
+      operationId: listIntegrations
+      tags:
+        - Integrations
+      parameters:
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of integrations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Integration"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /integrations/{id}:
+    get:
+      summary: Get integration
+      description: Get integration by ID
+      operationId: getIntegration
+      tags:
+        - Integrations
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Integration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    put:
+      summary: Update integration
+      description: |
+        Enable, disable or configure an integration. Every integration accepts
+        `status`; the rest of the accepted keys depend on which integration it
+        is, and anything else is ignored.
+
+        - `SiteScanIntegration` also accepts `scan_frequency` (`weekly` or
+          `monthly`; weekly is not available on free accounts) and
+          `auto_add_vendors`.
+        - `GoogleConsentModeIntegration` also accepts `url_passthrough` and
+          `ads_data_redaction`.
+
+        Enabling an integration may add its associated vendors to the account.
+      operationId: updateIntegration
+      tags:
+        - Integrations
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Integration settings to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntegrationWriteRequest"
+      responses:
+        "200":
+          description: Updated integration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # scan endpoints - index, GET & POST
+  /scans:
+    get:
+      summary: List scans
+      description: |
+        List the account's website scans, newest first. Requires an
+        account-scoped API token.
+      operationId: listScans
+      tags:
+        - Scans
+      parameters:
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of scans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Scan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    post:
+      summary: Start a scan
+      description: |
+        Queue a scan of the account's website. Only one scan can run at a time
+        per account, and accounts have a daily scan limit — both come back as a
+        `422`.
+
+        Scanning is asynchronous: the scan is created `queued`, and the report
+        appears on the scan once its status reaches `completed`.
+      operationId: createScan
+      tags:
+        - Scans
+      requestBody:
+        description: Scan to queue
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScanWriteRequest"
+      responses:
+        "201":
+          description: Queued scan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /scans/{id}:
+    get:
+      summary: Get scan
+      description: |
+        Get a scan by ID. `report` is only present once the scan has completed;
+        poll `status` until then.
+      operationId: getScan
+      tags:
+        - Scans
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Scan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # TCF vendor endpoints - index, GET, POST & DELETE
+  /tcf-vendors:
+    get:
+      summary: List TCF vendors
+      description: |
+        List the IAB TCF vendors enabled on the account, in global vendor ID
+        order. Requires an account-scoped API token.
+      operationId: listTcfVendors
+      tags:
+        - TCF Vendors
+      parameters:
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of TCF vendors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TcfVendor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    post:
+      summary: Add a TCF vendor
+      description: |
+        Add a vendor from the IAB Global Vendor List to the account, one at a
+        time, so you can reconcile against your own list without restating it.
+
+        Re-adding a vendor that was previously removed restores the original
+        record rather than creating a second one. A vendor already on the
+        account, or an ID that isn't in the Global Vendor List, returns a `422`.
+      operationId: createTcfVendor
+      tags:
+        - TCF Vendors
+      requestBody:
+        description: Vendor to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TcfVendorWriteRequest"
+      responses:
+        "201":
+          description: The added vendor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TcfVendorResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /tcf-vendors/{id}:
+    get:
+      summary: Get TCF vendor
+      description: Get TCF vendor by ID
+      operationId: getTcfVendor
+      tags:
+        - TCF Vendors
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: TCF vendor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TcfVendorResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    delete:
+      summary: Remove a TCF vendor
+      description: |
+        Remove a vendor from the account. The record is soft-deleted, so adding
+        the vendor again later restores it.
+      operationId: deleteTcfVendor
+      tags:
+        - TCF Vendors
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: TCF vendor removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "TCF vendor was deleted successfully"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
 components:
   securitySchemes:
     authorization:
@@ -1083,6 +1754,19 @@ components:
             errors:
               - code: 401
                 message: "API key must belong to a partner"
+
+    AccountAdminRequired:
+      description: |
+        The token resolved to a user who is not an admin of this account.
+        Account tokens carry the account's own authority and never see this.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 403
+                message: "User must be an admin of this account"
 
     NotFound:
       description: The record does not exist, or does not belong to the caller
@@ -2157,6 +2841,603 @@ components:
               previous_period: 27.0
         created_at: "2022-12-20T18:45:00Z"
         updated_at: "2023-01-10T19:00:00Z"
+
+    AccountWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          description: |
+            The account's domain. Must be a valid domain for website accounts.
+        domain:
+          type: string
+        subdomain:
+          type: string
+        default_language:
+          type: string
+          description: ISO 639-1 code the banner falls back to
+        auto_translate:
+          type: boolean
+          description: Whether new content is machine-translated into the account's languages
+        translations:
+          type: array
+          items:
+            type: string
+          description: ISO 639-1 codes the banner is translated into
+        allowed_domains_list:
+          type: string
+          description: Comma-separated list of domains the script may run on
+        industry:
+          type: string
+        description:
+          type: string
+        support_email:
+          type: string
+          format: email
+        privacy_policy_url:
+          type: string
+        banner_debug_mode:
+          type: boolean
+        blocking_mode:
+          type: string
+          description: How aggressively scripts are blocked before consent
+        retain_consent_duration:
+          type: integer
+          description: |
+            Years consent records are retained. Free accounts are fixed at 3.
+
+    AccountWriteRequest:
+      type: object
+      properties:
+        account:
+          $ref: "#/components/schemas/AccountWrite"
+      required:
+        - account
+      example:
+        account:
+          name: "example.com"
+          support_email: "privacy@example.com"
+          banner_debug_mode: false
+
+    SiteServiceWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the service, shown to visitors
+        category_id:
+          type: string
+          description: |
+            ID of the category the service belongs to. Required on create;
+            on update, supplying it moves the service to that category.
+        description:
+          type: string
+          description: Description shown to visitors
+        processing_company:
+          type: string
+          description: Company that processes data through this service
+        privacy_policy_url:
+          type: string
+        additional_info:
+          type: string
+        accepted_by_default:
+          type: boolean
+          description: Whether the service is pre-accepted in the banner
+        enabled:
+          type: boolean
+          description: Whether the service is active on the account
+        auto_block:
+          type: boolean
+          description: Whether the widget blocks this service's scripts before consent
+        auto_block_domains_input:
+          type: string
+          description: |
+            Domains to auto-block, separated by commas or newlines. Parsed into
+            the `auto_block_domains` list on save.
+      required:
+        - name
+
+    SiteServiceWriteRequest:
+      type: object
+      properties:
+        site_service:
+          $ref: "#/components/schemas/SiteServiceWrite"
+      required:
+        - site_service
+      example:
+        site_service:
+          name: "Google Analytics"
+          category_id: "cat1"
+          processing_company: "Google LLC"
+          privacy_policy_url: "https://policies.google.com/privacy"
+          auto_block: true
+
+    SiteService:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: [string, "null"]
+        processing_company:
+          type: [string, "null"]
+        privacy_policy_url:
+          type: [string, "null"]
+        additional_info:
+          type: [string, "null"]
+        accepted_by_default:
+          type: boolean
+        enabled:
+          type: boolean
+        auto_block:
+          type: boolean
+        auto_block_domains:
+          type: array
+          items:
+            type: string
+          description: Domains the widget blocks for this service before consent
+        default_language:
+          type: [string, "null"]
+        category:
+          type: object
+          description: The category this service is filed under
+          properties:
+            id:
+              type: [string, "null"]
+            name:
+              type: [string, "null"]
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "svc1"
+        name: "Google Analytics"
+        description: "Measures how visitors use the site."
+        processing_company: "Google LLC"
+        privacy_policy_url: "https://policies.google.com/privacy"
+        additional_info: null
+        accepted_by_default: false
+        enabled: true
+        auto_block: true
+        auto_block_domains: ["google-analytics.com"]
+        default_language: "en"
+        category:
+          id: "cat1"
+          name: "Analytics"
+        created_at: "2023-03-01T09:00:00Z"
+        updated_at: "2023-03-23T12:34:56Z"
+
+    SiteServiceResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/SiteService"
+
+    ConsentBannerWrite:
+      type: object
+      description: |
+        The banner attributes the dashboard's banner designer can set. The full
+        set is large; the commonly used ones are listed here, and any other
+        attribute the designer exposes is accepted too.
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+          description: Whether the banner is live. New banners are always created disabled.
+        enable_tcf:
+          type: boolean
+          description: Whether the banner runs in IAB TCF mode
+        force_consent:
+          type: boolean
+          description: Whether the page is blocked until the visitor chooses
+        consent_mode:
+          type: string
+          description: e.g. `opt_in`, `opt_out`
+        consent_duration_days:
+          type: integer
+          description: How long a visitor's choice is remembered
+        consent_layout:
+          type: string
+          description: e.g. `box`, `bar`
+        consent_position:
+          type: string
+          description: e.g. `bottom_center`
+        consent_title:
+          type: string
+        consent_description:
+          type: string
+        privacy_policy_url:
+          type: string
+        preferences_control_level:
+          type: string
+          description: How granular the preferences modal is
+        dark_mode:
+          type: string
+          description: e.g. `light`, `dark`, `auto`
+        language_autodetect:
+          type: string
+        target_type:
+          type: string
+          description: Who sees the banner, e.g. `worldwide`, `selected_countries`
+        target_countries:
+          type: array
+          items:
+            type: string
+          description: ISO 3166-1 alpha-2 codes
+        target_us_states:
+          type: array
+          items:
+            type: string
+
+    ConsentBannerWriteRequest:
+      type: object
+      properties:
+        consent_banner:
+          $ref: "#/components/schemas/ConsentBannerWrite"
+      required:
+        - consent_banner
+      example:
+        consent_banner:
+          name: "EU banner"
+          consent_title: "We use cookies"
+          consent_mode: "opt_in"
+          target_type: "selected_countries"
+          target_countries: ["DE", "FR"]
+
+    ConsentBanner:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        enabled:
+          type: boolean
+        enable_tcf:
+          type: boolean
+        force_consent:
+          type: boolean
+        consent_mode:
+          type: string
+        consent_duration_days:
+          type: integer
+        consent_layout:
+          type: string
+        consent_position:
+          type: string
+        consent_title:
+          type: [string, "null"]
+        consent_description:
+          type: [string, "null"]
+        privacy_policy_url:
+          type: [string, "null"]
+        preferences_control_level:
+          type: string
+        dark_mode:
+          type: string
+        language_autodetect:
+          type: string
+        revision:
+          type: integer
+          readOnly: true
+          description: Bumped when a change requires visitors to consent again
+        targeting:
+          type: object
+          properties:
+            target_type:
+              type: string
+            target_countries:
+              type: array
+              items:
+                type: string
+            target_us_states:
+              type: array
+              items:
+                type: string
+        languages:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: ISO 639-1 codes this banner has translations for
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "ban1"
+        name: "EU banner"
+        enabled: true
+        enable_tcf: false
+        force_consent: false
+        consent_mode: "opt_in"
+        consent_duration_days: 180
+        consent_layout: "box"
+        consent_position: "bottom_center"
+        consent_title: "We use cookies"
+        consent_description: "We use cookies to improve your experience."
+        privacy_policy_url: "https://example.com/privacy"
+        preferences_control_level: "category_and_services"
+        dark_mode: "light"
+        language_autodetect: "document"
+        revision: 2
+        targeting:
+          target_type: "selected_countries"
+          target_countries: ["DE", "FR"]
+          target_us_states: []
+        languages: ["en", "de", "fr"]
+        created_at: "2023-01-05T10:15:30Z"
+        updated_at: "2023-02-01T08:00:00Z"
+
+    ConsentBannerResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/ConsentBanner"
+
+    IntegrationWrite:
+      type: object
+      description: |
+        `status` applies to every integration. The remaining keys are only
+        accepted by the integration that declares them; anything else is ignored.
+      properties:
+        status:
+          type: string
+          enum: [active, inactive]
+        scan_frequency:
+          type: string
+          enum: [weekly, monthly]
+          description: |
+            `SiteScanIntegration` only. Weekly is not available on free accounts.
+        auto_add_vendors:
+          type: boolean
+          description: "`SiteScanIntegration` only: add vendors a scan discovers."
+        url_passthrough:
+          type: boolean
+          description: "`GoogleConsentModeIntegration` only."
+        ads_data_redaction:
+          type: boolean
+          description: "`GoogleConsentModeIntegration` only."
+
+    IntegrationWriteRequest:
+      type: object
+      properties:
+        integration:
+          $ref: "#/components/schemas/IntegrationWrite"
+      required:
+        - integration
+      example:
+        integration:
+          status: "active"
+          scan_frequency: "monthly"
+          auto_add_vendors: true
+
+    Integration:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+          description: The integration class, e.g. `SiteScanIntegration`
+        name:
+          type: string
+          readOnly: true
+          description: Human-readable name
+        status:
+          type: string
+          enum: [active, inactive]
+        short_description:
+          type: [string, "null"]
+          readOnly: true
+        settings:
+          type: [object, "null"]
+          additionalProperties: true
+          description: Integration-specific settings
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "int1"
+        type: "SiteScanIntegration"
+        name: "Site Scan"
+        status: "active"
+        short_description: "Scan your website for cookies on a schedule."
+        settings:
+          scan_frequency: "monthly"
+          auto_add_vendors: false
+        created_at: "2023-01-05T10:15:30Z"
+        updated_at: "2023-02-01T08:00:00Z"
+
+    IntegrationResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Integration"
+
+    ScanWrite:
+      type: object
+      properties:
+        starting_url:
+          type: string
+          description: |
+            URL the crawl starts from. A missing scheme is treated as `https://`.
+            Defaults to the account's own domain when omitted.
+        max_pages:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Maximum pages to crawl
+        crawl_subdomains:
+          type: boolean
+          description: Whether the crawl follows links onto subdomains
+
+    ScanWriteRequest:
+      type: object
+      properties:
+        scan:
+          $ref: "#/components/schemas/ScanWrite"
+      required:
+        - scan
+      example:
+        scan:
+          starting_url: "https://example.com"
+          max_pages: 25
+          crawl_subdomains: false
+
+    Scan:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          enum: [queued, in_progress, completed, failed]
+          readOnly: true
+        starting_url:
+          type: string
+        domain:
+          type: string
+          readOnly: true
+          description: Host derived from `starting_url`, without a `www.` prefix
+        max_pages:
+          type: [integer, "null"]
+        crawl_subdomains:
+          type: boolean
+        response_code:
+          type: [string, "null"]
+          readOnly: true
+        report:
+          type: object
+          readOnly: true
+          description: |
+            Only present once `status` is `completed`. Storage items found
+            before and after consent, grouped by vendor and storage type.
+          properties:
+            before_consent:
+              type: object
+              additionalProperties: true
+            after_consent:
+              type: object
+              additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "scn1"
+        status: "queued"
+        starting_url: "https://example.com"
+        domain: "example.com"
+        max_pages: 25
+        crawl_subdomains: false
+        response_code: null
+        created_at: "2023-03-01T09:00:00Z"
+        updated_at: "2023-03-01T09:00:00Z"
+
+    ScanResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Scan"
+
+    TcfVendorWrite:
+      type: object
+      properties:
+        global_vendor_id:
+          type: integer
+          description: ID of the vendor in the IAB Global Vendor List
+      required:
+        - global_vendor_id
+
+    TcfVendorWriteRequest:
+      type: object
+      properties:
+        tcf_vendor:
+          $ref: "#/components/schemas/TcfVendorWrite"
+      required:
+        - tcf_vendor
+      example:
+        tcf_vendor:
+          global_vendor_id: 755
+
+    TcfVendor:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        global_vendor_id:
+          type: integer
+        status:
+          type: string
+          enum: [active, removed]
+          readOnly: true
+        vendor:
+          type: object
+          readOnly: true
+          description: |
+            Details from the IAB Global Vendor List. Empty when the ID has been
+            retired upstream, since the list is not stored per account.
+          properties:
+            name:
+              type: [string, "null"]
+            urls:
+              type: [array, "null"]
+              items:
+                type: object
+                additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "tcf1"
+        global_vendor_id: 755
+        status: "active"
+        vendor:
+          name: "Google Advertising Products"
+          urls:
+            - langId: "en"
+              privacy: "https://policies.google.com/privacy"
+        created_at: "2023-01-05T10:15:30Z"
+        updated_at: "2023-01-05T10:15:30Z"
+
+    TcfVendorResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/TcfVendor"
 
 security:
   - authorization: []
