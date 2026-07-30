@@ -3078,6 +3078,36 @@ components:
           description: |
             Domains to auto-block, separated by commas or newlines. Parsed into
             the `auto_block_domains` list on save.
+        site_service_translations_attributes:
+          type: array
+          description: |
+            Create, update or discard the localized copy a visitor reads when the
+            banner runs in another language. Send an entry without an `id` to add
+            a translation, with the `id` the response gave you to change one, and
+            with `discarded_at` set to remove one. Unlike banner translations
+            there is no plan entitlement behind these, so they can be supplied
+            when creating the service.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: |
+                  The translation's ID, as returned in `translations`. Omit it to
+                  add a new translation.
+              language_code:
+                type: string
+                description: |
+                  The language this copy is for. Cannot be the service's own
+                  `default_language`, and each language may appear once.
+              description:
+                type: [string, "null"]
+              additional_info:
+                type: [string, "null"]
+              discarded_at:
+                type: [string, "null"]
+                format: date-time
+                description: Set to remove this translation
 
     SiteServiceCreate:
       description: |
@@ -3156,6 +3186,23 @@ components:
               type: [string, "null"]
             name:
               type: [string, "null"]
+        translations:
+          type: array
+          description: |
+            The localized copy for this service, one entry per language, with the
+            IDs `site_service_translations_attributes` expects back. Discarded
+            translations are not returned.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              language_code:
+                type: string
+              description:
+                type: [string, "null"]
+              additional_info:
+                type: [string, "null"]
         created_at:
           type: string
           format: date-time
@@ -3179,6 +3226,11 @@ components:
         category:
           id: "cat1"
           name: "Analytics"
+        translations:
+          - id: "svct1"
+            language_code: "de"
+            description: "Misst, wie Besucher die Website nutzen."
+            additional_info: null
         created_at: "2023-03-01T09:00:00Z"
         updated_at: "2023-03-23T12:34:56Z"
 
@@ -3188,7 +3240,7 @@ components:
         data:
           $ref: "#/components/schemas/SiteService"
 
-    ConsentBannerWrite:
+    ConsentBannerSettings:
       type: object
       description: |
         Every setting the banner designer exposes. The response returns the same
@@ -3238,9 +3290,6 @@ components:
         enable_tcf:
           type: boolean
           description: Whether the banner runs in IAB TCF mode
-        enabled:
-          type: boolean
-          description: Whether the banner is live. New banners are always created disabled.
         equal_weight_buttons:
           type: boolean
         floating_preferences_icon_position:
@@ -3324,6 +3373,19 @@ components:
             type: string
           description: Colour overrides, keyed by button element
 
+    ConsentBannerWrite:
+      description: |
+        Every setting the banner designer exposes, plus whether the banner is
+        live. Creating a banner uses ConsentBannerSettings instead, which is this
+        same set without `enabled`.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerSettings"
+        - type: object
+          properties:
+            enabled:
+              type: boolean
+              description: Whether the banner is live.
+
     ConsentBannerUpdate:
       description: |
         Everything a banner accepts on update, including its translations.
@@ -3391,15 +3453,12 @@ components:
 
     ConsentBannerCreate:
       description: |
-        The create payload. `enabled` is absent because a new banner is always
-        created disabled — enable it with an update once its content and
-        targeting are set.
+        The create payload: every banner setting except `enabled`, which is not
+        part of it because a new banner is always created disabled — enable it
+        with an update once its content and targeting are set. Sending `enabled`
+        anyway is not an error, the value is simply ignored.
       allOf:
-        - $ref: "#/components/schemas/ConsentBannerWrite"
-        - type: object
-          properties:
-            enabled:
-              not: {}
+        - $ref: "#/components/schemas/ConsentBannerSettings"
 
     ConsentBannerCreateRequest:
       type: object
