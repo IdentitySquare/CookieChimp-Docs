@@ -1243,7 +1243,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ConsentBannerWriteRequest"
+              $ref: "#/components/schemas/ConsentBannerCreateRequest"
       responses:
         "201":
           description: Created consent banner
@@ -1303,7 +1303,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ConsentBannerWriteRequest"
+              $ref: "#/components/schemas/ConsentBannerUpdateRequest"
       responses:
         "200":
           description: Updated consent banner
@@ -1726,9 +1726,9 @@ components:
         key resolves to on its own.
 
         Optional for reads, where it narrows the request to that account.
-        Required for writes when the key can reach more than one account:
-        without it the request would act on an account it picked rather than one
-        you named, so it is refused with a `400`.
+        Required for writes that declare it when the key can reach more than one
+        account: without it the request would act on an account it picked rather
+        than one you named, so it is refused with a `400`.
       required: false
       schema:
         type: string
@@ -3201,6 +3201,12 @@ components:
           description: |
             Province and territory codes, used when `target_type` is
             `selected_canadian_provinces`.
+    ConsentBannerUpdate:
+      description: |
+        Everything a banner accepts on update, including its translations.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerWrite"
+      properties:
         banner_languages_attributes:
           type: object
           description: |
@@ -3243,11 +3249,22 @@ components:
                 format: date-time
                 description: Set to remove this translation
 
-    ConsentBannerWriteRequest:
+    ConsentBannerCreateRequest:
       type: object
+      description: |
+        Translations are not accepted here — add them by updating the banner,
+        which is where the account's language entitlement is enforced.
       properties:
         consent_banner:
           $ref: "#/components/schemas/ConsentBannerWrite"
+      required:
+        - consent_banner
+
+    ConsentBannerUpdateRequest:
+      type: object
+      properties:
+        consent_banner:
+          $ref: "#/components/schemas/ConsentBannerUpdate"
       required:
         - consent_banner
       example:

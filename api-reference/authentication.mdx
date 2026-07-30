@@ -98,7 +98,7 @@ Two endpoints take their body unwrapped: [Log in](/api-reference/auth/login), wh
 
 An account API key identifies exactly one account, so there is nothing to choose. A user API key can reach several, and the endpoints that declare an `account_id` query parameter — the account's API id — let you say which one you mean. Endpoints that don't declare it act on the account the key resolves to on its own.
 
-For reads it is optional and narrows the request. For writes it is required whenever the key can reach more than one account: without it the request would act on an account it picked rather than one you named, so it is refused with a `400`.
+Where an endpoint accepts it, reads treat it as optional — it just narrows the request — while writes require it whenever the key can reach more than one account: without it the request would act on an account it picked rather than one you named, so it is refused with a `400`. Endpoints that don't accept the parameter are unaffected either way.
 
 ```
 POST /api/v1/consent-banners?account_id=aBcD1234
