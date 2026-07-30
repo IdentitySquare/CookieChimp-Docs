@@ -3043,7 +3043,7 @@ components:
           support_email: "privacy@example.com"
           banner_debug_mode: false
 
-    SiteServiceWrite:
+    SiteServiceSettings:
       type: object
       properties:
         name:
@@ -3078,43 +3078,62 @@ components:
           description: |
             Domains to auto-block, separated by commas or newlines. Parsed into
             the `auto_block_domains` list on save.
-        site_service_translations_attributes:
-          type: array
-          description: |
-            Create, update or discard the localized copy a visitor reads when the
-            banner runs in another language. Send an entry without an `id` to add
-            a translation, with the `id` the response gave you to change one, and
-            with `discarded_at` set to remove one. Unlike banner translations
-            there is no plan entitlement behind these, so they can be supplied
-            when creating the service.
-          items:
-            type: object
-            properties:
-              id:
-                type: string
+
+    SiteServiceWrite:
+      description: |
+        Everything a service accepts on update, including its translations.
+      allOf:
+        - $ref: "#/components/schemas/SiteServiceSettings"
+        - type: object
+          properties:
+            site_service_translations_attributes:
+              type: array
+              description: |
+                Create, update or discard the localized copy a visitor reads when the
+                banner runs in another language. Send an entry without an `id` to add
+                a translation, with the `id` the response gave you to change one, and
+                with `discarded_at` set to remove one.
+
+                Not accepted when creating a service — add them by updating it, which
+                is where the account's language entitlement is enforced.
+              items:
+                type: object
                 description: |
-                  The translation's ID, as returned in `translations`. Omit it to
-                  add a new translation.
-              language_code:
-                type: string
-                description: |
-                  The language this copy is for. Cannot be the service's own
-                  `default_language`, and each language may appear once.
-              description:
-                type: [string, "null"]
-              additional_info:
-                type: [string, "null"]
-              discarded_at:
-                type: [string, "null"]
-                format: date-time
-                description: Set to remove this translation
+                  An entry without an `id` creates a translation and must name its
+                  `language_code`; an entry with one may send only the fields it
+                  changes.
+                anyOf:
+                  - required: [id]
+                  - required: [language_code]
+                properties:
+                  id:
+                    type: string
+                    description: |
+                      The translation's ID, as returned in `translations`. Omit it to
+                      add a new translation.
+                  language_code:
+                    type: string
+                    description: |
+                      The language this copy is for. Cannot be the service's own
+                      `default_language`, and each language may appear once.
+                  description:
+                    type: [string, "null"]
+                  additional_info:
+                    type: [string, "null"]
+                  discarded_at:
+                    type: [string, "null"]
+                    format: date-time
+                    description: Set to remove this translation
 
     SiteServiceCreate:
       description: |
         A service is always filed under a category, so `category_id` is
-        required here even though it is optional when updating.
+        required here even though it is optional when updating. Translations are
+        absent for the same reason they are on banners — add them by updating
+        the service, which is where the account's language entitlement is
+        enforced. Sending them anyway is not an error, they are simply ignored.
       allOf:
-        - $ref: "#/components/schemas/SiteServiceWrite"
+        - $ref: "#/components/schemas/SiteServiceSettings"
       required:
         - name
         - category_id
@@ -3405,6 +3424,13 @@ components:
                 one, and set `discarded_at` to remove it.
               additionalProperties:
                 type: object
+                description: |
+                  An entry without an `id` creates a translation and must name its
+                  `language_code`; an entry with one may send only the fields it
+                  changes.
+                anyOf:
+                  - required: [id]
+                  - required: [language_code]
                 properties:
                   id:
                     type: string
