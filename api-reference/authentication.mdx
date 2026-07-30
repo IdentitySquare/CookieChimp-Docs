@@ -90,7 +90,21 @@ Resource endpoints expect the resource wrapped under its own key rather than at 
 }
 ```
 
-The wrapper matches the resource: `category`, `storage_item`, `group`, `account_user`, `account_invitation`, and `user` for [Change password](/api-reference/auth/change-password).
+The wrapper matches the resource, though not always the path — `/services` wraps in `site_service`:
+
+| Endpoint | Wrapper |
+|---|---|
+| `/categories` | `category` |
+| `/storage-items` | `storage_item` |
+| `/services` | `site_service` |
+| `/consent-banners` | `consent_banner` |
+| `/scans` | `scan` |
+| `/integrations` | `integration` |
+| `/accounts` | `account` |
+| `/groups` | `group` |
+| `/account-users` | `account_user` |
+| `/account-invitations` | `account_invitation` |
+| [Change password](/api-reference/auth/change-password) | `user` |
 
 Two endpoints take their body unwrapped: [Log in](/api-reference/auth/login), which takes `email` and `password` at the top level, and [Create consent banner from a template](/api-reference/consent-banners/create-consent-banner-from-template), which takes `jurisdiction_id` — a selector for which template to build from, not an attribute of the banner it creates.
 
