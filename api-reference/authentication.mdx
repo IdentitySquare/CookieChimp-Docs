@@ -101,7 +101,8 @@ The wrapper matches the resource: `category`, `storage_item`, `group`, `account_
 | List endpoints | `{ "pagination": { ... }, "data": [ ... ] }` |
 | Single resource | `{ "data": { ... } }` |
 | A single group or account | The resource itself, unwrapped |
-| Delete endpoints | `{ "message": "..." }` |
+| Resource-deletion endpoints | `{ "message": "..." }` |
+| [Log out](/api-reference/auth/logout) | `{}` |
 
 Group and account **listings** use the standard list envelope in the first row — only their single-resource responses are unwrapped.
 
@@ -153,10 +154,12 @@ Validation errors on groups and account users return the failing attributes dire
 }
 ```
 
-The `/auth` and `/password` endpoints return a single `error` string:
+Two specific failures return a single top-level `error` string: rejected credentials on [Log in](/api-reference/auth/login), and a wrong current password or invalid new password on [Change password](/api-reference/auth/change-password).
 
 ```json
 {
   "error": "Invalid Email or password."
 }
 ```
+
+This applies only to those two failures. Everything else on those endpoints — a missing or invalid bearer token, or a rate limit — uses the `errors` array shape above.

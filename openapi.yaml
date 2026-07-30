@@ -16,7 +16,8 @@ info:
     Listing endpoints — including `GET /groups` and `GET /accounts` — return
     `{"pagination": {...}, "data": [...]}`. Most single-resource endpoints
     return `{"data": {...}}`; a single group or account is returned unwrapped.
-    Delete endpoints return `{"message": "..."}`.
+    Resource-deletion endpoints return `{"message": "..."}`; `DELETE /auth`
+    returns an empty object.
   version: 1.2.0
 
 servers:
@@ -29,7 +30,9 @@ paths:
       summary: Log in
       description: |
         Exchange a user's email and password for an API token. This is the only
-        endpoint that does not require an `Authorization` header.
+        operation in this specification that does not require an
+        `Authorization` header — the API serves a few other public routes, such
+        as the widget and mobile SDK endpoints, that are not documented here.
 
         The token returned is the user's default API token; calling this endpoint
         again returns the same token rather than minting a new one.
