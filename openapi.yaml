@@ -3178,24 +3178,26 @@ components:
       type: object
       description: |
         Every setting the banner designer exposes. The response returns the same
-        set, so a banner can be read, edited and sent back unchanged.
+        set, so a banner can be read, edited and sent back unchanged. Fields the
+        database leaves nullable are declared nullable here too — the response
+        returns null for unset copy, and the same shape has to be sendable back.
       properties:
         banner_accept_btn_text:
-          type: string
+          type: [string, "null"]
         banner_accept_necessary_btn_text:
-          type: string
+          type: [string, "null"]
         banner_footer_content:
-          type: string
+          type: [string, "null"]
         banner_preferences_btn_text:
-          type: string
+          type: [string, "null"]
         btn_border_radius:
           type: string
         consent_additional_description:
-          type: string
+          type: [string, "null"]
         consent_button_placement:
           type: string
         consent_description:
-          type: string
+          type: [string, "null"]
         consent_duration_days:
           type: integer
           description: How long a visitor's choice is remembered
@@ -3209,14 +3211,14 @@ components:
           type: string
           description: e.g. `bottom_center`
         consent_title:
-          type: string
+          type: [string, "null"]
         dark_mode:
           type: string
           description: e.g. `light`, `dark`, `auto`
         do_not_sell_description:
-          type: string
+          type: [string, "null"]
         do_not_sell_title:
-          type: string
+          type: [string, "null"]
         enable_banner_footer:
           type: boolean
         enable_tcf:
@@ -3235,36 +3237,36 @@ components:
         language_autodetect:
           type: string
         logo_url_dark:
-          type: string
+          type: [string, "null"]
         logo_url_light:
-          type: string
+          type: [string, "null"]
         modal_border_radius:
           type: string
         name:
           type: string
         preferences_accept_btn_text:
-          type: string
+          type: [string, "null"]
         preferences_accept_necessary_btn_text:
-          type: string
+          type: [string, "null"]
         preferences_control_level:
           type: string
           description: How granular the preferences modal is
         privacy_policy_url:
-          type: string
+          type: [string, "null"]
         save_preferences_btn_text:
-          type: string
+          type: [string, "null"]
         settings_description:
-          type: string
+          type: [string, "null"]
         settings_layout:
           type: string
         settings_more_info:
-          type: string
+          type: [string, "null"]
         settings_more_info_title:
-          type: string
+          type: [string, "null"]
         settings_position_x:
           type: string
         settings_title:
-          type: string
+          type: [string, "null"]
         show_banner_accept_btn:
           type: boolean
         show_banner_accept_necessary_btn:
@@ -3285,9 +3287,28 @@ components:
           type: boolean
         swap_buttons:
           type: boolean
+        target_canadian_regions:
+          type: array
+          items:
+            type: string
+          description: Province and territory codes, used when `target_type` is `selected_canadian_provinces`. Shares a column with `target_us_states`.
+        target_countries:
+          type: array
+          items:
+            type: string
+          description: ISO 3166-1 alpha-2 codes
         target_type:
           type: string
           description: Who sees the banner, e.g. `worldwide`, `selected_countries`
+        target_us_states:
+          type: array
+          items:
+            type: string
+        button_colors:
+          type: object
+          additionalProperties:
+            type: string
+          description: Colour overrides, keyed by button element
 
     ConsentBannerUpdate:
       description: |
@@ -3408,12 +3429,6 @@ components:
               type: string
             consent_position:
               type: string
-            consent_title:
-              type: [string, "null"]
-            consent_description:
-              type: [string, "null"]
-            privacy_policy_url:
-              type: [string, "null"]
             preferences_control_level:
               type: string
             dark_mode:
