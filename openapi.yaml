@@ -1074,6 +1074,8 @@ paths:
                 $ref: "#/components/schemas/SiteServiceResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           description: The referenced `category_id` does not belong to this account
           content:
@@ -1134,6 +1136,8 @@ paths:
                 $ref: "#/components/schemas/SiteServiceResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -1160,6 +1164,8 @@ paths:
                 message: "Service was deleted successfully"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "429":
@@ -1206,6 +1212,10 @@ paths:
         recently updated banner, the same way the dashboard's new-banner flow
         does, and is always created disabled — enable it once its content and
         targeting are set. A name is generated if you don't supply one.
+
+        Translations are not accepted here; add them by updating the banner
+        afterwards, which is where the account's language entitlement is
+        enforced.
       operationId: createConsentBanner
       tags:
         - Consent Banners
@@ -1225,6 +1235,8 @@ paths:
                 $ref: "#/components/schemas/ConsentBannerResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "422":
           $ref: "#/components/responses/ValidationError"
         "429":
@@ -1279,6 +1291,8 @@ paths:
                 $ref: "#/components/schemas/ConsentBannerResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -1305,6 +1319,8 @@ paths:
                 message: "Consent banner was deleted successfully"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "429":
@@ -1330,6 +1346,8 @@ paths:
                 $ref: "#/components/schemas/ConsentBannerResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -1345,6 +1363,9 @@ paths:
         List every integration available to the account, active and inactive.
         Integrations the account has never opened are created inactive on first
         listing, so the collection is always the full set you can enable.
+
+        Only integrations the account's platform can run are included — a mobile
+        app account does not see the website-only ones.
       operationId: listIntegrations
       tags:
         - Integrations
@@ -1430,6 +1451,8 @@ paths:
                 $ref: "#/components/schemas/IntegrationResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -1476,7 +1499,7 @@ paths:
       description: |
         Queue a scan of the account's website. Only one scan can run at a time
         per account, and accounts have a daily scan limit — both come back as a
-        `422`.
+        `422`, as does a mobile app account, which has no website to crawl.
 
         Scanning is asynchronous: the scan is created `queued`, and the report
         appears on the scan once its status reaches `completed`.
@@ -1499,6 +1522,8 @@ paths:
                 $ref: "#/components/schemas/ScanResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "422":
           $ref: "#/components/responses/ValidationError"
         "429":
@@ -1591,6 +1616,8 @@ paths:
                 $ref: "#/components/schemas/TcfVendorResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "422":
           $ref: "#/components/responses/ValidationError"
         "429":
@@ -1640,6 +1667,8 @@ paths:
                 message: "TCF vendor was deleted successfully"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "429":
@@ -1758,7 +1787,10 @@ components:
     AccountAdminRequired:
       description: |
         The token resolved to a user who is not an admin of this account.
-        Account tokens carry the account's own authority and never see this.
+        Configuration changes are admin-only, mirroring the dashboard — a group
+        admin qualifies even without a direct membership, since a group role
+        supersedes one. Account tokens carry the account's own authority and
+        never see this; reads are unaffected.
       content:
         application/json:
           schema:
@@ -2874,8 +2906,6 @@ components:
         support_email:
           type: string
           format: email
-        privacy_policy_url:
-          type: string
         banner_debug_mode:
           type: boolean
         blocking_mode:
@@ -3167,12 +3197,20 @@ components:
               type: array
               items:
                 type: string
-        languages:
+        translations:
           type: array
-          items:
-            type: string
           readOnly: true
-          description: ISO 639-1 codes this banner has translations for
+          description: |
+            The banner's translations. The `id` is what you send back in
+            `banner_languages_attributes` to update or discard one.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              language_code:
+                type: string
+                description: ISO 639-1 code
         created_at:
           type: string
           format: date-time
@@ -3202,7 +3240,11 @@ components:
           target_type: "selected_countries"
           target_countries: ["DE", "FR"]
           target_us_states: []
-        languages: ["en", "de", "fr"]
+        translations:
+          - id: "trn1"
+            language_code: "de"
+          - id: "trn2"
+            language_code: "fr"
         created_at: "2023-01-05T10:15:30Z"
         updated_at: "2023-02-01T08:00:00Z"
 
