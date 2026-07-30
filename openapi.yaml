@@ -8,8 +8,11 @@ info:
 
     Resource endpoints expect the resource wrapped under its own key, e.g.
     `{"category": {"name": "Analytics"}}` rather than a bare object.
-    `PUT /password` wraps in `user`. `POST /auth` is the exception: it takes
-    `email` and `password` at the top level.
+    `PUT /password` wraps in `user`. Two endpoints take their body unwrapped:
+    `POST /auth`, which takes `email` and `password` at the top level, and
+    `POST /consent-banners/from-template`, which takes `jurisdiction_id` —
+    a selector for which template to build from, not an attribute of the
+    banner it creates.
 
     ## Response envelopes
 
@@ -140,6 +143,7 @@ paths:
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -164,6 +168,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create category
       description: Create a new category for the current account.
       operationId: createCategory
@@ -198,6 +204,7 @@ paths:
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -220,6 +227,7 @@ paths:
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Category to update
@@ -251,6 +259,7 @@ paths:
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -277,6 +286,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -301,6 +311,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create storage item
       description: Create a new storage item for the current account.
       operationId: createStorageItem
@@ -341,6 +353,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -363,6 +376,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Storage item to update
@@ -394,6 +408,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -539,6 +554,7 @@ paths:
       tags:
         - Consents
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -570,6 +586,7 @@ paths:
       tags:
         - Consents
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -596,6 +613,7 @@ paths:
       tags:
         - AI Actions
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -627,6 +645,7 @@ paths:
       tags:
         - AI Actions
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -755,6 +774,7 @@ paths:
       tags:
         - Account Users
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -786,6 +806,7 @@ paths:
       tags:
         - Account Users
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -808,6 +829,7 @@ paths:
       tags:
         - Account Users
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Account user to update
@@ -841,6 +863,7 @@ paths:
       tags:
         - Account Users
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -876,6 +899,7 @@ paths:
       tags:
         - Account Invitations
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -900,6 +924,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create account invitation
       description: |
         Invite someone to the current account and email them the invitation.
@@ -946,6 +972,7 @@ paths:
       tags:
         - Account Invitations
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -968,6 +995,7 @@ paths:
       tags:
         - Account Invitations
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Invitation to update
@@ -999,6 +1027,7 @@ paths:
       tags:
         - Account Invitations
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1027,6 +1056,7 @@ paths:
       tags:
         - Services
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -1051,6 +1081,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create service
       description: |
         Create a service under one of the account's categories. `category_id`
@@ -1097,6 +1129,7 @@ paths:
       tags:
         - Services
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1121,6 +1154,7 @@ paths:
       tags:
         - Services
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Service to update
@@ -1156,6 +1190,7 @@ paths:
       tags:
         - Services
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1188,6 +1223,7 @@ paths:
       tags:
         - Consent Banners
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -1212,6 +1248,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create consent banner
       description: |
         Create a consent banner. It inherits the design of the account's most
@@ -1258,6 +1296,7 @@ paths:
       tags:
         - Consent Banners
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1282,6 +1321,7 @@ paths:
       tags:
         - Consent Banners
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Consent banner to update
@@ -1317,6 +1357,7 @@ paths:
       tags:
         - Consent Banners
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1348,6 +1389,7 @@ paths:
       tags:
         - Consent Banners
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "201":
@@ -1384,6 +1426,7 @@ paths:
       tags:
         - Integrations
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -1415,6 +1458,7 @@ paths:
       tags:
         - Integrations
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1448,6 +1492,7 @@ paths:
       tags:
         - Integrations
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Integration settings to update
@@ -1487,6 +1532,7 @@ paths:
       tags:
         - Scans
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -1511,6 +1557,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Start a scan
       description: |
         Queue a scan of the account's website. Only one scan can run at a time
@@ -1557,6 +1605,7 @@ paths:
       tags:
         - Scans
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -1575,6 +1624,8 @@ paths:
   # compliance report
   /compliance:
     get:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Get the regional compliance report
       description: |
         Evaluate the account's banners against every regulation CookieChimp
@@ -1614,6 +1665,8 @@ paths:
   # banner templates
   /banner-templates:
     get:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: List banner templates
       description: |
         The jurisdiction templates a banner can be created from, grouped by
@@ -1636,6 +1689,8 @@ paths:
 
   /consent-banners/from-template:
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create consent banner from a template
       description: |
         Create a banner preconfigured for a jurisdiction — the consent mode,
@@ -1685,6 +1740,21 @@ components:
       description: API token obtained from the login endpoint or the dashboard
 
   parameters:
+    account_id:
+      name: account_id
+      in: query
+      description: |
+        Which account to act on, as the account's API id. Only meaningful for a
+        user API key, which may reach several accounts — an account key already
+        identifies exactly one and ignores this.
+
+        Optional for reads, where it narrows the request to that account.
+        Required for writes when the key can reach more than one account:
+        without it the request would act on an account it picked rather than one
+        you named, so it is refused with a `400`.
+      required: false
+      schema:
+        type: string
     id:
       name: id
       in: path

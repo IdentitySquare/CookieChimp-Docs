@@ -92,7 +92,17 @@ Resource endpoints expect the resource wrapped under its own key rather than at 
 
 The wrapper matches the resource: `category`, `storage_item`, `group`, `account_user`, `account_invitation`, and `user` for [Change password](/api-reference/auth/change-password).
 
-[Log in](/api-reference/auth/login) is the exception — it takes `email` and `password` at the top level, unwrapped.
+Two endpoints take their body unwrapped: [Log in](/api-reference/auth/login), which takes `email` and `password` at the top level, and [Create consent banner from a template](/api-reference/consent-banners/create-consent-banner-from-template), which takes `jurisdiction_id` — a selector for which template to build from, not an attribute of the banner it creates.
+
+## Choosing an account
+
+An account API key identifies exactly one account, so there is nothing to choose. A user API key can reach several, and account-scoped endpoints accept an `account_id` query parameter — the account's API id — to say which one you mean.
+
+For reads it is optional and narrows the request. For writes it is required whenever the key can reach more than one account: without it the request would act on an account it picked rather than one you named, so it is refused with a `400`.
+
+```
+POST /api/v1/consent-banners?account_id=aBcD1234
+```
 
 ## Response Envelopes
 
