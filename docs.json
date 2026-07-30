@@ -144,6 +144,14 @@
             ]
           },
           {
+            "group": "Auth",
+            "pages": [
+              "api-reference/auth/login",
+              "api-reference/auth/logout",
+              "api-reference/auth/change-password"
+            ]
+          },
+          {
             "group": "Partner Integration",
             "pages": [
               "api-reference/partner-api",

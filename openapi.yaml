@@ -1,26 +1,140 @@
 openapi: 3.1.0
 info:
   title: CookieChimp API
-  description: API for CookieChimp.com
-  version: 1.0.1
+  description: |
+    API for CookieChimp.com.
+
+    ## Request bodies
+
+    Write endpoints expect the resource wrapped under its own key, e.g.
+    `{"category": {"name": "Analytics"}}` rather than a bare object.
+
+    ## Response envelopes
+
+    Listing endpoints return `{"pagination": {...}, "data": [...]}`. Most
+    single-resource endpoints return `{"data": {...}}`; the group and account
+    endpoints return the resource unwrapped. Delete endpoints return
+    `{"message": "..."}`.
+  version: 1.2.0
 
 servers:
   - url: "https://cookiechimp.com/api/v1"
 
 paths:
+  # auth endpoints - token exchange and sign out
+  /auth:
+    post:
+      summary: Log in
+      description: |
+        Exchange a user's email and password for an API token. This is the only
+        endpoint that does not require an `Authorization` header.
+
+        The token returned is the user's default API token; calling this endpoint
+        again returns the same token rather than minting a new one.
+      operationId: login
+      tags:
+        - Auth
+      security: []
+      requestBody:
+        description: User credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: API token for the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    delete:
+      summary: Log out
+      description: |
+        Sign the current user out. Pass `notification_token` to also remove a
+        registered push notification token for that user.
+      operationId: logout
+      tags:
+        - Auth
+      parameters:
+        - name: notification_token
+          in: query
+          description: Push notification token to remove for the current user
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Signed out
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # password endpoint - change the current user's password
+  /password:
+    put:
+      summary: Change password
+      description: |
+        Change the password of the user the API token belongs to. The current
+        password must be supplied. Requires a user API token.
+      operationId: updatePassword
+      tags:
+        - Auth
+      requestBody:
+        description: Current and new password
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordUpdateRequest"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+              example:
+                success: true
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          description: The current password was wrong, or the new one was invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
   # category endpoints - GET, POST, PUT, DELETE
   /categories:
     get:
       summary: List categories
-      description: List all categories
+      description: List all categories for the current account. Requires an account-scoped API token.
       operationId: listCategories
       tags:
         - Categories
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: List of categories
@@ -30,23 +144,19 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/CategoryPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Category"
-
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
 
     post:
       summary: Create category
-      description: Create a new category
+      description: Create a new category for the current account.
       operationId: createCategory
       tags:
         - Categories
@@ -56,20 +166,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CategoryWrite"
+              $ref: "#/components/schemas/CategoryWriteRequest"
       responses:
         "201":
           description: Created category
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Category"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/CategoryResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
 
   /categories/{id}:
     get:
@@ -86,13 +194,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Category"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/CategoryResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
     put:
       summary: Update category
       description: Update category by ID
@@ -107,23 +214,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CategoryWrite"
+              $ref: "#/components/schemas/CategoryWriteRequest"
       responses:
         "200":
           description: Updated category
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Category"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/CategoryResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
     delete:
       summary: Delete category
-      description: Delete category by ID
+      description: Delete category by ID. The category is soft-deleted and stops appearing in listings.
       operationId: deleteCategory
       tags:
         - Categories
@@ -135,33 +243,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Category"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Category was deleted successfully"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   # storage item endpoints - GET, POST, PUT, DELETE
   /storage-items:
     get:
       summary: List storage items
-      description: List all storage items
+      description: List all storage items (cookies, local storage and session storage) for the current account.
       operationId: listStorageItems
       tags:
         - Storage Items
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
-        - name: category_id
-          in: query
-          description: ID of the category to filter by
-          required: false
-          schema:
-            type: string
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: List of storage items
@@ -171,23 +271,19 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/StorageItemPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/StorageItem"
-
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
 
     post:
       summary: Create storage item
-      description: Create a new storage item
+      description: Create a new storage item for the current account.
       operationId: createStorageItem
       tags:
         - Storage Items
@@ -197,20 +293,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StorageItemWrite"
+              $ref: "#/components/schemas/StorageItemWriteRequest"
       responses:
         "201":
           description: Created storage item
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StorageItem"
-        default:
-          description: unexpected error
+                $ref: "#/components/schemas/StorageItemResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          description: The referenced `category_id` or `site_service_id` does not belong to this account
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
 
   /storage-items/{id}:
     get:
@@ -227,13 +327,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StorageItem"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/StorageItemResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
     put:
       summary: Update storage item
       description: Update storage item by ID
@@ -248,23 +347,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StorageItemWrite"
+              $ref: "#/components/schemas/StorageItemWriteRequest"
       responses:
         "200":
           description: Updated storage item
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StorageItem"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/StorageItemResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
     delete:
       summary: Delete storage item
-      description: Delete storage item by ID
+      description: Delete storage item by ID. The item is soft-deleted and stops appearing in listings.
       operationId: deleteStorageItem
       tags:
         - Storage Items
@@ -276,19 +376,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StorageItem"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Storage item was deleted successfully"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
-  # groups endpoints - index, show, create, update
+  # group endpoints - index, GET, POST & PUT
   /groups:
     get:
       summary: List groups
-      description: List all groups belonging to the authenticated partner. Requires a partner API token.
+      description: List all groups for your partner. Requires a partner API token.
       operationId: listGroups
       tags:
         - Groups
@@ -304,15 +404,19 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/GroupPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Group"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/PartnerTokenRequired"
+
     post:
       summary: Create group
-      description: Create a new group under the authenticated partner. Requires a partner API token.
+      description: Create a new group under your partner. Requires a partner API token.
       operationId: createGroup
       tags:
         - Groups
@@ -322,7 +426,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GroupCreate"
+              $ref: "#/components/schemas/GroupCreateRequest"
       responses:
         "201":
           description: Created group
@@ -330,6 +434,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Group"
+        "401":
+          $ref: "#/components/responses/PartnerTokenRequired"
+        "422":
+          $ref: "#/components/responses/ModelValidationError"
 
   /groups/{id}:
     get:
@@ -347,9 +455,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Group"
+        "401":
+          $ref: "#/components/responses/PartnerTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
     put:
       summary: Update group
-      description: Update a group by ID. Requires a partner API token. Note that `max_pageviews_per_month` cannot be changed after creation.
+      description: |
+        Update a group by ID. Requires a partner API token. Only `name` and
+        `external_id` can be changed; the plan limits (`max_pageviews_per_month`
+        and `max_unique_visitors_per_month`) are set at creation time and are
+        ignored here.
       operationId: updateGroup
       tags:
         - Groups
@@ -361,7 +478,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GroupUpdate"
+              $ref: "#/components/schemas/GroupUpdateRequest"
       responses:
         "200":
           description: Updated group
@@ -369,178 +486,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Group"
+        "401":
+          $ref: "#/components/responses/PartnerTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ModelValidationError"
 
-  # sessions endpoints - index & GET
-  /sessions:
-    get:
-      summary: List sessions
-      description: List all sessions
-      operationId: listSessions
-      tags:
-        - Sessions
-      parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
-        - name: user_id
-          in: query
-          description: ID of the user to filter by
-          required: false
-          schema:
-            type: string
-      responses:
-        "200":
-          description: List of sessions
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/SessionIndex"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /sessions/{id}:
-    get:
-      summary: Get session
-      description: Get session by ID
-      operationId: getSession
-      tags:
-        - Sessions
-      parameters:
-        - $ref: "#/components/parameters/id"
-      responses:
-        "200":
-          description: Session
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Session"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  # pageviews endpoints - index & GET
-  /pageviews:
-    get:
-      summary: List pageviews
-      description: List all pageviews
-      operationId: listPageviews
-      tags:
-        - Pageviews
-      parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
-        - name: session_id
-          in: query
-          description: ID of the session to filter by
-          required: false
-          schema:
-            type: string
-        - name: user_id
-          in: query
-          description: ID of the user to filter by
-          required: false
-          schema:
-            type: string
-        - name: consent_id
-          in: query
-          description: ID of the consent to filter by
-          required: false
-          schema:
-            type: string
-        - name: url
-          in: query
-          description: URL of the pageview to filter by
-          required: false
-          schema:
-            type: string
-      responses:
-        "200":
-          description: List of pageviews
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Pageview"
-                  pagination:
-                    type: object
-                    $ref: "#/components/schemas/Pagination"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /pageviews/{id}:
-    get:
-      summary: Get pageview
-      description: Get pageview by ID
-      operationId: getPageview
-      tags:
-        - Pageviews
-      parameters:
-        - $ref: "#/components/parameters/id"
-      responses:
-        "200":
-          description: Pageview
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Pageview"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  # consents endpoints - index, POST & GET
+  # consent endpoints - index & GET
   /consents:
     get:
       summary: List consents
-      description: List all consents
+      description: |
+        List consent records for the current account, newest first. Requires an
+        account-scoped API token.
       operationId: listConsents
       tags:
         - Consents
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
-        - name: session_id
-          in: query
-          description: ID of the session to filter by
-          required: false
-          schema:
-            type: string
-        - name: user_id
-          in: query
-          description: ID of the user to filter by
-          required: false
-          schema:
-            type: string
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: List of consents
@@ -550,46 +515,15 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/ConsentPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Consent"
-
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-    post:
-      summary: Create a Consent
-      description: Create a new consent record
-      operationId: createConsent
-      tags:
-        - Consents
-      requestBody:
-        description: Consent to create
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ConsentWrite"
-      responses:
-        "201":
-          description: Created consent
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Consent"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
 
   /consents/{id}:
     get:
@@ -606,43 +540,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Consent"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ConsentResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
-  # AI actions endpoints - index & GET
+  # AI action endpoints - index & GET
   /ai-actions:
     get:
       summary: List AI actions
-      description: Audit log of all actions performed by the AI
-      operationId: listAIActions
+      description: |
+        List the actions CookieChimp's AI has taken on this account's categories
+        and storage items. Requires an account-scoped API token.
+      operationId: listAiActions
       tags:
         - AI Actions
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
-        - name: cookie_id
-          in: query
-          description: ID of the cookie to filter by
-          required: false
-          schema:
-            type: string
-        - name: type
-          in: query
-          description: Type of the AI action to filter by
-          required: false
-          schema:
-            type: string
-            enum:
-              - autofill
-              - auto_categorisation
-              - auto_approved
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: List of AI actions
@@ -652,25 +568,21 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/AIActionPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/AIAction"
-
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
 
   /ai-actions/{id}:
     get:
       summary: Get AI action
       description: Get AI action by ID
-      operationId: getAIAction
+      operationId: getAiAction
       tags:
         - AI Actions
       parameters:
@@ -681,26 +593,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AIAction"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/AIActionResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
-  # account - get your own account
+  # account endpoints - index & GET
   /accounts:
     get:
       summary: List accounts
-      description: List all accounts accessible to the authenticated token. With a partner token, returns all accounts across the partner's groups. With a user token, returns accounts the user is a member of. Supports filtering by `onboarding_status`.
+      description: |
+        List accounts. Accepts partner, user, or account tokens: a partner token
+        lists every account under the partner's groups, a user token lists the
+        accounts that user can access, and an account token lists just that
+        account.
       operationId: listAccounts
       tags:
-        - Account
+        - Accounts
       parameters:
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
         - $ref: "#/components/parameters/onboarding_status"
+        - $ref: "#/components/parameters/visitor_stats"
       responses:
         "200":
           description: List of accounts
@@ -710,12 +625,15 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/AccountPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Account"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /accounts/{id}:
     get:
@@ -726,6 +644,7 @@ paths:
         - Accounts
       parameters:
         - $ref: "#/components/parameters/id"
+        - $ref: "#/components/parameters/visitor_stats"
       responses:
         "200":
           description: Account
@@ -733,20 +652,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
-  # account user endpoints
+  # account user endpoints - index, GET, PUT & DELETE
   /account-users:
     get:
       summary: List account users
-      description: List all account users
+      description: List the users that belong to the current account. Requires an account-scoped API token.
       operationId: listAccountUsers
       tags:
         - Account Users
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: List of account users
@@ -756,21 +677,16 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/AccountUserPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/AccountUser"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
 
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  # get, update, delete account user
   /account-users/{id}:
     get:
       summary: Get account user
@@ -786,16 +702,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountUser"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/AccountUserResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
     put:
       summary: Update account user
-      description: Update account user by ID
+      description: Update an account user's roles.
       operationId: updateAccountUser
       tags:
         - Account Users
@@ -807,27 +722,26 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                role:
-                  type: string
-                  enum: [admin, member]
+              $ref: "#/components/schemas/AccountUserWriteRequest"
       responses:
         "200":
           description: Updated account user
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountUser"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/AccountUserResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ModelValidationError"
+
     delete:
       summary: Delete account user
-      description: Delete account user by ID
+      description: |
+        Remove a user from the current account. The account owner cannot be
+        removed and returns a `422`.
       operationId: deleteAccountUser
       tags:
         - Account Users
@@ -839,27 +753,34 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountUser"
-        default:
-          description: unexpected error
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Account user was deleted successfully"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          description: The account user is the account owner
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ValidationError"
+              example:
+                errors:
+                  - error: "Cannot remove account owner"
 
-  # account invitation endpoints
+  # account invitation endpoints - index, POST, GET, PUT & DELETE
   /account-invitations:
     get:
       summary: List account invitations
-      description: List all account invitations
+      description: List pending invitations for the current account. Requires an account-scoped API token.
       operationId: listAccountInvitations
       tags:
         - Account Invitations
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
-        - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/order"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: List of account invitations
@@ -869,47 +790,53 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    type: object
                     $ref: "#/components/schemas/AccountInvitationPagination"
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/AccountInvitation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
 
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
     post:
       summary: Create account invitation
-      description: Create a new account invitation
+      description: |
+        Invite someone to the current account and email them the invitation.
+
+        If an invitation already exists for that email address it is resent
+        rather than duplicated, and the response is `200` instead of `201`.
+
+        Invited users join as account admins.
       operationId: createAccountInvitation
       tags:
         - Account Invitations
       requestBody:
-        description: Account invitation to create
+        description: Invitation to create
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AccountInvitationCreate"
+              $ref: "#/components/schemas/AccountInvitationCreateRequest"
       responses:
+        "200":
+          description: An invitation already existed for this email and was resent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountInvitationResponse"
         "201":
           description: Created account invitation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountInvitation"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/AccountInvitationResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
 
-  # edit, update, delete account invitation
   /account-invitations/{id}:
     get:
       summary: Get account invitation
@@ -925,44 +852,44 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountInvitation"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/AccountInvitationResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
     put:
       summary: Update account invitation
-      description: Update account invitation by ID
+      description: Update the name on an account invitation. The email address cannot be changed.
       operationId: updateAccountInvitation
       tags:
         - Account Invitations
       parameters:
         - $ref: "#/components/parameters/id"
       requestBody:
-        description: Account invitation to update
+        description: Invitation to update
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AccountInvitationUpdate"
+              $ref: "#/components/schemas/AccountInvitationUpdateRequest"
       responses:
         "200":
           description: Updated account invitation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountInvitation"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/AccountInvitationResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
     delete:
       summary: Delete account invitation
-      description: Delete account invitation by ID
+      description: Cancel an account invitation.
       operationId: deleteAccountInvitation
       tags:
         - Account Invitations
@@ -974,13 +901,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountInvitation"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Account invitation was deleted successfully"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
   securitySchemes:
@@ -997,52 +924,23 @@ components:
       required: true
       schema:
         type: string
-    limit:
-      name: limit
+    page:
+      name: page
       in: query
-      description: Number of resources to return
+      description: |
+        Page number. Must be a positive integer; anything else returns a `400`.
+        Requesting a page past the end returns the last page.
       required: false
       schema:
         type: integer
         minimum: 1
-        maximum: 100
-        default: 20
-    offset:
-      name: offset
-      in: query
-      description: Number of resources to skip
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-    sort:
-      name: sort
-      in: query
-      description: Field to sort by
-      required: false
-      schema:
-        type: string
-    order:
-      name: order
-      in: query
-      description: Sort order
-      required: false
-      schema:
-        type: string
-        enum: [asc, desc]
-    page:
-      name: page
-      in: query
-      description: Page number
-      required: false
-      schema:
-        type: integer
         default: 1
     per_page:
       name: per_page
       in: query
-      description: Number of records to return per page
+      description: |
+        Number of records to return per page. Values outside 1–50 fall back to
+        the default of 20.
       required: false
       schema:
         type: integer
@@ -1063,61 +961,191 @@ components:
       schema:
         type: string
         enum: [account_created, vendors_setup, code_installed, inactive, live]
+    visitor_stats:
+      name: visitor_stats
+      in: query
+      description: |
+        Set to `false` to skip resolving analytics and return `visitor_stats` as
+        `null`. Useful when you only need the account list, as it avoids the
+        analytics lookup entirely.
+      required: false
+      schema:
+        type: boolean
+        default: true
+
+  responses:
+    BadRequest:
+      description: Invalid pagination parameter
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 400
+                message: "Invalid page parameter"
+
+    Unauthorized:
+      description: Missing, invalid or expired API token
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 401
+                message: "Invalid API Key"
+
+    AccountTokenRequired:
+      description: |
+        Missing or invalid API token, or a token that does not resolve to an
+        account. Account-scoped endpoints accept an account token, or a user
+        token whose user belongs to an account; partner tokens are rejected.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 401
+                message: "API key must belong to an account"
+
+    PartnerTokenRequired:
+      description: Missing or invalid API token, or a token that does not belong to a partner
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 401
+                message: "API key must belong to a partner"
+
+    NotFound:
+      description: The record does not exist, or does not belong to the caller
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 404
+                message: "Record not found"
+
+    RateLimited:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 429
+                message: "Too many requests. Please retry later."
+
+    ValidationError:
+      description: The record could not be saved
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
+
+    ModelValidationError:
+      description: The record could not be saved
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModelValidationError"
 
   schemas:
     Error:
       type: object
+      description: |
+        The standard error envelope, used for authentication, authorization,
+        pagination and not-found errors.
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+      example:
+        errors:
+          - code: 401
+            message: "Invalid API Key"
+
+    ValidationError:
+      type: object
+      description: |
+        Returned when a create or update fails validation. Each entry carries a
+        single human-readable `error` string.
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              error:
+                type: string
+      example:
+        errors:
+          - error: "Name can't be blank"
+
+    ModelValidationError:
+      type: object
+      description: |
+        Returned by the group and account-user write endpoints, which render the
+        model's errors directly: an object keyed by attribute name.
+      additionalProperties:
+        type: array
+        items:
+          type: string
+      example:
+        name: ["can't be blank"]
+        external_id: ["has already been taken"]
+
+    MessageError:
+      type: object
+      description: Returned by the auth and password endpoints, which use a single `error` string.
       properties:
         error:
-          type: object
-          properties:
-            code:
-              type: integer
-            message:
-              type: string
+          type: string
       example:
-        error:
-          code: 400
-          message: "Invalid request"
+        error: "Invalid Email or password."
 
-    Pagination:
+    DeletedMessage:
       type: object
       properties:
-        total:
-          type: integer
-          description: Total number of resources
-        limit:
-          type: integer
-          description: Number of resources to return
-        offset:
-          type: integer
-          description: Number of resources to skip
+        message:
+          type: string
       example:
-        total: 100
-        limit: 20
-        offset: 0
+        message: "Record was deleted successfully"
 
     BasePagination:
       type: object
       properties:
         prev_url:
           type: string
-          description: Path to get previous page
+          description: Path to get the previous page
         next_url:
           type: string
-          description: Path to get next page
+          description: Path to get the next page
         count:
           type: integer
-          description: Total number of pages
+          description: Total number of records across all pages
         page:
           type: integer
           description: Current page
         prev:
-          type: integer
-          description: Previous page number
+          type: [integer, "null"]
+          description: Previous page number, or null on the first page
         next:
-          type: integer
-          description: Next page number
+          type: [integer, "null"]
+          description: Next page number, or null on the last page
 
     AccountPagination:
       allOf:
@@ -1125,7 +1153,7 @@ components:
       example:
         prev_url: "/api/v1/accounts?page="
         next_url: "/api/v1/accounts?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
@@ -1136,7 +1164,7 @@ components:
       example:
         prev_url: "/api/v1/account-invitations?page="
         next_url: "/api/v1/account-invitations?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
@@ -1147,7 +1175,7 @@ components:
       example:
         prev_url: "/api/v1/account-users?page="
         next_url: "/api/v1/account-users?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
@@ -1158,7 +1186,7 @@ components:
       example:
         prev_url: "/api/v1/ai-actions?page="
         next_url: "/api/v1/ai-actions?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
@@ -1169,7 +1197,7 @@ components:
       example:
         prev_url: "/api/v1/categories?page="
         next_url: "/api/v1/categories?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
@@ -1180,7 +1208,7 @@ components:
       example:
         prev_url: "/api/v1/consents?page="
         next_url: "/api/v1/consents?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
@@ -1191,7 +1219,7 @@ components:
       example:
         prev_url: "/api/v1/groups?page="
         next_url: "/api/v1/groups?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
@@ -1202,10 +1230,144 @@ components:
       example:
         prev_url: "/api/v1/storage-items?page="
         next_url: "/api/v1/storage-items?page=2"
-        count: 4
+        count: 68
         page: 1
         prev: null
         next: 2
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The user's email address
+        password:
+          type: string
+          format: password
+          description: The user's password
+      required:
+        - email
+        - password
+      example:
+        email: "user@example.com"
+        password: "correct-horse-battery-staple"
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: API token to send as a bearer token on subsequent requests
+      example:
+        token: "0mHFuvY2mCVfMBXbtNCPXA"
+
+    PasswordUpdateRequest:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            current_password:
+              type: string
+              format: password
+            password:
+              type: string
+              format: password
+            password_confirmation:
+              type: string
+              format: password
+          required:
+            - current_password
+            - password
+            - password_confirmation
+      required:
+        - user
+      example:
+        user:
+          current_password: "correct-horse-battery-staple"
+          password: "a-longer-new-password"
+          password_confirmation: "a-longer-new-password"
+
+    CategoryWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the category that is displayed to users
+        slug:
+          type: string
+          description: |
+            URL-friendly identifier for the category, used by the consent banner
+            and the JavaScript SDK. Some slugs are reserved by CookieChimp.
+        description:
+          type: string
+          description: Description of the category that is displayed to users
+        required:
+          type: boolean
+          description: Whether the category is required for the website to function
+      required:
+        - name
+
+    CategoryWriteRequest:
+      type: object
+      properties:
+        category:
+          $ref: "#/components/schemas/CategoryWrite"
+      required:
+        - category
+      example:
+        category:
+          name: "Analytics"
+          slug: "analytics"
+          description: "Cookies that help us understand how the site is used"
+          required: false
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Unique identifier for the category
+        name:
+          type: string
+          description: Name of the category that is displayed to users
+        description:
+          type: string
+          description: Description of the category that is displayed to users
+        slug:
+          type: string
+          description: URL-friendly identifier for the category
+        required:
+          type: boolean
+          description: Whether the category is required for the website to function
+        default_language:
+          type: string
+          description: Language code the name and description are written in
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "essential"
+        name: "Essential"
+        description: "Cookies essential for website functionality"
+        slug: "essential"
+        required: true
+        default_language: "en"
+        created_at: "2023-01-01T00:00:00Z"
+        updated_at: "2023-01-02T00:00:00Z"
+
+    CategoryResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Category"
 
     StorageItemWrite:
       type: object
@@ -1213,6 +1375,10 @@ components:
         name:
           type: string
           description: Name of the storage item
+        storage_type:
+          type: string
+          enum: [cookie, local_storage, session_storage]
+          description: The kind of browser storage this item uses
         description:
           type: string
           description: Description of the storage item that is displayed to users
@@ -1224,115 +1390,180 @@ components:
           description: Domain of the storage item
         duration:
           type: string
-          description: Duration of the storage item
+          description: How long the storage item persists
         partitioned:
           type: boolean
-          description: Whether the storage item is partitioned
+          description: Whether the storage item is partitioned (CHIPS)
         path:
           type: string
           description: Path of the storage item
-        same_site:
+        samesite:
           type: string
+          enum: [lax, strict]
           description: SameSite attribute of the storage item
         category_id:
           type: string
-          description: ID of the storage item category
+          description: ID of the category to file this item under
+        site_service_id:
+          type: string
+          description: |
+            ID of the service this item belongs to. When set, the item inherits
+            the service's category.
       required:
         - name
 
+    StorageItemWriteRequest:
+      type: object
+      properties:
+        storage_item:
+          $ref: "#/components/schemas/StorageItemWrite"
+      required:
+        - storage_item
+      example:
+        storage_item:
+          name: "_ga"
+          storage_type: "cookie"
+          description: "Used to distinguish users."
+          company_name: "Google"
+          domain: ".example.com"
+          duration: "2 years"
+          partitioned: false
+          path: "/"
+          samesite: "lax"
+          category_id: "cat1"
+
     StorageItem:
       type: object
-      allOf:
-        - $ref: "#/components/schemas/StorageItemWrite"
       properties:
         id:
           type: string
           readOnly: true
           description: Unique identifier for the storage item
-        last_seen_at:
-          type: string
-          format: date-time
-          readOnly: true
-        status:
-          type: string
-          enum: [draft, processing, in_review, finalised]
-          default: draft
-          readOnly: true
-        approved_by_type:
-          type: string
-          nullable: true
-          readOnly: true
-        approved_by_id:
-          type: string
-          nullable: true
-          readOnly: true
-        wildcard_cookie_id:
-          type: string
-          nullable: true
-          readOnly: true
-        is_wildcard_cookie:
-          type: boolean
-          readOnly: true
-      example:
-        company_name: "Example Company Name"
-        description: "Tracks user preferences."
-        domain: "www.example.com"
-        duration: "1 year"
-        last_seen_at: "2023-03-23T12:34:56Z"
-        name: "user-pref-cookie"
-        partitioned: false
-        path: "/"
-        same_site: "Lax"
-        category_id: "cat1"
-        status: "finalised"
-        approved_by_type: "AI"
-        wildcard_cookie_id: null
-        id: "user-pref-cookie"
-        is_wildcard_cookie: false
-
-    CategoryWrite:
-      type: object
-      properties:
         name:
           type: string
-          description: Name of the category that is displayed to users
+        storage_type:
+          type: string
+          enum: [cookie, local_storage, session_storage]
+        category:
+          type: object
+          description: |
+            The category this item is filed under. Falls back to the category of
+            the item's service when the item has no category of its own.
+          properties:
+            id:
+              type: [string, "null"]
+            name:
+              type: [string, "null"]
+        service:
+          type: object
+          description: The service this item belongs to, if any
+          properties:
+            id:
+              type: [string, "null"]
+            name:
+              type: [string, "null"]
         description:
           type: string
-          description: Description of the category that is displayed to users
-        required:
-          type: boolean
-          description: Whether the category is required for the website to function
-      required:
-        - name
-        - description
-        - required
-
-    Category:
-      type: object
-      allOf:
-        - $ref: "#/components/schemas/CategoryWrite"
-      properties:
-        id:
+        company_name:
           type: string
+        duration:
+          type: string
+        domain:
+          type: string
+        partitioned:
+          type: boolean
+        path:
+          type: string
+        samesite:
+          type: [string, "null"]
+          enum: [lax, strict, null]
+        wildcard_id:
+          type: [string, "null"]
           readOnly: true
-          description: Unique identifier for the category
+          description: ID of the wildcard item this one was matched against, if any
+        default_language:
+          type: string
+          description: Language code the name and description are written in
+        last_seen_at:
+          type: [string, "null"]
+          format: date-time
+          readOnly: true
+          description: When this item was last observed on the website
+        created_by:
+          type: string
+          enum: [user, scan]
+          readOnly: true
+          description: Whether the item was added by a user or found by a scan
         created_at:
           type: string
           format: date-time
           readOnly: true
-          description: Date and time when the category was created
         updated_at:
           type: string
           format: date-time
           readOnly: true
-          description: Date and time when the category was last updated
       example:
-        id: "essential"
-        name: "Essential"
-        description: "Cookies essential for website functionality"
-        required: true
-        created_at: "2023-01-01T00:00:00Z"
-        updated_at: "2023-01-02T00:00:00Z"
+        id: "sto123"
+        name: "_ga"
+        storage_type: "cookie"
+        category:
+          id: "cat1"
+          name: "Analytics"
+        service:
+          id: "svc1"
+          name: "Google Analytics"
+        description: "Used to distinguish users."
+        company_name: "Google"
+        duration: "2 years"
+        domain: ".example.com"
+        partitioned: false
+        path: "/"
+        samesite: "lax"
+        wildcard_id: null
+        default_language: "en"
+        last_seen_at: "2023-03-23T12:34:56Z"
+        created_by: "scan"
+        created_at: "2023-03-01T09:00:00Z"
+        updated_at: "2023-03-23T12:34:56Z"
+
+    StorageItemResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/StorageItem"
+
+    GroupCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the group
+        external_id:
+          type: string
+          description: External ID set by the partner
+        max_pageviews_per_month:
+          type: integer
+          description: Maximum number of pageviews per month
+        max_unique_visitors_per_month:
+          type: integer
+          description: Maximum number of unique visitors per month
+      required:
+        - name
+        - external_id
+
+    GroupCreateRequest:
+      type: object
+      properties:
+        group:
+          $ref: "#/components/schemas/GroupCreate"
+      required:
+        - group
+      example:
+        group:
+          name: "Example Ltd"
+          external_id: "ABC_123"
+          max_pageviews_per_month: 500000
+          max_unique_visitors_per_month: 100000
 
     GroupUpdate:
       type: object
@@ -1347,22 +1578,17 @@ components:
         - name
         - external_id
 
-    GroupCreate:
+    GroupUpdateRequest:
       type: object
       properties:
-        name:
-          type: string
-          description: Name of the group
-        external_id:
-          type: string
-          description: External ID set by the partner
-        max_pageviews_per_month:
-          type: integer
-          description: Maximum number of pageviews per month
+        group:
+          $ref: "#/components/schemas/GroupUpdate"
       required:
-        - name
-        - external_id
-        - max_pageviews_per_month
+        - group
+      example:
+        group:
+          name: "Example Ltd"
+          external_id: "ABC_123"
 
     Group:
       type: object
@@ -1371,272 +1597,273 @@ components:
           type: string
           readOnly: true
           description: Unique identifier for the group
-      allOf:
-        - $ref: "#/components/schemas/GroupCreate"
+        partner:
+          type: string
+          readOnly: true
+          description: Name of the partner the group belongs to
+        name:
+          type: string
+          description: Name of the group
+        external_id:
+          type: string
+          description: External ID set by the partner
+        max_pageviews_per_month:
+          type: [integer, "null"]
+          description: Maximum number of pageviews per month
+        max_unique_visitors_per_month:
+          type: [integer, "null"]
+          description: Maximum number of unique visitors per month
       example:
         id: "abc123"
+        partner: "partner_one"
         name: "Example Ltd"
         external_id: "ABC_123"
-        partner: "partner_one"
         max_pageviews_per_month: 500000
-
-    Session:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the session
-        user_id:
-          type: string
-          description: ID of the user set by your website
-          nullable: true
-        pageviews:
-          type: array
-          items:
-            $ref: "#/components/schemas/Pageview"
-          description: List of pageviews in the session
-        consents:
-          type: array
-          items:
-            $ref: "#/components/schemas/Consent"
-          description: List of consents in the session
-        first_seen_at:
-          type: string
-          format: date-time
-          description: Date and time when the session was first seen
-        last_seen_at:
-          type: string
-          format: date-time
-          description: Date and time when the session was last seen
-      example:
-        id: "sess123"
-        user_id: "user456"
-        pageviews:
-          - id: "pageview789"
-            session_id: "sess123"
-            url: "https://www.example.com/products"
-            consent_id: null
-            active_cookies:
-              - essential-cookie-1
-            created_at: "2023-01-20T12:45:30Z"
-          - id: "pageview890"
-            session_id: "sess123"
-            url: "https://www.example.com/products/123"
-            consent_id: consent321
-            active_cookies:
-              - essential-cookie-1
-              - cookie1
-              - cookie2
-            created_at: "2023-01-20T12:50:00Z"
-        consents:
-          - id: "consent321"
-            session_id: "sess123"
-            user_id: "user456"
-            user_preferences:
-              accept_type: "all"
-              accepted_categories: ["cat1", "cat2"]
-              rejected_categories: ["cat3", "cat4"]
-              accepted_services: { "company1": ["cookie1", "cookie2"] }
-              rejected_services: {}
-            created_at: "2023-01-20T12:46:30Z"
-        first_seen_at: "2023-01-20T12:45:30Z"
-        last_seen_at: "2023-01-20T12:50:00Z"
-
-    SessionIndex:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the session
-        user_id:
-          type: string
-          description: ID of the user set by your website
-          nullable: true
-        first_seen_at:
-          type: string
-          format: date-time
-          description: Date and time when the session was first seen
-        last_seen_at:
-          type: string
-          format: date-time
-          description: Date and time when the session was last seen
-      example:
-        id: "sess123"
-        user_id: "user456"
-        first_seen_at: "2023-01-20T12:45:30Z"
-        last_seen_at: "2023-01-20T12:50:00Z"
-
-    Pageview:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the pageview
-        session_id:
-          type: string
-          description: ID of the session
-        url:
-          type: string
-          format: uri
-          description: URL of the pageview
-        consent_id:
-          type: string
-          nullable: true
-          description: If the user has given consent, the ID of the consent that is associated with the pageview
-        active_cookies:
-          type: array
-          items:
-            type: string
-          description: List of active cookies in the pageview
-        created_at:
-          type: string
-          format: date-time
-          description: Date and time when the pageview was created
-      example:
-        id: "pageview890"
-        session_id: "sess123"
-        url: "https://www.example.com/products/123"
-        consent_id: consent321
-        active_cookies:
-          - essential-cookie-1
-          - cookie1
-          - cookie2
-        created_at: "2023-01-20T12:50:00Z"
-
-    ConsentWrite:
-      type: object
-      properties:
-        user_id:
-          type: string
-          description: ID of the user set by your website
-        user_preferences:
-          # looks something like this:
-          # acceptType: string,
-          # acceptedCategories: string[],
-          # rejectedCategories: string[],
-          # acceptedServices: {[category: string]: string[]}
-          # rejectedServices: {[category: string]: string[]}
-
-          # Possible acceptType values: 'all', 'custom', 'necessary'
-
-          type: object
-          properties:
-            accept_type:
-              type: string
-              enum: [all, custom, necessary]
-            accepted_categories:
-              type: array
-              items:
-                type: string
-            rejected_categories:
-              type: array
-              items:
-                type: string
-            accepted_services:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: string
-            rejected_services:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: string
-      required:
-        - user_preferences
+        max_unique_visitors_per_month: 100000
 
     Consent:
       type: object
-      allOf:
-        - $ref: "#/components/schemas/ConsentWrite"
+      description: |
+        A consent record, written when a visitor interacts with the consent
+        banner.
       properties:
         id:
           type: string
           description: Unique identifier for the consent
-        session_id:
+        consent_banner_id:
+          type: [string, "null"]
+          description: ID of the consent banner the visitor saw
+        uuid:
           type: string
-          description: ID of the session
+          description: Anonymous visitor identifier generated by the widget
+        url:
+          type: string
+          description: URL the consent was given on
+        ip_address:
+          type: [string, "null"]
+          description: Partially masked IP address of the visitor
+        ip_country:
+          type: [string, "null"]
+          description: Two-letter country code resolved from the visitor's IP
+        ip_region:
+          type: [string, "null"]
+          description: Region resolved from the visitor's IP
+        visitor_user_id:
+          type: [string, "null"]
+          description: ID of the user set by your website
+        accept_type:
+          type: [string, "null"]
+          description: |
+            How the visitor responded. Typically `all`, `custom` or `necessary`.
+        accepted_categories:
+          type: [array, "null"]
+          items:
+            type: string
+          description: Slugs of the categories the visitor accepted
+        rejected_categories:
+          type: [array, "null"]
+          items:
+            type: string
+          description: Slugs of the categories the visitor rejected
+        accepted_services:
+          type: [object, "null"]
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Accepted services, keyed by category slug
+        rejected_services:
+          type: [object, "null"]
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Rejected services, keyed by category slug
+        accepted_cookies:
+          type: [array, "null"]
+          items:
+            type: object
+          description: Storage items the visitor accepted
+        rejected_cookies:
+          type: [array, "null"]
+          items:
+            type: object
+          description: Storage items the visitor rejected
+        device:
+          type: string
+          description: Device type derived from the user agent
+        user_agent:
+          type: string
+          description: User agent of the visitor's browser
+        gpc_preference:
+          type: [boolean, "null"]
+          description: Whether the visitor sent a Global Privacy Control signal
+        do_not_sell:
+          type: boolean
+          description: Whether the visitor opted out of the sale of their data
         created_at:
           type: string
           format: date-time
-          description: Date and time when the consent was created
+          description: Date and time when the consent was recorded
       example:
         id: "consent321"
-        session_id: "sess123"
-        user_id: "user456"
-        user_preferences:
-          accept_type: "all"
-          accepted_categories: ["cat1", "cat2"]
-          rejected_categories: ["cat3", "cat4"]
-          accepted_services: { "company1": ["cookie1", "cookie2"] }
-          rejected_services: {}
+        consent_banner_id: "banner123"
+        uuid: "8f14e45f-ea8f-4f2e-b1b0-0f1d2c3b4a59"
+        url: "https://example.com/pricing"
+        ip_address: "203.0.113.XXX"
+        ip_country: "GB"
+        ip_region: "England"
+        visitor_user_id: "user456"
+        accept_type: "custom"
+        accepted_categories: ["essential", "analytics"]
+        rejected_categories: ["marketing"]
+        accepted_services: { "analytics": ["Google Analytics"] }
+        rejected_services: { "marketing": ["Meta Pixel"] }
+        accepted_cookies: []
+        rejected_cookies: []
+        device: "desktop"
+        user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
+        gpc_preference: false
+        do_not_sell: false
         created_at: "2023-01-20T12:46:30Z"
+
+    ConsentResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Consent"
 
     AIAction:
       type: object
+      description: An action CookieChimp's AI took on a category or storage item.
       properties:
         id:
           type: string
           description: Unique identifier for the AI action
-        cookie_id:
+        action_type:
           type: string
-          description: ID of the cookie that the AI action is associated with
-        type:
+          enum: [autofill, auto_categorise, translate]
+          description: What the AI did
+        actionable_type:
           type: string
-          enum:
-            - autofill
-            - auto_categorisation
-            - auto_approved
-        metadata:
-          type: object
+          enum: [Category, ClientStorageItem]
+          description: The type of record the action was taken on
+        actionable_id:
+          type: string
+          description: ID of the record the action was taken on
+        suggested_params:
+          type: [object, "null"]
           additionalProperties: true
+          description: The values the AI suggested
+        created_at:
+          type: string
+          format: date-time
+        actionable:
+          description: |
+            The record the action was taken on — a category or a storage item,
+            in the same shape those endpoints return.
+          oneOf:
+            - $ref: "#/components/schemas/Category"
+            - $ref: "#/components/schemas/StorageItem"
       example:
-        cookie_id: "example_uuid"
-        type: "autofill"
-        metadata:
-          description: "Tracks user activities."
-          company: "Example Company"
-          domain: "example.com"
-          duration: "Session"
+        id: "act123"
+        action_type: "autofill"
+        actionable_type: "ClientStorageItem"
+        actionable_id: "sto123"
+        suggested_params:
+          description: "Used to distinguish users."
+          company_name: "Google"
+          duration: "2 years"
+        created_at: "2023-02-01T10:00:00Z"
+        actionable:
+          id: "sto123"
+          name: "_ga"
+          storage_type: "cookie"
+
+    AIActionResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/AIAction"
+
+    Roles:
+      type: object
+      description: |
+        Role flags for a membership. Currently `admin` is the only role, and it
+        defaults to `true`.
+      additionalProperties:
+        type: boolean
+      example:
+        admin: true
 
     AccountUserWrite:
       type: object
       properties:
-        role:
-          type: string
-          enum: [admin, member]
-          description: Role of the account user
+        roles:
+          $ref: "#/components/schemas/Roles"
+
+    AccountUserWriteRequest:
+      type: object
+      properties:
+        account_user:
+          $ref: "#/components/schemas/AccountUserWrite"
       required:
-        - role
+        - account_user
+      example:
+        account_user:
+          roles:
+            admin: false
 
     AccountUser:
       type: object
-      allOf:
-        - $ref: "#/components/schemas/AccountUserWrite"
       properties:
         id:
           type: string
           description: Unique identifier for the account user
-        email:
-          type: string
-          format: email
-          description: Email address of the account user
+        roles:
+          $ref: "#/components/schemas/Roles"
         created_at:
           type: string
           format: date-time
-          description: Date and time when the account user was created
         updated_at:
           type: string
           format: date-time
-          description: Date and time when the account user was last updated
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+        account:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
       example:
         id: "accuser123"
-        email: "admin@example.com"
-        role: "admin"
+        roles:
+          admin: true
         created_at: "2023-01-05T10:15:30Z"
         updated_at: "2023-01-15T11:20:45Z"
+        user:
+          id: "usr123"
+          name: "Ada Lovelace"
+          email: "admin@example.com"
+        account:
+          id: "acc123"
+          name: "example.com"
+
+    AccountUserResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/AccountUser"
 
     AccountInvitationCreate:
       type: object
@@ -1648,14 +1875,21 @@ components:
           type: string
           format: email
           description: Email address of the user
-        role:
-          type: string
-          enum: [admin, member]
-          description: Role of the user when they accept the invitation
       required:
         - name
         - email
-        - role
+
+    AccountInvitationCreateRequest:
+      type: object
+      properties:
+        account_invitation:
+          $ref: "#/components/schemas/AccountInvitationCreate"
+      required:
+        - account_invitation
+      example:
+        account_invitation:
+          name: "Grace Hopper"
+          email: "newmember@cookiechimp.com"
 
     AccountInvitationUpdate:
       type: object
@@ -1663,64 +1897,127 @@ components:
         name:
           type: string
           description: Name of the user the invitation is for
-        role:
-          type: string
-          enum: [admin, member]
-          description: Role of the user when they accept the invitation
       required:
         - name
-        - role
+
+    AccountInvitationUpdateRequest:
+      type: object
+      properties:
+        account_invitation:
+          $ref: "#/components/schemas/AccountInvitationUpdate"
+      required:
+        - account_invitation
+      example:
+        account_invitation:
+          name: "Grace Hopper"
 
     AccountInvitation:
       type: object
-      allOf:
-        - $ref: "#/components/schemas/AccountInvitationCreate"
       properties:
         id:
           type: string
+        name:
+          type: string
+          description: Name of the user the invitation is for
         email:
           type: string
           format: email
           description: Email address of the user
-        invited_by_type:
+        invite_url:
           type: string
-          description: Type of entity that created the invitation (account_user or API)
-        invited_by_id:
-          type: string
-          nullable: true
-          description: ID of the user who created the invitation
+          description: URL the invited user follows to accept the invitation
+        roles:
+          $ref: "#/components/schemas/Roles"
         created_at:
           type: string
           format: date-time
-          description: Date and time when the invitation was created
         updated_at:
           type: string
           format: date-time
-          description: Date and time when the invitation was last updated
-        deleted_at:
-          type: string
-          format: date-time
-          description: Date and time when the invitation was cancelled
+        invited_by:
+          type: [object, "null"]
+          description: The user who sent the invitation. Empty when it was created via the API.
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+              format: email
       example:
         id: "inv123"
+        name: "Grace Hopper"
         email: "newmember@cookiechimp.com"
-        role: "member"
-        invited_by_type: "API"
+        invite_url: "https://cookiechimp.com/account_invitations/inv123"
+        roles:
+          admin: true
         created_at: "2023-01-25T09:30:20Z"
         updated_at: "2023-01-25T09:30:20Z"
+        invited_by:
+          id: "usr123"
+          name: "Ada Lovelace"
+          email: "admin@example.com"
 
-    AccountWrite:
+    AccountInvitationResponse:
       type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/AccountInvitation"
+
+    VisitorStatsMetric:
+      type: object
+      properties:
+        count:
+          type: number
+          description: Value for the current period
+        rate_of_change:
+          type: number
+          description: Percentage change against the comparison period
+
+    VisitorStatsRawMetric:
+      type: object
+      properties:
+        current_period:
+          type: number
+        previous_period:
+          type: number
+
+    VisitorStats:
+      type: [object, "null"]
+      description: |
+        Visitor analytics for the last 30 days, compared against the 30 days
+        before that. `null` when the client passed `?visitor_stats=false`.
+      properties:
+        comparison:
+          type: string
+          description: Label for the comparison period
+        statistics:
+          type: object
+          properties:
+            consents:
+              $ref: "#/components/schemas/VisitorStatsMetric"
+            unique_visitors:
+              $ref: "#/components/schemas/VisitorStatsMetric"
+            consent_rate:
+              $ref: "#/components/schemas/VisitorStatsMetric"
+        raw_data:
+          type: object
+          properties:
+            consents:
+              $ref: "#/components/schemas/VisitorStatsRawMetric"
+            unique_visitors:
+              $ref: "#/components/schemas/VisitorStatsRawMetric"
+            consent_rate:
+              $ref: "#/components/schemas/VisitorStatsRawMetric"
 
     Account:
       type: object
-      allOf:
-        - $ref: "#/components/schemas/AccountWrite"
       properties:
         id:
           type: string
           readOnly: true
-          description: Unique identifier for the group
+          description: Unique identifier for the account
         name:
           type: string
           readOnly: true
@@ -1730,7 +2027,7 @@ components:
           items:
             type: string
           readOnly: true
-          description: List of allowed domains the the script will run on
+          description: List of allowed domains the script will run on
         owner_id:
           type: string
           readOnly: true
@@ -1746,9 +2043,7 @@ components:
             - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
             - `live`: The account is live and operational.
         visitor_stats:
-          type: object
-          readOnly: true
-          description: Visitor statistics for the account
+          $ref: "#/components/schemas/VisitorStats"
         created_at:
           type: string
           format: date-time
@@ -1765,37 +2060,28 @@ components:
         allowed_domains: ["example.net", "example.org"]
         owner_id: "xyz123"
         onboarding_status: "live"
-        visitor_stats: {
-          comparison: "vs. Last 30 days",
-          statistics: {
-            views: {
-              count: 1471,
-              rate_of_change: 3.37
-            },
-            consents: {
-              count: 213,
+        visitor_stats:
+          comparison: "vs. Last 30 days"
+          statistics:
+            consents:
+              count: 213
               rate_of_change: 25.29
-            },
-            unique_visitors: {
-              count: 895,
+            unique_visitors:
+              count: 895
               rate_of_change: 42.06
-            }
-          },
-          raw_data: {
-            views: {
-              current_period: 1471,
-              previous_period: 1423
-            },
-            consents: {
-              current_period: 213,
+            consent_rate:
+              count: 23.8
+              rate_of_change: -11.85
+          raw_data:
+            consents:
+              current_period: 213
               previous_period: 170
-            },
-            unique_visitors: {
-              current_period: 895,
+            unique_visitors:
+              current_period: 895
               previous_period: 630
-            }
-          }
-        }
+            consent_rate:
+              current_period: 23.8
+              previous_period: 27.0
         created_at: "2022-12-20T18:45:00Z"
         updated_at: "2023-01-10T19:00:00Z"
 

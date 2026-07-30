@@ -35,9 +35,34 @@ API tokens can belong to different bearer types:
 - **Partner tokens** — Access partner-level resources like groups.
 - **Account tokens** — Access resources scoped to a specific account.
 
+Most endpoints are scoped to a single account. These accept an **account token**, or a **user token** whose user belongs to an account. A **partner token** does not resolve to one account, so those endpoints reject it with:
+
+```json
+{
+  "errors": [
+    {
+      "code": 401,
+      "message": "API key must belong to an account"
+    }
+  ]
+}
+```
+
+The group endpoints work the other way around: they require a partner token and reject user and account tokens with `API key must belong to a partner`. The account endpoints accept all three.
+
 ## Rate Limits
 
-To ensure fair usage of the API, we limit the number of requests you can make. The rate limit is 100 requests per minute. If you exceed this limit, you will receive a `429 Too Many Requests` response.
+To ensure fair usage of the API, we limit the number of requests you can make. The general limit is **300 requests per 5 minutes**, counted per API token (or per IP address when no token is sent).
+
+A few endpoints have tighter limits, counted per IP address:
+
+| Endpoint | Limit |
+|----------|-------|
+| `POST /auth` | 10 per 3 minutes (and 6 per minute per email address) |
+| `PUT /password` | 5 per 15 minutes |
+| `POST /users` | 10 per hour |
+
+If you exceed a limit you receive a `429 Too Many Requests` response with a `Retry-After` header giving the number of seconds until the window resets.
 
 ## Pagination
 
@@ -48,11 +73,49 @@ List endpoints support pagination with the following query parameters:
 | `page` | Page number | 1 |
 | `per_page` | Records per page (1-50) | 20 |
 
-Paginated responses include a `pagination` object with `prev_url`, `next_url`, `count`, `page`, `prev`, and `next` fields.
+Paginated responses include a `pagination` object with `prev_url`, `next_url`, `count`, `page`, `prev`, and `next` fields. `count` is the total number of records across all pages, not the number of pages. `prev` and `next` are `null` on the first and last page.
+
+`page` must be a positive integer — anything else returns a `400`. A `per_page` outside 1–50 falls back to 20, and requesting a page past the end returns the last page.
+
+## Request Bodies
+
+Write endpoints expect the resource wrapped under its own key rather than at the top level:
+
+```json
+{
+  "category": {
+    "name": "Analytics",
+    "required": false
+  }
+}
+```
+
+The wrapper matches the resource: `category`, `storage_item`, `group`, `account_user`, `account_invitation`.
+
+## Response Envelopes
+
+| Response | Shape |
+|----------|-------|
+| List endpoints | `{ "pagination": { ... }, "data": [ ... ] }` |
+| Single resource | `{ "data": { ... } }` |
+| Groups and accounts | The resource itself, unwrapped |
+| Delete endpoints | `{ "message": "..." }` |
 
 ## Errors
 
-The API returns standard HTTP status codes. Error responses include an `errors` array:
+The API returns standard HTTP status codes.
+
+| Status Code | Description |
+|-------------|-------------|
+| `200` | Success |
+| `201` | Created |
+| `400` | Bad request — an invalid `page` parameter |
+| `401` | Unauthorized — invalid or missing API token, or a token of the wrong type |
+| `404` | Not found |
+| `422` | Validation error |
+| `429` | Rate limit exceeded |
+
+Authentication, pagination and not-found errors return an `errors` array of objects with `code` and `message`:
 
 ```json
 {
@@ -65,10 +128,31 @@ The API returns standard HTTP status codes. Error responses include an `errors` 
 }
 ```
 
-| Status Code | Description |
-|-------------|-------------|
-| `200` | Success |
-| `401` | Unauthorized — invalid or missing API token |
-| `404` | Not found |
-| `422` | Validation error |
-| `429` | Rate limit exceeded |
+Validation errors on categories, storage items and account invitations return an `errors` array of objects with a single human-readable `error`:
+
+```json
+{
+  "errors": [
+    {
+      "error": "Name can't be blank"
+    }
+  ]
+}
+```
+
+Validation errors on groups and account users return the failing attributes directly:
+
+```json
+{
+  "name": ["can't be blank"],
+  "external_id": ["has already been taken"]
+}
+```
+
+The `/auth` and `/password` endpoints return a single `error` string:
+
+```json
+{
+  "error": "Invalid Email or password."
+}
+```
