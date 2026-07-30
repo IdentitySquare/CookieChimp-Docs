@@ -1072,6 +1072,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SiteServiceResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1134,6 +1136,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SiteServiceResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1162,6 +1166,8 @@ paths:
                 $ref: "#/components/schemas/DeletedMessage"
               example:
                 message: "Service was deleted successfully"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1233,6 +1239,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1289,6 +1297,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1317,6 +1327,8 @@ paths:
                 $ref: "#/components/schemas/DeletedMessage"
               example:
                 message: "Consent banner was deleted successfully"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1344,6 +1356,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1449,6 +1463,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IntegrationResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1520,6 +1536,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScanResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
@@ -1554,123 +1572,108 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  # TCF vendor endpoints - index, GET, POST & DELETE
-  /tcf-vendors:
+  # compliance report
+  /compliance:
     get:
-      summary: List TCF vendors
+      summary: Get the regional compliance report
       description: |
-        List the IAB TCF vendors enabled on the account, in global vendor ID
-        order. Requires an account-scoped API token.
-      operationId: listTcfVendors
+        Evaluate the account's banners against every regulation CookieChimp
+        tracks, and report what is outstanding — the same evaluation the
+        dashboard's compliance screen renders.
+
+        Regulations the account has chosen to ignore are reported separately in
+        `ignored_jurisdictions` rather than dropped, and are excluded from the
+        top-level `compliant` verdict.
+
+        Requires a plan that includes the compliance report.
+      operationId: getComplianceReport
       tags:
-        - TCF Vendors
-      parameters:
-        - $ref: "#/components/parameters/per_page"
-        - $ref: "#/components/parameters/page"
+        - Compliance
       responses:
         "200":
-          description: List of TCF vendors
+          description: The compliance report
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  pagination:
-                    $ref: "#/components/schemas/BasePagination"
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/TcfVendor"
-        "400":
-          $ref: "#/components/responses/BadRequest"
+                $ref: "#/components/schemas/ComplianceReportResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          description: The account's plan does not include the compliance report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                errors:
+                  - code: 403
+                    message: "The compliance report is not available on this plan"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # banner templates
+  /banner-templates:
+    get:
+      summary: List banner templates
+      description: |
+        The jurisdiction templates a banner can be created from, grouped by
+        region. Use a template's `id` as the `jurisdiction_id` for
+        `POST /consent-banners/from-template`.
+      operationId: listBannerTemplates
+      tags:
+        - Consent Banners
+      responses:
+        "200":
+          description: Templates grouped by region
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BannerTemplatesResponse"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "429":
           $ref: "#/components/responses/RateLimited"
 
+  /consent-banners/from-template:
     post:
-      summary: Add a TCF vendor
+      summary: Create consent banner from a template
       description: |
-        Add a vendor from the IAB Global Vendor List to the account, one at a
-        time, so you can reconcile against your own list without restating it.
+        Create a banner preconfigured for a jurisdiction — the consent mode,
+        targeting and copy that regulation requires. As with every banner this
+        API creates, it starts disabled.
 
-        Re-adding a vendor that was previously removed restores the original
-        record rather than creating a second one. A vendor already on the
-        account, or an ID that isn't in the Global Vendor List, returns a `422`.
-      operationId: createTcfVendor
+        `jurisdiction_id` comes from `GET /banner-templates`.
+      operationId: createConsentBannerFromTemplate
       tags:
-        - TCF Vendors
+        - Consent Banners
       requestBody:
-        description: Vendor to add
+        description: The jurisdiction to build the banner for
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TcfVendorWriteRequest"
+              $ref: "#/components/schemas/BannerFromTemplateRequest"
       responses:
         "201":
-          description: The added vendor
+          description: The created consent banner
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TcfVendorResponse"
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
         "403":
           $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          description: No template exists for that `jurisdiction_id`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "422":
           $ref: "#/components/responses/ValidationError"
-        "429":
-          $ref: "#/components/responses/RateLimited"
-
-  /tcf-vendors/{id}:
-    get:
-      summary: Get TCF vendor
-      description: Get TCF vendor by ID
-      operationId: getTcfVendor
-      tags:
-        - TCF Vendors
-      parameters:
-        - $ref: "#/components/parameters/id"
-      responses:
-        "200":
-          description: TCF vendor
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TcfVendorResponse"
-        "401":
-          $ref: "#/components/responses/AccountTokenRequired"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "429":
-          $ref: "#/components/responses/RateLimited"
-
-    delete:
-      summary: Remove a TCF vendor
-      description: |
-        Remove a vendor from the account. The record is soft-deleted, so adding
-        the vendor again later restores it.
-      operationId: deleteTcfVendor
-      tags:
-        - TCF Vendors
-      parameters:
-        - $ref: "#/components/parameters/id"
-      responses:
-        "200":
-          description: TCF vendor removed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DeletedMessage"
-              example:
-                message: "TCF vendor was deleted successfully"
-        "401":
-          $ref: "#/components/responses/AccountTokenRequired"
-        "403":
-          $ref: "#/components/responses/AccountAdminRequired"
-        "404":
-          $ref: "#/components/responses/NotFound"
         "429":
           $ref: "#/components/responses/RateLimited"
 
@@ -1783,6 +1786,20 @@ components:
             errors:
               - code: 401
                 message: "API key must belong to a partner"
+
+    AmbiguousAccount:
+      description: |
+        A user API key that can reach more than one account attempted a write
+        without saying which account it meant. Pass `account_id` (the account's
+        API id) as a query parameter. Account keys are never ambiguous.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 400
+                message: "Specify account_id when the API key can access more than one account"
 
     AccountAdminRequired:
       description: |
@@ -3432,77 +3449,137 @@ components:
         data:
           $ref: "#/components/schemas/Scan"
 
-    TcfVendorWrite:
-      type: object
-      properties:
-        global_vendor_id:
-          type: integer
-          description: ID of the vendor in the IAB Global Vendor List
-      required:
-        - global_vendor_id
-
-    TcfVendorWriteRequest:
-      type: object
-      properties:
-        tcf_vendor:
-          $ref: "#/components/schemas/TcfVendorWrite"
-      required:
-        - tcf_vendor
-      example:
-        tcf_vendor:
-          global_vendor_id: 755
-
-    TcfVendor:
+    ComplianceJurisdiction:
       type: object
       properties:
         id:
           type: string
-          readOnly: true
-        global_vendor_id:
-          type: integer
-        status:
+          description: Identifier for the regulation, e.g. `gdpr`
+        name:
           type: string
-          enum: [active, removed]
-          readOnly: true
-        vendor:
+        region:
+          type: string
+        flag:
+          type: [string, "null"]
+        applicability:
+          type: [string, "null"]
+          description: Who the regulation applies to
+        legal_refs:
+          type: [array, "null"]
+          items:
+            type: object
+            additionalProperties: true
+        compliant:
+          type: boolean
+          description: Whether the banner covering this regulation satisfies it
+        issues:
+          type: array
+          description: Requirements not currently met
+          items:
+            type: object
+            additionalProperties: true
+        warnings:
+          type: array
+          description: Things worth attention that do not by themselves fail the check
+          items:
+            type: object
+            additionalProperties: true
+        compliant_items:
+          type: array
+          description: Requirements already satisfied
+          items:
+            type: object
+            additionalProperties: true
+        matched_region:
+          type: [string, "null"]
+          description: The targeted region that caused this banner to be selected
+        banner:
           type: object
-          readOnly: true
           description: |
-            Details from the IAB Global Vendor List. Empty when the ID has been
-            retired upstream, since the list is not stored per account.
+            The banner evaluated for this regulation. Both fields are null when
+            no banner targets it, which is itself a compliance issue.
           properties:
+            id:
+              type: [string, "null"]
             name:
               type: [string, "null"]
-            urls:
-              type: [array, "null"]
-              items:
-                type: object
-                additionalProperties: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-      example:
-        id: "tcf1"
-        global_vendor_id: 755
-        status: "active"
-        vendor:
-          name: "Google Advertising Products"
-          urls:
-            - langId: "en"
-              privacy: "https://policies.google.com/privacy"
-        created_at: "2023-01-05T10:15:30Z"
-        updated_at: "2023-01-05T10:15:30Z"
 
-    TcfVendorResponse:
+    ComplianceReportResponse:
       type: object
       properties:
         data:
-          $ref: "#/components/schemas/TcfVendor"
+          type: object
+          properties:
+            compliant:
+              type: boolean
+              description: |
+                True when every regulation not ignored is satisfied.
+            jurisdictions:
+              type: array
+              items:
+                $ref: "#/components/schemas/ComplianceJurisdiction"
+            ignored_jurisdictions:
+              type: array
+              description: |
+                Regulations the account has chosen to ignore. Reported so a
+                client can see what was excluded from `compliant`.
+              items:
+                $ref: "#/components/schemas/ComplianceJurisdiction"
+
+    BannerTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Pass as `jurisdiction_id` when creating a banner
+        name:
+          type: string
+        flag:
+          type: [string, "null"]
+        consent_type:
+          type: string
+          description: e.g. `opt_in`, `opt_out`
+        consent_type_label:
+          type: string
+          description: e.g. `Opt-in`
+
+    BannerTemplatesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              region:
+                type: string
+              region_label:
+                type: string
+              templates:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BannerTemplate"
+      example:
+        data:
+          - region: "europe"
+            region_label: "Europe"
+            templates:
+              - id: "gdpr"
+                name: "GDPR"
+                flag: "🇪🇺"
+                consent_type: "opt_in"
+                consent_type_label: "Opt-in"
+
+    BannerFromTemplateRequest:
+      type: object
+      properties:
+        jurisdiction_id:
+          type: string
+          description: A template `id` from `GET /banner-templates`
+      required:
+        - jurisdiction_id
+      example:
+        jurisdiction_id: "gdpr"
 
 security:
   - authorization: []

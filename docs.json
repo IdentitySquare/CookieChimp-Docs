@@ -14,7 +14,12 @@
     "library": "lucide"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "favicon": "/favicon.png",
   "navigation": {
@@ -172,6 +177,8 @@
             "pages": [
               "api-reference/consent-banners/list-consent-banners",
               "api-reference/consent-banners/create-consent-banner",
+              "api-reference/consent-banners/list-banner-templates",
+              "api-reference/consent-banners/create-consent-banner-from-template",
               "api-reference/consent-banners/get-consent-banner",
               "api-reference/consent-banners/update-consent-banner",
               "api-reference/consent-banners/duplicate-consent-banner",
@@ -189,12 +196,9 @@
             ]
           },
           {
-            "group": "TCF Vendors",
+            "group": "Compliance",
             "pages": [
-              "api-reference/tcf-vendors/list-tcf-vendors",
-              "api-reference/tcf-vendors/create-tcf-vendor",
-              "api-reference/tcf-vendors/get-tcf-vendor",
-              "api-reference/tcf-vendors/delete-tcf-vendor"
+              "api-reference/compliance/get-compliance-report"
             ]
           },
           {
