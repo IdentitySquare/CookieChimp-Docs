@@ -79,7 +79,7 @@ Paginated responses include a `pagination` object with `prev_url`, `next_url`, `
 
 ## Request Bodies
 
-Write endpoints expect the resource wrapped under its own key rather than at the top level:
+Resource endpoints expect the resource wrapped under its own key rather than at the top level:
 
 ```json
 {
@@ -90,7 +90,9 @@ Write endpoints expect the resource wrapped under its own key rather than at the
 }
 ```
 
-The wrapper matches the resource: `category`, `storage_item`, `group`, `account_user`, `account_invitation`.
+The wrapper matches the resource: `category`, `storage_item`, `group`, `account_user`, `account_invitation`, and `user` for [Change password](/api-reference/auth/change-password).
+
+[Log in](/api-reference/auth/login) is the exception — it takes `email` and `password` at the top level, unwrapped.
 
 ## Response Envelopes
 
@@ -98,8 +100,10 @@ The wrapper matches the resource: `category`, `storage_item`, `group`, `account_
 |----------|-------|
 | List endpoints | `{ "pagination": { ... }, "data": [ ... ] }` |
 | Single resource | `{ "data": { ... } }` |
-| Groups and accounts | The resource itself, unwrapped |
+| A single group or account | The resource itself, unwrapped |
 | Delete endpoints | `{ "message": "..." }` |
+
+Group and account **listings** use the standard list envelope in the first row — only their single-resource responses are unwrapped.
 
 ## Errors
 

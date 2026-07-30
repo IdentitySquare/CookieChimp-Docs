@@ -939,13 +939,11 @@ components:
       name: per_page
       in: query
       description: |
-        Number of records to return per page. Values outside 1–50 fall back to
-        the default of 20.
+        Number of records to return per page. The effective range is 1–50; any
+        value outside it is accepted but falls back to the default of 20.
       required: false
       schema:
         type: integer
-        minimum: 1
-        maximum: 50
         default: 20
     onboarding_status:
       name: onboarding_status
@@ -1761,8 +1759,9 @@ components:
         actionable:
           description: |
             The record the action was taken on — a category or a storage item,
-            in the same shape those endpoints return.
-          oneOf:
+            in the same shape those endpoints return. Use `actionable_type` to
+            tell which one it is.
+          anyOf:
             - $ref: "#/components/schemas/Category"
             - $ref: "#/components/schemas/StorageItem"
       example:
