@@ -3550,26 +3550,6 @@ components:
               type: integer
               readOnly: true
               description: Bumped when a change requires visitors to consent again
-            targeting:
-              type: object
-              properties:
-                target_type:
-                  type: string
-                target_countries:
-                  type: array
-                  items:
-                    type: string
-                target_us_states:
-                  type: array
-                  items:
-                    type: string
-                target_canadian_regions:
-                  type: array
-                  items:
-                    type: string
-                  description: |
-                    Populated instead of `target_us_states` when `target_type` is
-                    `selected_canadian_provinces`; the two share a column.
             translations:
               type: array
               readOnly: true
@@ -3645,10 +3625,10 @@ components:
         dark_mode: "light"
         language_autodetect: "document"
         revision: 2
-        targeting:
-          target_type: "selected_countries"
-          target_countries: ["DE", "FR"]
-          target_us_states: []
+        target_type: "selected_countries"
+        target_countries: ["DE", "FR"]
+        target_us_states: []
+        target_canadian_regions: []
         translations:
           - id: "trn1"
             language_code: "de"
