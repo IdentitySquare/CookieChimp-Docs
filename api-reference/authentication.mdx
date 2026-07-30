@@ -145,7 +145,7 @@ Validation errors on categories, storage items and account invitations return an
 }
 ```
 
-Validation errors on groups and account users return the failing attributes directly:
+Three endpoints — [Create group](/api-reference/groups/create-group), [Update group](/api-reference/groups/update-group) and [Update account user](/api-reference/account-users/update-account-user) — render the model's errors directly instead, as an object keyed by attribute:
 
 ```json
 {
@@ -153,6 +153,8 @@ Validation errors on groups and account users return the failing attributes dire
   "external_id": ["has already been taken"]
 }
 ```
+
+Every other validation failure uses the `errors` array above, including refusing to remove an account owner.
 
 Two specific failures return a single top-level `error` string: rejected credentials on [Log in](/api-reference/auth/login), and a wrong current password or invalid new password on [Change password](/api-reference/auth/change-password).
 

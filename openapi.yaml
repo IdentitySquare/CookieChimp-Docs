@@ -88,6 +88,8 @@ paths:
               example: {}
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # password endpoint - change the current user's password
   /password:
@@ -158,6 +160,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     post:
       summary: Create category
@@ -183,6 +187,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "422":
           $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /categories/{id}:
     get:
@@ -204,6 +210,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     put:
       summary: Update category
@@ -233,6 +241,8 @@ paths:
           $ref: "#/components/responses/NotFound"
         "422":
           $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     delete:
       summary: Delete category
@@ -255,6 +265,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # storage item endpoints - GET, POST, PUT, DELETE
   /storage-items:
@@ -285,6 +297,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     post:
       summary: Create storage item
@@ -316,6 +330,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         "422":
           $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /storage-items/{id}:
     get:
@@ -337,6 +353,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     put:
       summary: Update storage item
@@ -366,6 +384,8 @@ paths:
           $ref: "#/components/responses/NotFound"
         "422":
           $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     delete:
       summary: Delete storage item
@@ -388,6 +408,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # group endpoints - index, GET, POST & PUT
   /groups:
@@ -418,6 +440,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/PartnerTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     post:
       summary: Create group
@@ -443,6 +467,8 @@ paths:
           $ref: "#/components/responses/PartnerTokenRequired"
         "422":
           $ref: "#/components/responses/ModelValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /groups/{id}:
     get:
@@ -464,6 +490,8 @@ paths:
           $ref: "#/components/responses/PartnerTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     put:
       summary: Update group
@@ -497,6 +525,8 @@ paths:
           $ref: "#/components/responses/NotFound"
         "422":
           $ref: "#/components/responses/ModelValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # consent endpoints - index & GET
   /consents:
@@ -529,6 +559,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /consents/{id}:
     get:
@@ -550,6 +582,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # AI action endpoints - index & GET
   /ai-actions:
@@ -582,6 +616,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /ai-actions/{id}:
     get:
@@ -603,6 +639,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # account endpoints - index & GET
   /accounts:
@@ -639,6 +677,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /accounts/{id}:
     get:
@@ -661,6 +701,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # account user endpoints - index, GET, PUT & DELETE
   /account-users:
@@ -691,6 +733,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /account-users/{id}:
     get:
@@ -712,6 +756,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     put:
       summary: Update account user
@@ -741,6 +787,8 @@ paths:
           $ref: "#/components/responses/NotFound"
         "422":
           $ref: "#/components/responses/ModelValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     delete:
       summary: Delete account user
@@ -774,6 +822,8 @@ paths:
               example:
                 errors:
                   - error: "Cannot remove account owner"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   # account invitation endpoints - index, POST, GET, PUT & DELETE
   /account-invitations:
@@ -804,6 +854,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     post:
       summary: Create account invitation
@@ -841,6 +893,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "422":
           $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /account-invitations/{id}:
     get:
@@ -862,6 +916,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     put:
       summary: Update account invitation
@@ -891,6 +947,8 @@ paths:
           $ref: "#/components/responses/NotFound"
         "422":
           $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
     delete:
       summary: Delete account invitation
@@ -913,6 +971,8 @@ paths:
           $ref: "#/components/responses/AccountTokenRequired"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
 components:
   securitySchemes:
@@ -1036,7 +1096,14 @@ components:
                 message: "Record not found"
 
     RateLimited:
-      description: Too many requests
+      description: |
+        Too many requests. The general limit is 300 requests per 5 minutes per
+        API token; the auth endpoints are throttled more tightly per IP.
+      headers:
+        Retry-After:
+          description: Seconds until the current rate-limit window resets
+          schema:
+            type: integer
       content:
         application/json:
           schema:
@@ -1101,8 +1168,10 @@ components:
     ModelValidationError:
       type: object
       description: |
-        Returned by the group and account-user write endpoints, which render the
-        model's errors directly: an object keyed by attribute name.
+        Returned by group create/update and account-user update, which render
+        the model's errors directly: an object keyed by attribute name. Other
+        validation failures — including removing an account owner — use
+        `ValidationError`.
       additionalProperties:
         type: array
         items:
