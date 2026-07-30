@@ -1465,6 +1465,11 @@ paths:
           `ads_data_redaction`.
 
         Enabling an integration may add its associated vendors to the account.
+
+        Scheduled scanning is a paid feature: on a free plan, setting
+        `SiteScanIntegration` to `active` or turning on `auto_add_vendors` is
+        refused with a `422`. Turning it off always works, so an account that
+        downgrades can still disable it.
       operationId: updateIntegration
       tags:
         - Integrations

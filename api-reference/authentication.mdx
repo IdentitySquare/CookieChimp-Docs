@@ -142,10 +142,10 @@ The API returns standard HTTP status codes.
 | `200` | Success |
 | `201` | Created |
 | `400` | Bad request — an invalid `page` parameter, or a write from a user key that can reach more than one account without an `account_id` |
-| `401` | Unauthorized — invalid or missing API token, or a token of the wrong type |
-| `403` | Forbidden — the key resolved to a user who is not an admin of the account, on a change the dashboard reserves for admins |
-| `404` | Not found |
-| `422` | Validation error |
+| `401` | Unauthorized — invalid or missing API token, a token of the wrong type, or, on [Log in](/api-reference/auth/login), the wrong email or password |
+| `403` | Forbidden — the key resolved to a user who is not an admin of the account, on a change the dashboard reserves for admins; or the account's plan does not include the feature, as with the [compliance report](/api-reference/compliance/get-compliance-report) |
+| `404` | Not found — including a referenced record that belongs to another account |
+| `422` | Validation error, or a setting the account's plan does not allow |
 | `429` | Rate limit exceeded |
 
 Authentication, pagination and not-found errors return an `errors` array of objects with `code` and `message`:
