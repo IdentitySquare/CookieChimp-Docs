@@ -3280,6 +3280,22 @@ components:
                 type: string
               save_preferences_btn_text:
                 type: string
+              consent_additional_description:
+                type: string
+              banner_footer_content:
+                type: string
+              settings_more_info_title:
+                type: string
+              settings_more_info:
+                type: string
+              do_not_sell_title:
+                type: string
+              do_not_sell_description:
+                type: string
+              preferences_accept_btn_text:
+                type: string
+              preferences_accept_necessary_btn_text:
+                type: string
               discarded_at:
                 type: [string, "null"]
                 format: date-time
