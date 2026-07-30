@@ -3380,6 +3380,18 @@ components:
                     format: date-time
                     description: Set to remove this translation
 
+    ConsentBannerCreate:
+      description: |
+        The create payload. `enabled` is absent because a new banner is always
+        created disabled — enable it with an update once its content and
+        targeting are set.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerWrite"
+        - type: object
+          properties:
+            enabled:
+              not: {}
+
     ConsentBannerCreateRequest:
       type: object
       description: |
@@ -3387,7 +3399,7 @@ components:
         which is where the account's language entitlement is enforced.
       properties:
         consent_banner:
-          $ref: "#/components/schemas/ConsentBannerWrite"
+          $ref: "#/components/schemas/ConsentBannerCreate"
       required:
         - consent_banner
 
