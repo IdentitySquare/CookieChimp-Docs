@@ -17,7 +17,10 @@ info:
     ## Response envelopes
 
     Listing endpoints — including `GET /groups` and `GET /accounts` — return
-    `{"pagination": {...}, "data": [...]}`. Most single-resource endpoints
+    `{"pagination": {...}, "data": [...]}`. `GET /banner-templates` is the
+    exception: it returns `{"data": [...]}` with no pagination, being a fixed
+    catalogue rather than a collection of the account's records.
+    Most single-resource endpoints
     return `{"data": {...}}`; a single group or account is returned unwrapped.
     Resource-deletion endpoints return `{"message": "..."}`; `DELETE /auth`
     returns an empty object.
