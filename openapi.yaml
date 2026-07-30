@@ -6,15 +6,17 @@ info:
 
     ## Request bodies
 
-    Write endpoints expect the resource wrapped under its own key, e.g.
+    Resource endpoints expect the resource wrapped under its own key, e.g.
     `{"category": {"name": "Analytics"}}` rather than a bare object.
+    `PUT /password` wraps in `user`. `POST /auth` is the exception: it takes
+    `email` and `password` at the top level.
 
     ## Response envelopes
 
-    Listing endpoints return `{"pagination": {...}, "data": [...]}`. Most
-    single-resource endpoints return `{"data": {...}}`; the group and account
-    endpoints return the resource unwrapped. Delete endpoints return
-    `{"message": "..."}`.
+    Listing endpoints — including `GET /groups` and `GET /accounts` — return
+    `{"pagination": {...}, "data": [...]}`. Most single-resource endpoints
+    return `{"data": {...}}`; a single group or account is returned unwrapped.
+    Delete endpoints return `{"message": "..."}`.
   version: 1.2.0
 
 servers:
