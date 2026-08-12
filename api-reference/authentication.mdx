@@ -66,7 +66,7 @@ If you exceed a limit you receive a `429 Too Many Requests` response with a `Ret
 
 ## Pagination
 
-List endpoints support pagination with the following query parameters:
+List endpoints support pagination with the following query parameters. [Banner templates](/api-reference/consent-banners/list-banner-templates) is the one exception — it returns the whole catalogue and accepts neither parameter.
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
@@ -90,21 +90,48 @@ Resource endpoints expect the resource wrapped under its own key rather than at 
 }
 ```
 
-The wrapper matches the resource: `category`, `storage_item`, `group`, `account_user`, `account_invitation`, and `user` for [Change password](/api-reference/auth/change-password).
+The wrapper matches the resource, though not always the path — `/services` wraps in `site_service`:
 
-[Log in](/api-reference/auth/login) is the exception — it takes `email` and `password` at the top level, unwrapped.
+| Endpoint | Wrapper |
+|---|---|
+| `/categories` | `category` |
+| `/storage-items` | `storage_item` |
+| `/services` | `site_service` |
+| `/consent-banners` | `consent_banner` |
+| `/scans` | `scan` |
+| `/integrations` | `integration` |
+| `/accounts` | `account` |
+| `/groups` | `group` |
+| `/account-users` | `account_user` |
+| `/account-invitations` | `account_invitation` |
+| [Change password](/api-reference/auth/change-password) | `user` |
+
+Two endpoints take their body unwrapped: [Log in](/api-reference/auth/login), which takes `email` and `password` at the top level, and [Create consent banner from a template](/api-reference/consent-banners/create-consent-banner-from-template), which takes `jurisdiction_id` — a selector for which template to build from, not an attribute of the banner it creates.
+
+## Choosing an account
+
+An account API key identifies exactly one account, so there is nothing to choose. A user API key can reach several, and the endpoints that declare an `account_id` query parameter — the account's API id — let you say which one you mean. Endpoints that don't declare it act on the account the key resolves to on its own.
+
+Where an endpoint accepts it, reads treat it as optional — it just narrows the request — while writes require it whenever the key can reach more than one account: without it the request would act on an account it picked rather than one you named, so it is refused with a `400`. Endpoints that don't accept the parameter are unaffected either way.
+
+```
+POST /api/v1/consent-banners?account_id=aBcD1234
+```
 
 ## Response Envelopes
 
 | Response | Shape |
 |----------|-------|
 | List endpoints | `{ "pagination": { ... }, "data": [ ... ] }` |
+| [Banner templates](/api-reference/consent-banners/list-banner-templates) | `{ "data": [ ... ] }` — no pagination |
 | Single resource | `{ "data": { ... } }` |
 | A single group or account | The resource itself, unwrapped |
 | Resource-deletion endpoints | `{ "message": "..." }` |
 | [Log out](/api-reference/auth/logout) | `{}` |
 
 Group and account **listings** use the standard list envelope in the first row — only their single-resource responses are unwrapped.
+
+Banner templates are a fixed catalogue rather than a collection of the account's own records, so that endpoint is not paginated and returns no `pagination` object.
 
 ## Errors
 
@@ -114,10 +141,11 @@ The API returns standard HTTP status codes.
 |-------------|-------------|
 | `200` | Success |
 | `201` | Created |
-| `400` | Bad request — an invalid `page` parameter |
-| `401` | Unauthorized — invalid or missing API token, or a token of the wrong type |
-| `404` | Not found |
-| `422` | Validation error |
+| `400` | Bad request — an invalid `page` parameter, or a write from a user key that can reach more than one account without an `account_id` |
+| `401` | Unauthorized — invalid or missing API token, a token of the wrong type, or, on [Log in](/api-reference/auth/login), the wrong email or password |
+| `403` | Forbidden — the key resolved to a user who is not an admin of the account, on a change the dashboard reserves for admins; or the account's plan does not include the feature, as with the [compliance report](/api-reference/compliance/get-compliance-report) |
+| `404` | Not found — including a referenced record that belongs to another account |
+| `422` | Validation error, or a setting the account's plan does not allow |
 | `429` | Rate limit exceeded |
 
 Authentication, pagination and not-found errors return an `errors` array of objects with `code` and `message`:

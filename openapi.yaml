@@ -8,13 +8,19 @@ info:
 
     Resource endpoints expect the resource wrapped under its own key, e.g.
     `{"category": {"name": "Analytics"}}` rather than a bare object.
-    `PUT /password` wraps in `user`. `POST /auth` is the exception: it takes
-    `email` and `password` at the top level.
+    `PUT /password` wraps in `user`. Two endpoints take their body unwrapped:
+    `POST /auth`, which takes `email` and `password` at the top level, and
+    `POST /consent-banners/from-template`, which takes `jurisdiction_id` —
+    a selector for which template to build from, not an attribute of the
+    banner it creates.
 
     ## Response envelopes
 
     Listing endpoints — including `GET /groups` and `GET /accounts` — return
-    `{"pagination": {...}, "data": [...]}`. Most single-resource endpoints
+    `{"pagination": {...}, "data": [...]}`. `GET /banner-templates` is the
+    exception: it returns `{"data": [...]}` with no pagination, being a fixed
+    catalogue rather than a collection of the account's records.
+    Most single-resource endpoints
     return `{"data": {...}}`; a single group or account is returned unwrapped.
     Resource-deletion endpoints return `{"message": "..."}`; `DELETE /auth`
     returns an empty object.
@@ -704,6 +710,48 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
+    patch:
+      summary: Update account
+      description: |
+        Update an account's settings — the same fields the dashboard's account
+        settings screens expose.
+
+        An account token carries the account's own authority. A user token must
+        belong to an admin of the account, mirroring the web UI, and a
+        non-admin member gets a `403`.
+
+        `account_type` cannot be changed here, as on the web form: mobile app
+        accounts are only created through the admin panel.
+      operationId: updateAccount
+      tags:
+        - Accounts
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Account settings to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountWriteRequest"
+      responses:
+        "200":
+          description: Updated account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
   # account user endpoints - index, GET, PUT & DELETE
   /account-users:
     get:
@@ -974,6 +1022,698 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
+  # site service endpoints - index, GET, POST, PUT & DELETE
+  /services:
+    get:
+      summary: List services
+      description: |
+        List the services configured on the current account, in name order.
+        Requires an account-scoped API token.
+      operationId: listServices
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SiteService"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      summary: Create service
+      description: |
+        Create a service under one of the account's categories. `category_id`
+        is required and must belong to this account.
+      operationId: createService
+      tags:
+        - Services
+      requestBody:
+        description: Service to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteServiceCreateRequest"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteServiceResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          description: The referenced `category_id` does not belong to this account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /services/{id}:
+    get:
+      summary: Get service
+      description: Get service by ID
+      operationId: getService
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteServiceResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    put:
+      summary: Update service
+      description: |
+        Update a service. Passing `category_id` moves the service to that
+        category; omitting it leaves the service where it is.
+      operationId: updateService
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Service to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteServiceUpdateRequest"
+      responses:
+        "200":
+          description: Updated service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteServiceResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    delete:
+      summary: Delete service
+      description: Delete a service. It is soft-deleted and stops appearing in listings.
+      operationId: deleteService
+      tags:
+        - Services
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Service deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Service was deleted successfully"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # consent banner endpoints - index, GET, POST, PUT, DELETE & duplicate
+  /consent-banners:
+    get:
+      summary: List consent banners
+      description: |
+        List the account's consent banners, newest first. Requires an
+        account-scoped API token.
+      operationId: listConsentBanners
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of consent banners
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ConsentBanner"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      summary: Create consent banner
+      description: |
+        Create a consent banner. It inherits the design of the account's most
+        recently updated banner, the same way the dashboard's new-banner flow
+        does, and is always created disabled — enable it once its content and
+        targeting are set. A name is generated if you don't supply one.
+
+        Translations are not accepted here; add them by updating the banner
+        afterwards, which is where the account's language entitlement is
+        enforced.
+      operationId: createConsentBanner
+      tags:
+        - Consent Banners
+      requestBody:
+        description: Consent banner to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsentBannerCreateRequest"
+      responses:
+        "201":
+          description: Created consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /consent-banners/{id}:
+    get:
+      summary: Get consent banner
+      description: Get consent banner by ID
+      operationId: getConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    put:
+      summary: Update consent banner
+      description: |
+        Update a consent banner's content, appearance or targeting. Set
+        `enabled` to `true` to make it live.
+      operationId: updateConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Consent banner to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsentBannerUpdateRequest"
+      responses:
+        "200":
+          description: Updated consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    delete:
+      summary: Delete consent banner
+      description: Delete a consent banner. It is soft-deleted and stops appearing in listings.
+      operationId: deleteConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Consent banner deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletedMessage"
+              example:
+                message: "Consent banner was deleted successfully"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /consent-banners/{id}/duplicate:
+    post:
+      summary: Duplicate consent banner
+      description: |
+        Copy a consent banner, including its design and targeting. The copy is
+        named after the original and is always created disabled.
+      operationId: duplicateConsentBanner
+      tags:
+        - Consent Banners
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      responses:
+        "201":
+          description: The duplicated consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # integration endpoints - index, GET & PUT
+  /integrations:
+    get:
+      summary: List integrations
+      description: |
+        List every integration available to the account, active and inactive.
+        Integrations the account has never opened are created inactive on first
+        listing, so the collection is always the full set you can enable.
+
+        Only integrations the account's platform can run are included — a mobile
+        app account does not see the website-only ones.
+      operationId: listIntegrations
+      tags:
+        - Integrations
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of integrations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Integration"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /integrations/{id}:
+    get:
+      summary: Get integration
+      description: Get integration by ID
+      operationId: getIntegration
+      tags:
+        - Integrations
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Integration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    put:
+      summary: Update integration
+      description: |
+        Enable, disable or configure an integration. Every integration accepts
+        `status`; the rest of the accepted keys depend on which integration it
+        is, and anything else is ignored.
+
+        - `SiteScanIntegration` also accepts `scan_frequency` (`weekly` or
+          `monthly`; weekly is not available on free accounts) and
+          `auto_add_vendors`.
+        - `GoogleConsentModeIntegration` also accepts `url_passthrough` and
+          `ads_data_redaction`.
+
+        Enabling an integration may add its associated vendors to the account.
+
+        Scheduled scanning is a paid feature: on a free plan, setting
+        `SiteScanIntegration` to `active` or turning on `auto_add_vendors` is
+        refused with a `422`. Turning it off always works, so an account that
+        downgrades can still disable it.
+      operationId: updateIntegration
+      tags:
+        - Integrations
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        description: Integration settings to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntegrationWriteRequest"
+      responses:
+        "200":
+          description: Updated integration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # scan endpoints - index, GET & POST
+  /scans:
+    get:
+      summary: List scans
+      description: |
+        List the account's website scans, newest first. Requires an
+        account-scoped API token.
+      operationId: listScans
+      tags:
+        - Scans
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: List of scans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/BasePagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Scan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+    post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      summary: Start a scan
+      description: |
+        Queue a scan of the account's website. Only one scan can run at a time
+        per account, and accounts have a daily scan limit — both come back as a
+        `422`, as does a mobile app account, which has no website to crawl.
+
+        Scanning is asynchronous: the scan is created `queued`, and the report
+        appears on the scan once its status reaches `completed`.
+      operationId: createScan
+      tags:
+        - Scans
+      requestBody:
+        description: Scan to queue
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScanWriteRequest"
+      responses:
+        "201":
+          description: Queued scan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /scans/{id}:
+    get:
+      summary: Get scan
+      description: |
+        Get a scan by ID. `report` is only present once the scan has completed;
+        poll `status` until then.
+      operationId: getScan
+      tags:
+        - Scans
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Scan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # compliance report
+  /compliance:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      summary: Get the regional compliance report
+      description: |
+        Evaluate the account's banners against every regulation CookieChimp
+        tracks, and report what is outstanding — the same evaluation the
+        dashboard's compliance screen renders.
+
+        Regulations the account has chosen to ignore are reported separately in
+        `ignored_jurisdictions` rather than dropped, and are excluded from the
+        top-level `compliant` verdict.
+
+        Requires a plan that includes the compliance report.
+      operationId: getComplianceReport
+      tags:
+        - Compliance
+      responses:
+        "200":
+          description: The compliance report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReportResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          description: The account's plan does not include the compliance report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                errors:
+                  - code: 403
+                    message: "The compliance report is not available on this plan"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  # banner templates
+  /banner-templates:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      summary: List banner templates
+      description: |
+        The jurisdiction templates a banner can be created from, grouped by
+        region. Use a template's `id` as the `jurisdiction_id` for
+        `POST /consent-banners/from-template`.
+      operationId: listBannerTemplates
+      tags:
+        - Consent Banners
+      responses:
+        "200":
+          description: Templates grouped by region
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BannerTemplatesResponse"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /consent-banners/from-template:
+    post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      summary: Create consent banner from a template
+      description: |
+        Create a banner preconfigured for a jurisdiction — the consent mode,
+        targeting and copy that regulation requires. As with every banner this
+        API creates, it starts disabled.
+
+        `jurisdiction_id` comes from `GET /banner-templates`.
+      operationId: createConsentBannerFromTemplate
+      tags:
+        - Consent Banners
+      requestBody:
+        description: The jurisdiction to build the banner for
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BannerFromTemplateRequest"
+      responses:
+        "201":
+          description: The created consent banner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentBannerResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
+        "401":
+          $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
+        "404":
+          description: No template exists for that `jurisdiction_id`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
 components:
   securitySchemes:
     authorization:
@@ -982,6 +1722,24 @@ components:
       description: API token obtained from the login endpoint or the dashboard
 
   parameters:
+    account_id:
+      name: account_id
+      in: query
+      description: |
+        Which account to act on, as the account's API id. Only meaningful for a
+        user API key, which may reach several accounts — an account key already
+        identifies exactly one and ignores this.
+
+        Accepted by the endpoints that declare it; others act on the account the
+        key resolves to on its own.
+
+        Optional for reads, where it narrows the request to that account.
+        Required for writes that declare it when the key can reach more than one
+        account: without it the request would act on an account it picked rather
+        than one you named, so it is refused with a `400`.
+      required: false
+      schema:
+        type: string
     id:
       name: id
       in: path
@@ -1019,6 +1777,10 @@ components:
         - `vendors_setup`: Categories, services or TCF vendors have been set up.
         - `script_installed`: The script has been installed on the user's website.
         - `live`: The account is live and operational.
+
+        Accounts whose status could not be determined are excluded from a
+        filtered listing, since their status is unknown rather than any
+        particular value.
       required: false
       schema:
         type: string
@@ -1082,6 +1844,36 @@ components:
             errors:
               - code: 401
                 message: "API key must belong to a partner"
+
+    AmbiguousAccount:
+      description: |
+        A user API key that can reach more than one account attempted a write
+        without saying which account it meant. Pass `account_id` (the account's
+        API id) as a query parameter. Account keys are never ambiguous.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 400
+                message: "Specify account_id when the API key can access more than one account"
+
+    AccountAdminRequired:
+      description: |
+        The token resolved to a user who is not an admin of this account.
+        Configuration changes are admin-only, mirroring the dashboard — a group
+        admin qualifies even without a direct membership, since a group role
+        supersedes one. Account tokens carry the account's own authority and
+        never see this; reads are unaffected.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            errors:
+              - code: 403
+                message: "User must be an admin of this account"
 
     NotFound:
       description: The record does not exist, or does not belong to the caller
@@ -2094,6 +2886,37 @@ components:
           type: string
           readOnly: true
           description: Domain of the account
+        account_type:
+          type: string
+          enum: [website, mobile_app]
+          readOnly: true
+        domain:
+          type: [string, "null"]
+        subdomain:
+          type: [string, "null"]
+        default_language:
+          type: string
+          description: ISO 639-1 code the banner falls back to
+        auto_translate:
+          type: boolean
+        translations:
+          type: array
+          items:
+            type: string
+          description: ISO 639-1 codes the banner is translated into
+        industry:
+          type: [string, "null"]
+        description:
+          type: [string, "null"]
+        support_email:
+          type: [string, "null"]
+        banner_debug_mode:
+          type: boolean
+        blocking_mode:
+          type: [string, "null"]
+        retain_consent_duration:
+          type: integer
+          description: Years consent records are retained
         allowed_domains:
           type: array
           items:
@@ -2105,7 +2928,7 @@ components:
           readOnly: true
           description: ID of the account user that owns the account
         onboarding_status:
-          type: string
+          type: [string, "null"]
           readOnly: true
           description: |
             The status of the account, where:
@@ -2113,6 +2936,11 @@ components:
             - `vendors_setup`: Categories, services or TCF vendors have been set up.
             - `script_installed`: The script has been installed on the user's website.
             - `live`: The account is live and operational.
+
+            `null` means the status could not be determined — the analytics store
+            behind it was unreachable when the response was built. It is not a
+            statement about the account, and the request itself still succeeded.
+            Treat it as "unknown" and retry rather than as a downgrade in status.
         visitor_stats:
           $ref: "#/components/schemas/VisitorStats"
         created_at:
@@ -2155,6 +2983,973 @@ components:
               previous_period: 27.0
         created_at: "2022-12-20T18:45:00Z"
         updated_at: "2023-01-10T19:00:00Z"
+
+    AccountWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          description: |
+            The account's domain. Must be a valid domain for website accounts.
+        domain:
+          type: string
+        subdomain:
+          type: string
+        default_language:
+          type: string
+          description: ISO 639-1 code the banner falls back to
+        auto_translate:
+          type: boolean
+          description: Whether new content is machine-translated into the account's languages
+        translations:
+          type: array
+          items:
+            type: string
+          description: ISO 639-1 codes the banner is translated into
+        allowed_domains_list:
+          type: string
+          description: |
+            Comma-separated list of domains the script may run on. Write-only —
+            responses return the parsed `allowed_domains` array instead.
+        industry:
+          type: string
+        description:
+          type: string
+        support_email:
+          type: string
+          format: email
+        banner_debug_mode:
+          type: boolean
+        blocking_mode:
+          type: string
+          description: How aggressively scripts are blocked before consent
+        retain_consent_duration:
+          type: integer
+          description: |
+            Years consent records are retained. Free accounts are fixed at 3.
+
+    AccountWriteRequest:
+      type: object
+      properties:
+        account:
+          $ref: "#/components/schemas/AccountWrite"
+      required:
+        - account
+      example:
+        account:
+          name: "example.com"
+          support_email: "privacy@example.com"
+          banner_debug_mode: false
+
+    SiteServiceSettings:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the service, shown to visitors
+        category_id:
+          type: string
+          description: |
+            ID of the category the service belongs to. Required on create;
+            on update, supplying it moves the service to that category.
+        description:
+          type: string
+          description: Description shown to visitors
+        processing_company:
+          type: string
+          description: Company that processes data through this service
+        privacy_policy_url:
+          type: string
+        additional_info:
+          type: string
+        accepted_by_default:
+          type: boolean
+          description: Whether the service is pre-accepted in the banner
+        enabled:
+          type: boolean
+          description: Whether the service is active on the account
+        auto_block:
+          type: boolean
+          description: Whether the widget blocks this service's scripts before consent
+        auto_block_domains_input:
+          type: string
+          description: |
+            Domains to auto-block, separated by commas or newlines. Parsed into
+            the `auto_block_domains` list on save.
+
+    SiteServiceWrite:
+      description: |
+        Everything a service accepts on update, including its translations.
+      allOf:
+        - $ref: "#/components/schemas/SiteServiceSettings"
+        - type: object
+          properties:
+            site_service_translations_attributes:
+              type: array
+              description: |
+                Create, update or discard the localized copy a visitor reads when the
+                banner runs in another language. Send an entry without an `id` to add
+                a translation, with the `id` the response gave you to change one, and
+                with `discarded_at` set to remove one.
+
+                Not accepted when creating a service — add them by updating it, which
+                is where the account's language entitlement is enforced.
+              items:
+                type: object
+                description: |
+                  An entry without an `id` creates a translation and must name its
+                  `language_code`; an entry with one may send only the fields it
+                  changes.
+                anyOf:
+                  - required: [id]
+                  - required: [language_code]
+                properties:
+                  id:
+                    type: string
+                    description: |
+                      The translation's ID, as returned in `translations`. Omit it to
+                      add a new translation.
+                  language_code:
+                    type: string
+                    description: |
+                      The language this copy is for. Cannot be the service's own
+                      `default_language`, and each language may appear once.
+                  description:
+                    type: [string, "null"]
+                  additional_info:
+                    type: [string, "null"]
+                  discarded_at:
+                    type: [string, "null"]
+                    format: date-time
+                    description: Set to remove this translation
+
+    SiteServiceCreate:
+      description: |
+        A service is always filed under a category, so `category_id` is
+        required here even though it is optional when updating. Translations are
+        absent for the same reason they are on banners — add them by updating
+        the service, which is where the account's language entitlement is
+        enforced. Sending them anyway is not an error, they are simply ignored.
+      allOf:
+        - $ref: "#/components/schemas/SiteServiceSettings"
+      required:
+        - name
+        - category_id
+
+    SiteServiceCreateRequest:
+      type: object
+      properties:
+        site_service:
+          $ref: "#/components/schemas/SiteServiceCreate"
+      required:
+        - site_service
+      example:
+        site_service:
+          name: "Google Analytics"
+          category_id: "cat1"
+          processing_company: "Google LLC"
+          privacy_policy_url: "https://policies.google.com/privacy"
+          auto_block: true
+
+    SiteServiceUpdateRequest:
+      type: object
+      description: |
+        Every field is optional; anything omitted keeps its current value.
+        Supplying `category_id` moves the service to that category.
+      properties:
+        site_service:
+          $ref: "#/components/schemas/SiteServiceWrite"
+      required:
+        - site_service
+      example:
+        site_service:
+          name: "Google Analytics 4"
+          auto_block: false
+
+    SiteService:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: [string, "null"]
+        processing_company:
+          type: [string, "null"]
+        privacy_policy_url:
+          type: [string, "null"]
+        additional_info:
+          type: [string, "null"]
+        accepted_by_default:
+          type: boolean
+        enabled:
+          type: boolean
+        auto_block:
+          type: boolean
+        auto_block_domains:
+          type: array
+          items:
+            type: string
+          description: Domains the widget blocks for this service before consent
+        default_language:
+          type: [string, "null"]
+        category:
+          type: object
+          description: The category this service is filed under
+          properties:
+            id:
+              type: [string, "null"]
+            name:
+              type: [string, "null"]
+        translations:
+          type: array
+          description: |
+            The localized copy for this service, one entry per language, with the
+            IDs `site_service_translations_attributes` expects back. Discarded
+            translations are not returned.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              language_code:
+                type: string
+              description:
+                type: [string, "null"]
+              additional_info:
+                type: [string, "null"]
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "svc1"
+        name: "Google Analytics"
+        description: "Measures how visitors use the site."
+        processing_company: "Google LLC"
+        privacy_policy_url: "https://policies.google.com/privacy"
+        additional_info: null
+        accepted_by_default: false
+        enabled: true
+        auto_block: true
+        auto_block_domains: ["google-analytics.com"]
+        default_language: "en"
+        category:
+          id: "cat1"
+          name: "Analytics"
+        translations:
+          - id: "svct1"
+            language_code: "de"
+            description: "Misst, wie Besucher die Website nutzen."
+            additional_info: null
+        created_at: "2023-03-01T09:00:00Z"
+        updated_at: "2023-03-23T12:34:56Z"
+
+    SiteServiceResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/SiteService"
+
+    ConsentBannerSettings:
+      type: object
+      description: |
+        Every setting the banner designer exposes. The response returns the same
+        set, so a banner can be read, edited and sent back unchanged. Fields the
+        database leaves nullable are declared nullable here too — the response
+        returns null for unset copy, and the same shape has to be sendable back.
+      properties:
+        banner_accept_btn_text:
+          type: [string, "null"]
+        banner_accept_necessary_btn_text:
+          type: [string, "null"]
+        banner_footer_content:
+          type: [string, "null"]
+        banner_preferences_btn_text:
+          type: [string, "null"]
+        btn_border_radius:
+          type: string
+        consent_additional_description:
+          type: [string, "null"]
+        consent_button_placement:
+          type: string
+        consent_description:
+          type: [string, "null"]
+        consent_duration_days:
+          type: integer
+          description: How long a visitor's choice is remembered
+        consent_layout:
+          type: string
+          description: e.g. `box`, `bar`
+        consent_mode:
+          type: string
+          description: e.g. `opt_in`, `opt_out`
+        consent_position:
+          type: string
+          description: e.g. `bottom_center`
+        consent_title:
+          type: [string, "null"]
+        dark_mode:
+          type: string
+          description: e.g. `light`, `dark`, `auto`
+        do_not_sell_description:
+          type: [string, "null"]
+        do_not_sell_title:
+          type: [string, "null"]
+        enable_banner_footer:
+          type: boolean
+        enable_tcf:
+          type: boolean
+          description: Whether the banner runs in IAB TCF mode
+        equal_weight_buttons:
+          type: boolean
+        floating_preferences_icon_position:
+          type: string
+        force_consent:
+          type: boolean
+          description: Whether the page is blocked until the visitor chooses
+        language_autodetect:
+          type: string
+        logo_url_dark:
+          type: [string, "null"]
+        logo_url_light:
+          type: [string, "null"]
+        modal_border_radius:
+          type: string
+        name:
+          type: string
+        preferences_accept_btn_text:
+          type: [string, "null"]
+        preferences_accept_necessary_btn_text:
+          type: [string, "null"]
+        preferences_control_level:
+          type: string
+          description: How granular the preferences modal is
+        privacy_policy_url:
+          type: [string, "null"]
+        save_preferences_btn_text:
+          type: [string, "null"]
+        settings_description:
+          type: [string, "null"]
+        settings_layout:
+          type: string
+        settings_more_info:
+          type: [string, "null"]
+        settings_more_info_title:
+          type: [string, "null"]
+        settings_position_x:
+          type: string
+        settings_title:
+          type: [string, "null"]
+        show_banner_accept_btn:
+          type: boolean
+        show_banner_accept_necessary_btn:
+          type: boolean
+        show_banner_close_btn:
+          type: boolean
+        show_banner_preferences_btn:
+          type: boolean
+        show_floating_preferences_icon:
+          type: boolean
+        show_preferences_accept_btn:
+          type: boolean
+        show_preferences_accept_necessary_btn:
+          type: boolean
+        show_save_preferences_btn:
+          type: boolean
+        show_services:
+          type: boolean
+        swap_buttons:
+          type: boolean
+        target_canadian_regions:
+          type: array
+          items:
+            type: string
+          description: Province and territory codes, used when `target_type` is `selected_canadian_provinces`. Shares a column with `target_us_states`.
+        target_countries:
+          type: array
+          items:
+            type: string
+          description: ISO 3166-1 alpha-2 codes
+        target_type:
+          type: string
+          description: Who sees the banner, e.g. `worldwide`, `selected_countries`
+        target_us_states:
+          type: array
+          items:
+            type: string
+        button_colors:
+          type: object
+          additionalProperties:
+            type: string
+          description: Colour overrides, keyed by button element
+
+    ConsentBannerWrite:
+      description: |
+        Every setting the banner designer exposes, plus whether the banner is
+        live. Creating a banner uses ConsentBannerSettings instead, which is this
+        same set without `enabled`.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerSettings"
+        - type: object
+          properties:
+            enabled:
+              type: boolean
+              description: Whether the banner is live.
+
+    ConsentBannerUpdate:
+      description: |
+        Everything a banner accepts on update, including its translations.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerWrite"
+        - type: object
+          properties:
+            banner_languages_attributes:
+              type: object
+              description: |
+                Create, update or discard translations. Not accepted when creating a
+                banner — add them by updating it, which is where the account's
+                language entitlement is enforced.
+
+                Keys are arbitrary indices. Omit `id` to add a translation; pass the
+                `id` from the banner's `translations` array to change an existing
+                one, and set `discarded_at` to remove it.
+              additionalProperties:
+                type: object
+                description: |
+                  An entry without an `id` creates a translation and must name its
+                  `language_code`; an entry with one may send only the fields it
+                  changes.
+                anyOf:
+                  - required: [id]
+                  - required: [language_code]
+                properties:
+                  id:
+                    type: string
+                    description: From the banner's `translations` array
+                  language_code:
+                    type: string
+                    description: ISO 639-1 code
+                  consent_title:
+                    type: [string, "null"]
+                  consent_description:
+                    type: [string, "null"]
+                  banner_accept_btn_text:
+                    type: [string, "null"]
+                  banner_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  banner_preferences_btn_text:
+                    type: [string, "null"]
+                  settings_title:
+                    type: [string, "null"]
+                  settings_description:
+                    type: [string, "null"]
+                  privacy_policy_url:
+                    type: [string, "null"]
+                  save_preferences_btn_text:
+                    type: [string, "null"]
+                  consent_additional_description:
+                    type: [string, "null"]
+                  banner_footer_content:
+                    type: [string, "null"]
+                  settings_more_info_title:
+                    type: [string, "null"]
+                  settings_more_info:
+                    type: [string, "null"]
+                  do_not_sell_title:
+                    type: [string, "null"]
+                  do_not_sell_description:
+                    type: [string, "null"]
+                  preferences_accept_btn_text:
+                    type: [string, "null"]
+                  preferences_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  discarded_at:
+                    type: [string, "null"]
+                    format: date-time
+                    description: Set to remove this translation
+
+    ConsentBannerCreate:
+      description: |
+        The create payload: every banner setting except `enabled`, which is not
+        part of it because a new banner is always created disabled — enable it
+        with an update once its content and targeting are set. Sending `enabled`
+        anyway is not an error, the value is simply ignored.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerSettings"
+
+    ConsentBannerCreateRequest:
+      type: object
+      description: |
+        Translations are not accepted here — add them by updating the banner,
+        which is where the account's language entitlement is enforced.
+      properties:
+        consent_banner:
+          $ref: "#/components/schemas/ConsentBannerCreate"
+      required:
+        - consent_banner
+
+    ConsentBannerUpdateRequest:
+      type: object
+      properties:
+        consent_banner:
+          $ref: "#/components/schemas/ConsentBannerUpdate"
+      required:
+        - consent_banner
+      example:
+        consent_banner:
+          name: "EU banner"
+          consent_title: "We use cookies"
+          consent_mode: "opt_in"
+          target_type: "selected_countries"
+          target_countries: ["DE", "FR"]
+
+    ConsentBanner:
+      description: |
+        Every setting the update endpoint accepts, plus the read-only fields
+        below — the response is derived from the same list the API permits, so a
+        banner can be read, edited and sent back unchanged.
+      allOf:
+        - $ref: "#/components/schemas/ConsentBannerWrite"
+        - type: object
+          properties:
+            id:
+              type: string
+              readOnly: true
+            name:
+              type: string
+            enabled:
+              type: boolean
+            enable_tcf:
+              type: boolean
+            force_consent:
+              type: boolean
+            consent_mode:
+              type: string
+            consent_duration_days:
+              type: integer
+            consent_layout:
+              type: string
+            consent_position:
+              type: string
+            preferences_control_level:
+              type: string
+            dark_mode:
+              type: string
+            language_autodetect:
+              type: string
+            revision:
+              type: integer
+              readOnly: true
+              description: Bumped when a change requires visitors to consent again
+            translations:
+              type: array
+              readOnly: true
+              description: |
+                The banner's translations, each with its localized copy alongside
+                its `id` — so a client can read what it is allowed to write rather
+                than overwriting fields it cannot see. The `id` is what you send
+                back in `banner_languages_attributes` to update or discard one.
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  language_code:
+                    type: string
+                    description: ISO 639-1 code
+                  consent_title:
+                    type: [string, "null"]
+                  consent_description:
+                    type: [string, "null"]
+                  consent_additional_description:
+                    type: [string, "null"]
+                  banner_accept_btn_text:
+                    type: [string, "null"]
+                  banner_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  banner_preferences_btn_text:
+                    type: [string, "null"]
+                  banner_footer_content:
+                    type: [string, "null"]
+                  settings_title:
+                    type: [string, "null"]
+                  settings_description:
+                    type: [string, "null"]
+                  settings_more_info_title:
+                    type: [string, "null"]
+                  settings_more_info:
+                    type: [string, "null"]
+                  privacy_policy_url:
+                    type: [string, "null"]
+                  do_not_sell_title:
+                    type: [string, "null"]
+                  do_not_sell_description:
+                    type: [string, "null"]
+                  preferences_accept_btn_text:
+                    type: [string, "null"]
+                  preferences_accept_necessary_btn_text:
+                    type: [string, "null"]
+                  save_preferences_btn_text:
+                    type: [string, "null"]
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+            updated_at:
+              type: string
+              format: date-time
+              readOnly: true
+      example:
+        id: "ban1"
+        name: "EU banner"
+        enabled: true
+        enable_tcf: false
+        force_consent: false
+        consent_mode: "opt_in"
+        consent_duration_days: 180
+        consent_layout: "box"
+        consent_position: "bottom_center"
+        consent_title: "We use cookies"
+        consent_description: "We use cookies to improve your experience."
+        privacy_policy_url: "https://example.com/privacy"
+        preferences_control_level: "category_and_services"
+        dark_mode: "light"
+        language_autodetect: "document"
+        revision: 2
+        target_type: "selected_countries"
+        target_countries: ["DE", "FR"]
+        target_us_states: []
+        target_canadian_regions: []
+        translations:
+          - id: "trn1"
+            language_code: "de"
+          - id: "trn2"
+            language_code: "fr"
+        created_at: "2023-01-05T10:15:30Z"
+        updated_at: "2023-02-01T08:00:00Z"
+
+    ConsentBannerResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/ConsentBanner"
+
+    IntegrationWrite:
+      type: object
+      description: |
+        `status` applies to every integration. The remaining keys are only
+        accepted by the integration that declares them; anything else is ignored.
+      properties:
+        status:
+          type: string
+          enum: [active, inactive]
+        scan_frequency:
+          type: string
+          enum: [weekly, monthly]
+          description: |
+            `SiteScanIntegration` only. Weekly is not available on free accounts.
+        auto_add_vendors:
+          type: boolean
+          description: "`SiteScanIntegration` only: add vendors a scan discovers."
+        url_passthrough:
+          type: boolean
+          description: "`GoogleConsentModeIntegration` only."
+        ads_data_redaction:
+          type: boolean
+          description: "`GoogleConsentModeIntegration` only."
+
+    IntegrationWriteRequest:
+      type: object
+      properties:
+        integration:
+          $ref: "#/components/schemas/IntegrationWrite"
+      required:
+        - integration
+      example:
+        integration:
+          status: "active"
+          scan_frequency: "monthly"
+          auto_add_vendors: true
+
+    Integration:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+          description: The integration class, e.g. `SiteScanIntegration`
+        name:
+          type: string
+          readOnly: true
+          description: Human-readable name
+        status:
+          type: string
+          enum: [active, inactive]
+        short_description:
+          type: [string, "null"]
+          readOnly: true
+        settings:
+          type: [object, "null"]
+          additionalProperties: true
+          description: Integration-specific settings
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "int1"
+        type: "SiteScanIntegration"
+        name: "Site Scan"
+        status: "active"
+        short_description: "Scan your website for cookies on a schedule."
+        settings:
+          scan_frequency: "monthly"
+          auto_add_vendors: false
+        created_at: "2023-01-05T10:15:30Z"
+        updated_at: "2023-02-01T08:00:00Z"
+
+    IntegrationResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Integration"
+
+    ScanWrite:
+      type: object
+      properties:
+        starting_url:
+          type: string
+          description: |
+            URL the crawl starts from. A missing scheme is treated as `https://`.
+            Defaults to the account's own domain when omitted.
+        max_pages:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Maximum pages to crawl
+        crawl_subdomains:
+          type: boolean
+          description: Whether the crawl follows links onto subdomains
+
+    ScanWriteRequest:
+      type: object
+      properties:
+        scan:
+          $ref: "#/components/schemas/ScanWrite"
+      required:
+        - scan
+      example:
+        scan:
+          starting_url: "https://example.com"
+          max_pages: 25
+          crawl_subdomains: false
+
+    Scan:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          enum: [queued, in_progress, completed, failed]
+          readOnly: true
+        starting_url:
+          type: string
+        domain:
+          type: string
+          readOnly: true
+          description: Host derived from `starting_url`, without a `www.` prefix
+        max_pages:
+          type: [integer, "null"]
+        crawl_subdomains:
+          type: boolean
+        response_code:
+          type: [string, "null"]
+          readOnly: true
+        report:
+          type: object
+          readOnly: true
+          description: |
+            Only present once `status` is `completed`. Storage items found
+            before and after consent, grouped by vendor and storage type.
+          properties:
+            before_consent:
+              type: object
+              additionalProperties: true
+            after_consent:
+              type: object
+              additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      example:
+        id: "scn1"
+        status: "queued"
+        starting_url: "https://example.com"
+        domain: "example.com"
+        max_pages: 25
+        crawl_subdomains: false
+        response_code: null
+        created_at: "2023-03-01T09:00:00Z"
+        updated_at: "2023-03-01T09:00:00Z"
+
+    ScanResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Scan"
+
+    ComplianceJurisdiction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier for the regulation, e.g. `gdpr`
+        name:
+          type: string
+        region:
+          type: string
+        flag:
+          type: [string, "null"]
+        applicability:
+          type: [string, "null"]
+          description: Who the regulation applies to
+        legal_refs:
+          type: [array, "null"]
+          items:
+            type: object
+            additionalProperties: true
+        compliant:
+          type: boolean
+          description: Whether the banner covering this regulation satisfies it
+        issues:
+          type: array
+          description: Requirements not currently met
+          items:
+            type: object
+            additionalProperties: true
+        warnings:
+          type: array
+          description: Things worth attention that do not by themselves fail the check
+          items:
+            type: object
+            additionalProperties: true
+        compliant_items:
+          type: array
+          description: Requirements already satisfied
+          items:
+            type: object
+            additionalProperties: true
+        matched_region:
+          type: [string, "null"]
+          description: The targeted region that caused this banner to be selected
+        banner:
+          type: object
+          description: |
+            The banner evaluated for this regulation. Both fields are null when
+            no banner targets it, which is itself a compliance issue.
+          properties:
+            id:
+              type: [string, "null"]
+            name:
+              type: [string, "null"]
+
+    ComplianceReportResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            compliant:
+              type: boolean
+              description: |
+                True when every regulation not ignored is satisfied.
+            jurisdictions:
+              type: array
+              items:
+                $ref: "#/components/schemas/ComplianceJurisdiction"
+            ignored_jurisdictions:
+              type: array
+              description: |
+                Regulations the account has chosen to ignore. Reported so a
+                client can see what was excluded from `compliant`.
+              items:
+                $ref: "#/components/schemas/ComplianceJurisdiction"
+
+    BannerTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Pass as `jurisdiction_id` when creating a banner
+        name:
+          type: string
+        flag:
+          type: [string, "null"]
+        consent_type:
+          type: string
+          description: e.g. `opt_in`, `opt_out`
+        consent_type_label:
+          type: string
+          description: e.g. `Opt-in`
+
+    BannerTemplatesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              region:
+                type: string
+              region_label:
+                type: string
+              templates:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BannerTemplate"
+      example:
+        data:
+          - region: "europe"
+            region_label: "Europe"
+            templates:
+              - id: "gdpr"
+                name: "GDPR"
+                flag: "🇪🇺"
+                consent_type: "opt_in"
+                consent_type_label: "Opt-in"
+
+    BannerFromTemplateRequest:
+      type: object
+      properties:
+        jurisdiction_id:
+          type: string
+          description: A template `id` from `GET /banner-templates`
+      required:
+        - jurisdiction_id
+      example:
+        jurisdiction_id: "gdpr"
 
 security:
   - authorization: []
