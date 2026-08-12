@@ -1017,12 +1017,12 @@ components:
         The status of the account, where:
         - `account_created`: The account has been created.
         - `vendors_setup`: Categories, services or TCF vendors have been set up.
-        - `code_installed`: The script has been installed on the user's website.
+        - `script_installed`: The script has been installed on the user's website.
         - `live`: The account is live and operational.
       required: false
       schema:
         type: string
-        enum: [account_created, vendors_setup, code_installed, live]
+        enum: [account_created, vendors_setup, script_installed, live]
     visitor_stats:
       name: visitor_stats
       in: query
@@ -2111,7 +2111,7 @@ components:
             The status of the account, where:
             - `account_created`: The account has been created.
             - `vendors_setup`: Categories, services or TCF vendors have been set up.
-            - `code_installed`: The script has been installed on the user's website.
+            - `script_installed`: The script has been installed on the user's website.
             - `live`: The account is live and operational.
         visitor_stats:
           $ref: "#/components/schemas/VisitorStats"
