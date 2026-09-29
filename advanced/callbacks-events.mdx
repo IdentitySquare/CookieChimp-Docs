@@ -5,7 +5,7 @@ description: "The complete client-side API — read the visitor's consent and th
 
 When the CookieChimp script loads, it exposes a global `CookieChimp` object (also available as `window.CookieChimp`). Everything on this page is read from — or called on — that object. Use it to:
 
-- **Read data** — what the visitor consented to, and which banner was served to them (country, region, consent mode).
+- **Read data** — what the visitor consented to, which banner was served to them (country, region, consent mode), and whether the browser looks automated.
 - **Listen for events** — react the moment consent is given, changed, or the modal is shown or hidden.
 - **Control the banner** — show, hide, accept, reject, or reset consent programmatically.
 
@@ -22,6 +22,19 @@ When the CookieChimp script loads, it exposes a global `CookieChimp` object (als
 CookieChimp exposes properties on the `CookieChimp` object that tell you about the visitor's location and the banner that was served to them. They're useful when you want to customise behaviour or tags based on country, region, or consent mode — without duplicating banners.
 
 <Snippet file="visitor-properties.mdx" />
+
+### `CookieChimp.isBot`
+
+A boolean indicating whether the web SDK considers this browser likely automated. It checks the browser's user agent for common crawler names (`bot`, `crawl`, `spider`, `slurp`, or `teoma`) and checks `navigator.webdriver`.
+
+```js
+if (window.CookieChimp && typeof window.CookieChimp.isBot === "boolean") {
+  const likelyBot = window.CookieChimp.isBot;
+  // Use likelyBot to label this visit in your own analytics.
+}
+```
+
+`true` means the browser check matched; `false` means it did not match, not that the visitor is confirmed human. CookieChimp sends this result with visit and consent events so likely bots can be excluded from headline analytics while their consent events are retained. The server may independently identify a bot from its user agent, so its classification can differ from this browser-only value. This property does not use Cloudflare Bot Management or bot scores, and it does not indicate the visitor's consent status.
 
 ### `getConfig()`
 
