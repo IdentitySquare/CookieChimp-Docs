@@ -5,7 +5,7 @@ description: "The complete client-side API — read the visitor's consent and th
 
 When the CookieChimp script loads, it exposes a global `CookieChimp` object (also available as `window.CookieChimp`). Everything on this page is read from — or called on — that object. Use it to:
 
-- **Read data** — what the visitor consented to, which banner was served to them (country, region, consent mode), and whether the browser looks automated.
+- **Read data** — what the visitor consented to, which banner was served to them (country, region, consent mode), and whether the SDK considers the visitor automated.
 - **Listen for events** — react the moment consent is given, changed, or the modal is shown or hidden.
 - **Control the banner** — show, hide, accept, reject, or reset consent programmatically.
 
@@ -25,7 +25,7 @@ CookieChimp exposes properties on the `CookieChimp` object that tell you about t
 
 ### `CookieChimp.isBot`
 
-A boolean indicating whether the web SDK considers this browser likely automated. It checks the browser's user agent for common crawler names (`bot`, `crawl`, `spider`, `slurp`, or `teoma`) and checks `navigator.webdriver`.
+A boolean indicating whether the web SDK considers this visitor likely automated. It combines Cloudflare's known-bot result from the widget script request, when available, with browser checks for common crawler names (`bot`, `crawl`, `spider`, `slurp`, or `teoma`) and `navigator.webdriver`. A Cloudflare `false` result does not disable the browser checks.
 
 ```js
 if (window.CookieChimp && typeof window.CookieChimp.isBot === "boolean") {
@@ -34,7 +34,11 @@ if (window.CookieChimp && typeof window.CookieChimp.isBot === "boolean") {
 }
 ```
 
-`true` means the browser check matched; `false` means it did not match, not that the visitor is confirmed human. The widget skips visit submissions for likely bots to avoid storing crawler traffic. It still sends consent submissions, including the browser result, so a mistaken bot classification does not discard someone's consent choice. The server can also identify and skip bot visits independently from the request's user agent or a trusted Cloudflare verified-bot signal, so its classification can differ from this browser-only value. The Devices panel counts stored visits only: it may show earlier bot visits but will not count newly skipped ones or retained bot consent events. This property does not use Cloudflare Bot Management or bot scores, and it does not indicate the visitor's consent status.
+`true` means at least one check matched; `false` does not confirm the visitor is human. The widget skips `visit` and `page_view` submissions for likely bots. It still sends consent submissions, including this result, so a mistaken classification does not discard someone's consent choice. The server checks each incoming request independently and skips bot visits before storage. The Devices panel counts stored visits only: it may show earlier bot visits but will not count newly skipped ones or retained bot consent events. This property does not use Cloudflare Bot Management or bot scores, and it does not indicate the visitor's consent status.
+
+### `CookieChimp.cloudflareKnownBot`
+
+The Cloudflare known-bot result for the widget script request: `true` for a known crawler, `false` when Cloudflare did not identify one, or `null` when no edge result was available. It is filled into the script when Cloudflare delivers it from KV. The script can be cached in the browser for two hours, so treat this as a result from script delivery, not a live verdict for every page view or consent request. The server checks the current visitor submission separately.
 
 ### `getConfig()`
 
