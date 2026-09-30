@@ -34,7 +34,7 @@ if (window.CookieChimp && typeof window.CookieChimp.isBot === "boolean") {
 }
 ```
 
-`true` means the browser check matched; `false` means it did not match, not that the visitor is confirmed human. The widget skips visit submissions for likely bots to avoid storing crawler traffic. It still sends consent submissions, including the browser result, so a mistaken bot classification does not discard someone's consent choice. The server can also identify and skip bot visits independently from the request's user agent or a trusted Cloudflare verified-bot signal, so its classification can differ from this browser-only value. The Devices panel does not count every detected bot visit. This property does not use Cloudflare Bot Management or bot scores, and it does not indicate the visitor's consent status.
+`true` means the browser check matched; `false` means it did not match, not that the visitor is confirmed human. The widget skips visit submissions for likely bots to avoid storing crawler traffic. It still sends consent submissions, including the browser result, so a mistaken bot classification does not discard someone's consent choice. The server can also identify and skip bot visits independently from the request's user agent or a trusted Cloudflare verified-bot signal, so its classification can differ from this browser-only value. The Devices panel counts stored visits only: it may show earlier bot visits but will not count newly skipped ones or retained bot consent events. This property does not use Cloudflare Bot Management or bot scores, and it does not indicate the visitor's consent status.
 
 ### `getConfig()`
 
