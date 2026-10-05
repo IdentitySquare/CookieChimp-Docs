@@ -10,17 +10,21 @@ To comply with privacy regulations, you can prevent 3rd party iframes from loadi
 ## How do I block an iframe?
 
 ```html
-<div data-service="youtube" data-id="<video-id>"></div>
+<div data-service="YouTube" data-id="<video-id>"></div>
 ```
+
+<Note>
+  The `data-service` attribute must match exactly how the service is named in [vendor management](vendor-management#what-are-vendors).
+</Note>
 
 ## How do I customize the iframe placeholder?
 
 ```html
 <div
-  data-service="youtube"
+  data-service="YouTube"
   data-id="5b35haQV7tU"
   data-autoscale
-  data-iframe-id="YoutubeEmbed"
+  data-iframe-id="YouTubeEmbed"
   data-iframe-loading="lazy"
   data-iframe-frameborder="0"
 ></div>
@@ -36,6 +40,7 @@ To comply with privacy regulations, you can prevent 3rd party iframes from loadi
 - `data-ratio`: [String] Custom aspect ratio (e.g., "16:9").
 - `data-autoscale`: Responsive iframe that fills parent width and scales proportionally.
 - `data-widget`: Use for custom widgets with explicit width and height.
+
 
 ## Which services are supported?
 
