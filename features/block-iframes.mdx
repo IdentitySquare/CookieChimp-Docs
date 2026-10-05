@@ -42,10 +42,58 @@ To comply with privacy regulations, you can prevent 3rd party iframes from loadi
 - `data-widget`: Use for custom widgets with explicit width and height.
 
 
-## Which services are supported?
+## Supported Services
 
-- YouTube
-- Vimeo
-- Google Maps
+Each service expects a different `data-id` format. Use `data-autoscale` for video embeds, and `data-widget` with an explicit width and height for audio widgets.
+
+#### YouTube
+
+`data-id` is the video ID from the YouTube URL (for example, `tgbNymZ7vqY` from `youtube.com/watch?v=tgbNymZ7vqY`).
+
+```html
+<div data-service="YouTube" data-id="tgbNymZ7vqY" data-autoscale></div>
+```
+
+#### Vimeo
+
+`data-id` is the numeric video ID from the Vimeo URL (for example, `1060110670` from `vimeo.com/1060110670`).
+
+```html
+<div data-service="Vimeo" data-id="1060110670" data-autoscale></div>
+```
+
+#### Spotify
+
+`data-id` is the resource path, such as `track/<id>`, `album/<id>`, or `playlist/<id>`.
+
+```html
+<div
+  data-service="Spotify"
+  data-id="track/4cOdK2wGLETKBW3PvgPWqT"
+  data-widget
+  style="width: 100%; height: 152px;"
+></div>
+```
+
+#### SoundCloud
+
+`data-id` is the URL-encoded SoundCloud API track URL.
+
+```html
+<div
+  data-service="SoundCloud"
+  data-id="https%3A//api.soundcloud.com/tracks/293"
+  data-widget
+  style="width: 100%; height: 166px;"
+></div>
+```
+
+#### Twitch
+
+`data-id` is a Twitch embed parameter such as `video=<id>` or `channel=<name>`.
+
+```html
+<div data-service="Twitch" data-id="video=992175865" data-autoscale></div>
+```
 
 Looking for a service that's not listed? [Let us know](mailto:support@cookiechimp.com).
