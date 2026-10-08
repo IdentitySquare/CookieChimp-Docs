@@ -14,7 +14,12 @@
     "library": "lucide"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "favicon": "/favicon.png",
   "navigation": {
@@ -163,7 +168,53 @@
             "group": "Account",
             "pages": [
               "api-reference/account/list-accounts",
-              "api-reference/account/get-account"
+              "api-reference/account/get-account",
+              "api-reference/account/update-account"
+            ]
+          },
+          {
+            "group": "Consent Banners",
+            "pages": [
+              "api-reference/consent-banners/list-consent-banners",
+              "api-reference/consent-banners/create-consent-banner",
+              "api-reference/consent-banners/list-banner-templates",
+              "api-reference/consent-banners/create-consent-banner-from-template",
+              "api-reference/consent-banners/get-consent-banner",
+              "api-reference/consent-banners/update-consent-banner",
+              "api-reference/consent-banners/duplicate-consent-banner",
+              "api-reference/consent-banners/delete-consent-banner"
+            ]
+          },
+          {
+            "group": "Services",
+            "pages": [
+              "api-reference/services/list-services",
+              "api-reference/services/create-service",
+              "api-reference/services/get-service",
+              "api-reference/services/update-service",
+              "api-reference/services/delete-service"
+            ]
+          },
+          {
+            "group": "Compliance",
+            "pages": [
+              "api-reference/compliance/get-compliance-report"
+            ]
+          },
+          {
+            "group": "Scans",
+            "pages": [
+              "api-reference/scans/list-scans",
+              "api-reference/scans/create-scan",
+              "api-reference/scans/get-scan"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "api-reference/integrations/list-integrations",
+              "api-reference/integrations/get-integration",
+              "api-reference/integrations/update-integration"
             ]
           },
           {
