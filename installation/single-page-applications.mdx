@@ -34,7 +34,7 @@ The pattern is the same across all SPA frameworks:
 
 The exact navigation event differs per framework. Pick yours below.
 
-The reinit pattern is the same across frameworks: **remove the existing CookieChimp script tag (if any) and append a fresh one**. Loading the script again triggers CookieChimp to rescan the newly mounted DOM. There's no public `reinitialize()` API — script re-injection is the documented mechanism.
+The reinit pattern is the same across frameworks: **remove the existing CookieChimp script tag (if any) and append a fresh one**. Loading the script again triggers CookieChimp to rescan the newly mounted DOM. If your app replaces the page content without changing the URL, call [`CookieChimp.pageview()`](/advanced/callbacks-events#pageview) to re-run CookieChimp for the new content.
 
 ### Astro
 
@@ -269,6 +269,14 @@ window.addEventListener("cc:onUpdate", function (event) {
       }
     }
   }
+});
+```
+
+To run code once CookieChimp has finished loading on each page — including after every client-side navigation — listen for `CookieChimpReady`. It fires each time CookieChimp re-runs, so keep the handler safe to run more than once.
+
+```javascript
+window.addEventListener("CookieChimpReady", function () {
+  // CookieChimp is ready on this page — every SDK method is available
 });
 ```
 
