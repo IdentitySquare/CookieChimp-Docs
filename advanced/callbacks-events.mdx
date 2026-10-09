@@ -574,13 +574,15 @@ function loadExampleWidgetIfAccepted() {
   }
 }
 
-// initial choice and later page loads
+// consent already stored, even if this code runs after CookieChimp has loaded
+onCookieChimpReady(loadExampleWidgetIfAccepted);
+// the visitor's first choice
 window.addEventListener("cc:onConsented", loadExampleWidgetIfAccepted);
 // the visitor enables it later from the preferences modal
 window.addEventListener("cc:onUpdate", loadExampleWidgetIfAccepted);
 ```
 
-Calling it again is safe: `loadScript` skips a `src` that's already on the page.
+This uses the [`onCookieChimpReady`](#cookiechimpready) helper from above. Calling `loadExampleWidgetIfAccepted` more than once is safe: `loadScript` skips a `src` that's already on the page.
 
 <Tip>
   For most scripts you don't need any JavaScript — add the
