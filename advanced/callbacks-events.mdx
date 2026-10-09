@@ -237,20 +237,30 @@ window.addEventListener("CookieChimpReady", function () {
   page.
 </Note>
 
-If the code that needs CookieChimp may run after the event has already fired, check whether the SDK methods are there before waiting for it. They're only attached once initialisation has finished, so their presence means you can call them straight away:
+The helper below covers all of this. It runs your callback exactly once, for every visitor, whether it's called before or after initialisation. If the SDK methods are already there, initialisation has finished and the callback runs straight away, since they're only attached once it's done. Otherwise it waits for whichever of `CookieChimpReady` or `cc:onConsented` comes first:
 
 ```js
 function onCookieChimpReady(callback) {
-  if (window.CookieChimp && typeof window.CookieChimp.getUserPreferences === "function") {
+  var done = false;
+
+  function run() {
+    if (done) return;
+    done = true;
+    window.removeEventListener("CookieChimpReady", defer);
+    window.removeEventListener("cc:onConsented", defer);
     callback();
+  }
+
+  // SDK methods are attached right after CookieChimpReady on the first load
+  function defer() {
+    setTimeout(run, 0);
+  }
+
+  if (window.CookieChimp && typeof window.CookieChimp.getUserPreferences === "function") {
+    run();
   } else {
-    window.addEventListener(
-      "CookieChimpReady",
-      function () {
-        setTimeout(callback, 0);
-      },
-      { once: true }
-    );
+    window.addEventListener("CookieChimpReady", defer);
+    window.addEventListener("cc:onConsented", defer);
   }
 }
 
@@ -537,7 +547,7 @@ window.location.reload();
 
 ### `pageview`
 
-Re-runs CookieChimp for the current page: the banner and privacy trigger are rendered again if needed, and [`CookieChimpReady`](#cookiechimpready) is dispatched again when it's done.
+Re-runs CookieChimp for the current page: the banner and privacy trigger are rendered again if needed, and [`CookieChimpReady`](#cookiechimpready) is dispatched again when it's done, with the same exceptions as on the first load (no banner for the visitor's location, or an honoured GPC signal).
 
 ```js
 CookieChimp.pageview();
@@ -554,7 +564,7 @@ Loads a script by adding a `<script>` tag to `<head>`, unless a script with the 
 Combine it with the consent checks above to load a third-party script only after the visitor accepts it:
 
 ```js
-window.addEventListener("cc:onConsented", function () {
+function loadExampleWidgetIfAccepted() {
   if (CookieChimp.acceptedService("Example Widget", "analytics")) {
     CookieChimp.loadScript("https://cdn.example.com/widget.js", {
       "data-site-id": "12345",
@@ -562,8 +572,15 @@ window.addEventListener("cc:onConsented", function () {
       if (!loaded) console.warn("Example Widget failed to load");
     });
   }
-});
+}
+
+// initial choice and later page loads
+window.addEventListener("cc:onConsented", loadExampleWidgetIfAccepted);
+// the visitor enables it later from the preferences modal
+window.addEventListener("cc:onUpdate", loadExampleWidgetIfAccepted);
 ```
+
+Calling it again is safe: `loadScript` skips a `src` that's already on the page.
 
 <Tip>
   For most scripts you don't need any JavaScript — add the
