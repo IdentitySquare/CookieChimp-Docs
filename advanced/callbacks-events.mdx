@@ -13,9 +13,10 @@ When the CookieChimp script loads, it exposes a global `CookieChimp` object (als
   The `CookieChimp` object and its properties are populated once the script has
   initialised. If you read them too early — for example, at the very top of the
   page — they may be `undefined`. Read them inside an [event
-  handler](#listening-for-events) such as
-  [`CookieChimpReady`](#cookiechimpready) or `cc:onConsented`, or after a check
-  for `window.CookieChimp`.
+  handler](#listening-for-events) such as `cc:onModalReady` or
+  `cc:onConsented`, on the next tick after
+  [`CookieChimpReady`](#cookiechimpready), or after a check for
+  `window.CookieChimp`.
 </Warning>
 
 ## Reading visitor & banner data
@@ -191,21 +192,30 @@ CookieChimp dispatches four families of events:
 
 #### `CookieChimpReady`
 
-Dispatched on `window` once CookieChimp has finished initialising on the page: the visitor's stored consent has been loaded, the banner has been set up (and will open if the visitor still needs to make a choice), and every method on this page is available on the `CookieChimp` object.
+Dispatched on `window` once CookieChimp has finished initialising on the page: the visitor's stored consent has been loaded, the banner has been set up (and will open if the visitor still needs to make a choice).
 
 Use it for code that needs the SDK but doesn't depend on a consent change — for example reading the visitor's preferences on every page load, or wiring your own UI to `CookieChimp.showPreferences()`.
 
+<Warning>
+  On the first page load, the methods on this page are attached to the
+  `CookieChimp` object immediately **after** `CookieChimpReady` is dispatched.
+  Defer any `CookieChimp.*` calls to the next tick with `setTimeout(..., 0)`,
+  as in the example below, or they may be `undefined`.
+</Warning>
+
 ```js
 window.addEventListener("CookieChimpReady", function () {
-  var preferences = CookieChimp.getUserPreferences();
+  setTimeout(function () {
+    var preferences = CookieChimp.getUserPreferences();
 
-  if (preferences.acceptedCategories.includes("analytics")) {
-    // analytics was accepted on this or a previous visit
-  }
+    if (preferences.acceptedCategories.includes("analytics")) {
+      // analytics was accepted on this or a previous visit
+    }
+  }, 0);
 });
 ```
 
-`CookieChimpReady` is a plain `Event`, so it carries no `event.detail` — read whatever you need from the `CookieChimp` object inside the listener.
+`CookieChimpReady` is a plain `Event`, so it carries no `event.detail` — read whatever you need from the `CookieChimp` object instead.
 
 <Tip>
   Register the listener before the CookieChimp script tag, or in a script that
@@ -227,14 +237,20 @@ window.addEventListener("CookieChimpReady", function () {
   page.
 </Note>
 
-If the code that needs CookieChimp may run after the event has already fired, check whether the SDK is ready before waiting for it:
+If the code that needs CookieChimp may run after the event has already fired, check whether the SDK methods are there before waiting for it. They're only attached once initialisation has finished, so their presence means you can call them straight away:
 
 ```js
 function onCookieChimpReady(callback) {
   if (window.CookieChimp && typeof window.CookieChimp.getUserPreferences === "function") {
     callback();
   } else {
-    window.addEventListener("CookieChimpReady", callback, { once: true });
+    window.addEventListener(
+      "CookieChimpReady",
+      function () {
+        setTimeout(callback, 0);
+      },
+      { once: true }
+    );
   }
 }
 
