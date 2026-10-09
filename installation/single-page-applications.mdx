@@ -276,15 +276,9 @@ To run code once CookieChimp has finished loading on each page — including aft
 
 ```javascript
 window.addEventListener("CookieChimpReady", function () {
-  // SDK methods are attached right after this event on the first load,
-  // so call them on the next tick
-  setTimeout(function () {
-    // CookieChimp is ready on this page
-  }, 0);
+  // CookieChimp is ready on this page — every SDK method is available
 });
 ```
-
-`CookieChimpReady` isn't dispatched for visitors who are shown no banner, or whose Global Privacy Control signal is honoured. If your code must run for every visitor, also listen for `cc:onConsented` — see [`CookieChimpReady`](/advanced/callbacks-events#cookiechimpready) in the JavaScript SDK.
 
 <Snippet file="install/callbacks-events-link.mdx" />
 

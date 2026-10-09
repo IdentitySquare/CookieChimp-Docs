@@ -28,7 +28,7 @@ Adobe Launch (now Adobe Experience Platform Tags) does not have a native consent
 CookieChimp exposes two things you'll wire into Launch:
 
 - **`window.cookieChimpConsentString`** &mdash; a comma-separated string of the categories and services the visitor has consented to, e.g. `essential,analytics,marketing,Google Analytics,Hotjar,Facebook Pixel`. You read this from a Data Element.
-- **`cc:consentStringUpdated`** &mdash; a `document` event that fires once consent has been granted and again every time the visitor changes their preferences. You listen for it from a rule's event.
+- **`cc:consentStringUpdated`** &mdash; a window event that fires once consent has been granted and again every time the visitor changes their preferences. You listen for it from a rule's event.
 
 Together, these let any Launch rule (a) wait for consent to be available and (b) only run when the matching category or vendor was accepted.
 
@@ -71,7 +71,7 @@ Together, these let any Launch rule (a) wait for consent to be available and (b)
           trigger();
         }
 
-        document.addEventListener("cc:consentStringUpdated", function () {
+        window.addEventListener("cc:consentStringUpdated", function () {
           trigger();
         });
         ```
@@ -81,7 +81,7 @@ Together, these let any Launch rule (a) wait for consent to be available and (b)
         Use this when the rule should only run after the consent state changes &mdash; for example, a tag that should not re-fire on every page load.
 
         ```js
-        document.addEventListener("cc:consentStringUpdated", function () {
+        window.addEventListener("cc:consentStringUpdated", function () {
           trigger();
         });
         ```
@@ -90,7 +90,7 @@ Together, these let any Launch rule (a) wait for consent to be available and (b)
 
     `trigger()` is a function Adobe Launch injects into Custom Code events. Calling it tells Launch to evaluate the rule's conditions and run its actions.
 
-    <Info>The `cc:consentStringUpdated` event is dispatched on `document` after CookieChimp has read the visitor's choices and rebuilt the consent string, so it's safe to read `window.cookieChimpConsentString` from inside the listener. Listen on `document`, not `window` &mdash; the event doesn't bubble, so a `window` listener won't be called.</Info>
+    <Info>The `cc:consentStringUpdated` event is dispatched after CookieChimp has read the visitor's choices and rebuilt the consent string, so it's safe to read `window.cookieChimpConsentString` from inside the listener. It's dispatched on `document` and bubbles up to `window`, so a listener on either works.</Info>
   </Step>
 
   <Step title="Add a condition to gate the tag on consent">

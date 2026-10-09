@@ -13,10 +13,9 @@ When the CookieChimp script loads, it exposes a global `CookieChimp` object (als
   The `CookieChimp` object and its properties are populated once the script has
   initialised. If you read them too early — for example, at the very top of the
   page — they may be `undefined`. Read them inside an [event
-  handler](#listening-for-events) such as `cc:onModalReady` or
-  `cc:onConsented`, on the next tick after
-  [`CookieChimpReady`](#cookiechimpready), or after a check for
-  `window.CookieChimp`.
+  handler](#listening-for-events) such as
+  [`CookieChimpReady`](#cookiechimpready) or `cc:onConsented`, or after a check
+  for `window.CookieChimp`.
 </Warning>
 
 ## Reading visitor & banner data
@@ -177,7 +176,7 @@ if (CookieChimp.validCookie("_ga")) {
 
 ## Listening for events
 
-Every event is a standard DOM event. Subscribe with `addEventListener` and read the data from `event.detail`. All events are dispatched on `window`, except `cc:consentStringUpdated`, which is dispatched on `document`.
+Every event is a standard DOM event dispatched on `window`. Subscribe with `window.addEventListener` and read the data from `event.detail`.
 
 CookieChimp dispatches four families of events:
 
@@ -192,30 +191,23 @@ CookieChimp dispatches four families of events:
 
 #### `CookieChimpReady`
 
-Dispatched on `window` once CookieChimp has finished initialising on the page: the visitor's stored consent has been loaded, the banner has been set up (and will open if the visitor still needs to make a choice).
+Dispatched on `window` once CookieChimp has finished initialising on the page: the visitor's stored consent has been loaded, the banner has been set up (and will open if the visitor still needs to make a choice), and every method on this page is available on the `CookieChimp` object.
+
+It fires on every page load for every visitor — including visitors in a location where no banner is shown, and visitors whose [Global Privacy Control](/integrations/global-privacy-control) signal is honoured.
 
 Use it for code that needs the SDK but doesn't depend on a consent change — for example reading the visitor's preferences on every page load, or wiring your own UI to `CookieChimp.showPreferences()`.
 
-<Warning>
-  On the first page load, the methods on this page are attached to the
-  `CookieChimp` object immediately **after** `CookieChimpReady` is dispatched.
-  Defer any `CookieChimp.*` calls to the next tick with `setTimeout(..., 0)`,
-  as in the example below, or they may be `undefined`.
-</Warning>
-
 ```js
 window.addEventListener("CookieChimpReady", function () {
-  setTimeout(function () {
-    var preferences = CookieChimp.getUserPreferences();
+  var preferences = CookieChimp.getUserPreferences();
 
-    if (preferences.acceptedCategories.includes("analytics")) {
-      // analytics was accepted on this or a previous visit
-    }
-  }, 0);
+  if (preferences.acceptedCategories.includes("analytics")) {
+    // analytics was accepted on this or a previous visit
+  }
 });
 ```
 
-`CookieChimpReady` is a plain `Event`, so it carries no `event.detail` — read whatever you need from the `CookieChimp` object instead.
+`CookieChimpReady` is a plain `Event`, so it carries no `event.detail` — read whatever you need from the `CookieChimp` object inside the listener.
 
 <Tip>
   Register the listener before the CookieChimp script tag, or in a script that
@@ -225,42 +217,14 @@ window.addEventListener("CookieChimpReady", function () {
   once.
 </Tip>
 
-<Note>
-  `CookieChimpReady` is **not** dispatched when:
-
-  - no banner is shown in the visitor's location (`CookieChimp.visitorNeedsConsent` is `false`), or
-  - [Global Privacy Control](/integrations/global-privacy-control) is enabled for the banner and the visitor's browser sends a GPC signal.
-
-  In both cases the visitor still has stored consent, so
-  [`cc:onConsented`](#consent-events) is dispatched. If your code must run for
-  every visitor, listen for both events and make sure it only runs once per
-  page.
-</Note>
-
-The helper below covers all of this. It runs your callback exactly once, for every visitor, whether it's called before or after initialisation. If the SDK methods are already there, initialisation has finished and the callback runs straight away, since they're only attached once it's done. Otherwise it waits for whichever of `CookieChimpReady` or `cc:onConsented` comes first:
+If the code that needs CookieChimp may run after the event has already fired — for example, an app bundle that loads after the CookieChimp script — check whether the SDK methods are there before waiting for it. They're only attached once initialisation has finished, so their presence means you can call them straight away:
 
 ```js
 function onCookieChimpReady(callback) {
-  var done = false;
-
-  function run() {
-    if (done) return;
-    done = true;
-    window.removeEventListener("CookieChimpReady", defer);
-    window.removeEventListener("cc:onConsented", defer);
-    callback();
-  }
-
-  // SDK methods are attached right after CookieChimpReady on the first load
-  function defer() {
-    setTimeout(run, 0);
-  }
-
   if (window.CookieChimp && typeof window.CookieChimp.getUserPreferences === "function") {
-    run();
+    callback();
   } else {
-    window.addEventListener("CookieChimpReady", defer);
-    window.addEventListener("cc:onConsented", defer);
+    window.addEventListener("CookieChimpReady", callback, { once: true });
   }
 }
 
@@ -421,14 +385,10 @@ The string is rebuilt every time the visitor's consent changes, so reading it in
 
 Triggered once consent has been granted and again every time the visitor changes their preferences, after `window.cookieChimpConsentString` has been rebuilt. The new string is also available as `event.detail.consentString`.
 
-<Warning>
-  Unlike the other events on this page, `cc:consentStringUpdated` is dispatched
-  on `document`, not `window`, and it does not bubble. Listen with
-  `document.addEventListener` — a listener on `window` won't be called.
-</Warning>
+The event is dispatched on `document` and bubbles up to `window`, so a listener on either receives it.
 
 ```js
-document.addEventListener("cc:consentStringUpdated", function () {
+window.addEventListener("cc:consentStringUpdated", function () {
   // window.cookieChimpConsentString is up to date here
   var consent = window.cookieChimpConsentString || "";
 
@@ -547,7 +507,7 @@ window.location.reload();
 
 ### `pageview`
 
-Re-runs CookieChimp for the current page: the banner and privacy trigger are rendered again if needed, and [`CookieChimpReady`](#cookiechimpready) is dispatched again when it's done, with the same exceptions as on the first load (no banner for the visitor's location, or an honoured GPC signal).
+Re-runs CookieChimp for the current page: the banner and privacy trigger are rendered again if needed, and [`CookieChimpReady`](#cookiechimpready) is dispatched again when it's done.
 
 ```js
 CookieChimp.pageview();
