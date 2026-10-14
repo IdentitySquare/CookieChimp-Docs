@@ -10,7 +10,7 @@ Use Node 22 or newer from this repository root (`docs.json`):
 ```sh
 npx --yes mint@4.2.1028 dev --port 3115 --no-open --telemetry=false
 npx --yes mint@4.2.1028 validate --telemetry=false
-npx --yes mint@4.2.1028 broken-links --files 'sdk/**/*.mdx' --check-anchors --telemetry=false
+npx --yes mint@4.2.1028 broken-links --files 'sdk/**/*.mdx' overview.mdx installation/react.mdx installation/nextjs.mdx --check-anchors --telemetry=false
 ```
 
 The local SDK overview is http://localhost:3115/sdk/overview. The public SDK
