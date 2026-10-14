@@ -60,10 +60,11 @@ npx @cookiechimp/cli pull
 
 Downloads the public dashboard config for the linked project (or `--project`) to `cookiechimp.config.json` (`--out` to change it) for offline builds. No token is sent. The bundle must match the project and schema version 1, and is capped at 2 MB.
 
-Both commands accept `--api` for another API origin (https only, or http on localhost). Only these two commands touch the network; `init` and `doctor` stay offline.
+Both commands accept `--api` for another API origin (https only, or http on localhost). `link` and `pull` make HTTP requests directly. `doctor` performs local static checks. `init` scaffolds locally, but its package-manager install can access the network; use `--no-install` or `--dry-run` to skip that install.
 
 ## Safety
 
-- No network access of its own. Only the package manager you chose runs, without a shell, and only with fixed arguments.
+- `init` and `doctor` make no HTTP requests themselves. `init` runs the chosen package manager without a shell and with fixed arguments; that manager may download dependencies and run their install scripts. `link` authenticates to the dashboard API, and `pull` downloads public config without sending a token.
+- Running the CLI through `npx` may download the CLI package before any command starts, including `doctor` and `init --no-install`.
 - Writes stay inside the project: absolute paths, `..`, and symlinks that leave the root are refused.
 - On Windows, the install command is printed for you to run instead of being spawned.
