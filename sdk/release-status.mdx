@@ -1,0 +1,38 @@
+---
+title: "Release status"
+description: "Package availability and production prerequisites."
+---
+
+The SDK is a prepared 1.0.0 candidate. The npm packages have not been published.
+Registry installation commands in these guides apply after publication. Until
+then, contributors can build the SDK workspace and run its examples.
+
+## Documentation
+
+The Consent SDK guides live with the existing CookieChimp documentation on
+Mintlify. The SDK repository keeps the source guides and runnable examples;
+Mintlify provides navigation, search, Markdown views and AI documentation indexes.
+
+## Connected mode
+
+Local mode needs no account. Connected mode requires the shared platform config
+and consent-ingestion endpoints to be deployed and tested with the project's
+account. Cached or in-code config is a fallback; it does not prove consent records
+were delivered. Verify connected delivery before using it in production.
+
+## IAB integrations and translations
+
+Production TCF requires a valid registered CMP ID, a current vendor list and IAB
+validation. Applications supply the GVL and the authoritative feature decision.
+The SDK does not provide a GVL CDN or enforce connected Pro entitlements.
+See the [reference](/sdk/reference) for GPP coverage and TCF limitations.
+
+Base and TCF locales marked as drafts require native-speaker review before launch.
+See [translations](/sdk/translations). Prepared code and automated tests do not
+establish certification, language quality or registry publication.
+
+## Publication
+
+The eight packages are released together. Publication is a separate approval step
+with package, fresh-consumer and provenance verification. Contributor procedures
+are in the SDK repository's [release guide](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/docs/release.md).

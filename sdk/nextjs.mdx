@@ -1,0 +1,249 @@
+---
+title: "Next.js"
+description: "App Router, Pages Router, connected mode and strict CSP."
+---
+
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
+`@cookiechimp/nextjs` provides an App Router server provider that renders the
+correct consent UI in the initial HTML and seeds the client with the same
+state.
+
+## Region handling
+
+CookieChimp never looks up a visitor's location. The SDK performs no geo-IP,
+IP address, browser geolocation, or external location-service request. Your
+application must decide which trusted location context to use.
+
+You can pass a region directly to `CookieChimpProvider` and
+`getServerConsent`. If your hosting platform already adds geo headers, read
+those headers in the App Router and resolve them locally. Vercel uses
+`x-vercel-ip-country` and `x-vercel-ip-country-region`. Cloudflare uses
+`cf-ipcountry`. `resolveRegion` only parses the headers you give it and never
+makes a network request.
+
+```tsx
+// app/layout.tsx
+import { resolveRegion } from "@cookiechimp/core/regions";
+import { CookieChimpProvider } from "@cookiechimp/nextjs/server";
+import { headers } from "next/headers";
+
+export default async function RootLayout({ children }) {
+  const requestHeaders = await headers();
+  const region = resolveRegion(requestHeaders, { provider: "vercel" });
+
+  return (
+    <html lang="en">
+      <body>
+        <CookieChimpProvider
+          config={{ categories: ["analytics", "advertising"] }}
+          region={region}
+        >
+          {children}
+        </CookieChimpProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+The `provider="vercel"` or `provider="cloudflare"` shorthand is also
+available on the provider when it is preferable for the provider itself to
+read the request headers. Passing an explicit `region` keeps ownership visible
+in application code.
+
+## Pages Router
+
+Use `withConsent` to add the server cookie, normalized region, and negotiated
+language to `getServerSideProps`. Wrap the page in `PagesConsentProvider`,
+either locally or from `pages/_app`, so the browser hydrates the exact server
+snapshot.
+
+```tsx
+import { PagesConsentProvider, withConsent } from "@cookiechimp/nextjs/pages";
+
+export const getServerSideProps = withConsent({
+  config,
+  provider: "vercel",
+  languages: { available: ["en", "de"], fallback: "en" },
+});
+
+export default function Page({ cookiechimp }) {
+  return <PagesConsentProvider config={config} {...cookiechimp}>...</PagesConsentProvider>;
+}
+```
+
+An existing `getServerSideProps` can be passed as the second argument. The
+`withConsentPage` HOC is available when wrapping the individual component is
+more convenient.
+
+## Connected mode: server-side dashboard config
+
+```tsx
+<CookieChimpProvider projectId="acct123" config={{ categories: ["analytics"] }}>
+  {children}
+</CookieChimpProvider>
+```
+
+The provider fetches the dashboard config on the server (Next.js data cache, `revalidate: 300` by default), so the first HTML already carries the dashboard categories and banner copy for the visitor's region and language. `config` is the fallback under the dashboard; `override` wins over it. If the platform is unreachable or returns anything unexpected, the page renders from `config`. The dashboard cookie name and expiry apply on the server too, and after hydration the browser revalidates once (a 304 when nothing changed) so newer copy shows without a reload; pass `revalidateClient={false}` to skip it. Use `getServerConfig` directly for custom layouts.
+
+## Self-hosted consent records
+
+Pass `endpoint` to `CookieChimpProvider`, `ClientProvider` or `PagesConsentProvider` to POST each decision to your own route (local mode, no account):
+
+```tsx
+<CookieChimpProvider config={config} endpoint="/api/consent">...</CookieChimpProvider>
+<CookieChimpProvider
+  config={config}
+  endpoint={{ url: "https://logs.example.com/consent", headers: { "X-Site": "shop" } }}
+>
+  ...
+</CookieChimpProvider>
+```
+
+Requests never carry cookies or credentials, and cookie or authorization headers are refused. Headers are public (they ship to the browser), so never put a secret in them. A custom header on a cross-origin URL triggers a CORS preflight, so that endpoint must answer `OPTIONS` and allow the header; a same-origin path avoids it. The endpoint code loads only when `endpoint` is set.
+
+## Middleware region forwarding
+
+The middleware helper only parses headers already provided by the explicitly
+selected host. It does not perform geo-IP, fetch, or any external lookup. With
+no `provider`, it ignores every location header and forwards no region. It
+always removes an incoming `x-cc-region`, including when no provider is set.
+
+```ts
+import { consentMiddleware } from "@cookiechimp/nextjs/middleware";
+
+export function middleware(request) {
+  return consentMiddleware(request, { provider: "cloudflare" });
+}
+```
+
+`getServerConsent`, `CookieChimpProvider`, and the Pages helpers ignore the
+forwarded `x-cc-region` request header by default. Pass
+`trustForwardedRegion: true` to opt in. Only enable trustForwardedRegion when
+the CookieChimp middleware runs on every route, since otherwise a visitor can
+send the header and choose their region. Use
+`provider: { header: "x-host-country", regionHeader: "x-host-region" }` to opt
+in to host-specific headers. Vercel mode reads only Vercel headers, Cloudflare
+mode reads only `cf-ipcountry`, and custom mode reads only the named headers.
+
+## IAB GPP (US privacy)
+
+Pass `gpp` to opt in to IAB GPP US sections (`true`, or serialisable options
+such as `{ approach: "national", values: { usnat: { SaleOptOutNotice: 1 } } }`)
+and render `GppStub` at the start of the head so vendor tags find `__gpp`:
+
+```tsx
+<head>
+  <GppStub nonce={nonce} />
+</head>
+<body>
+  <CookieChimpProvider config={config} provider="vercel" gpp>
+    {children}
+  </CookieChimpProvider>
+</body>
+```
+
+`@cookiechimp/core/gpp` loads by dynamic import after hydration only when `gpp`
+is set, replaces the stub, and follows the visitor's region (state section for
+CA, VA, CO, UT, CT, FL, MT, OR, TX, DE, IA, NE, NH, NJ and TN,
+`usnat` elsewhere in the US, none outside the US).
+`PagesConsentProvider` and the client `ClientProvider` accept the same prop.
+Without `gpp`, nothing GPP-related ships or runs.
+
+## Strict Content Security Policy
+
+`CookieChimpStyles` renders an inline style, and `GoogleConsentMode` and
+`GppStub` render inline scripts. Under a strict Content Security Policy, pass the
+same per-request nonce to each component. One approach is to generate the nonce in middleware,
+include it in the policy, and copy it to a request header:
+
+```ts
+// middleware.ts
+import { NextResponse, type NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  const nonce = btoa(crypto.randomUUID());
+  const policy = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    `style-src 'self' 'nonce-${nonce}'`,
+    "object-src 'none'",
+    "base-uri 'self'",
+  ].join("; ");
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", policy);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", policy);
+  return response;
+}
+```
+
+Expose the stylesheet from a Route Handler. The factory can derive a nonce
+from the request and use it to build a response policy:
+
+```ts
+// app/cookiechimp.css/route.ts
+import { createStylesRoute } from "@cookiechimp/nextjs/styles-route";
+
+export const GET = createStylesRoute({
+  nonce: (request) => request.headers.get("x-nonce") ?? undefined,
+  contentSecurityPolicy: (nonce) =>
+    `default-src 'none'; style-src 'self' 'nonce-${nonce}'`,
+});
+```
+
+Read the middleware header in the App Router layout. Use `StylesLink` for the
+external stylesheet, and pass the same nonce to inline elements:
+
+```tsx
+// app/layout.tsx
+import {
+  CookieChimpProvider,
+  CookieChimpStyles,
+  GoogleConsentMode,
+} from "@cookiechimp/nextjs/server";
+import { StylesLink } from "@cookiechimp/nextjs/styles-route";
+import { headers } from "next/headers";
+
+export default async function RootLayout({ children }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  return (
+    <html lang="en">
+      <head>
+        <StylesLink href="/cookiechimp.css" nonce={nonce} />
+        <CookieChimpStyles nonce={nonce} />
+        <GoogleConsentMode nonce={nonce} />
+      </head>
+      <body>
+        <CookieChimpProvider config={{ categories: ["analytics"] }}>
+          {children}
+        </CookieChimpProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+Omit `CookieChimpStyles` when the policy forbids inline styles entirely. The
+stylesheet response includes `text/css`, `X-Content-Type-Options: nosniff`, a
+stable ETag, and supports conditional 304 responses. The default static route
+uses immutable one-year caching. Configuring a per-request nonce or CSP uses
+`private, no-cache` instead, because a response whose policy varies by request
+must not be reused as an immutable shared response.
+
+
+## Opt-in TCF
+
+Compose `TcfProvider` from `@cookiechimp/react/tcf-provider` inside either
+Next.js consent provider, in a client component. Pass stable `TcfOptions` and
+an explicit server-owned `enabled` decision. The controller uses that same
+server-seeded consent runtime, so returning consent and revalidation stay
+consistent. See the [React TCF provider reference](/sdk/reference#opt-in-react-tcf-provider).
+
+Render `TcfStub` from `@cookiechimp/nextjs/server` in `<head>` before vendor
+tags only when opting in. `nonce` supports a strict CSP; optional `gdprApplies`
+must come from trusted region policy. Production without a registered CMP ID
+fails closed, and applications still supply their GVL source. Connected Pro
+entitlement enforcement and CookieChimp registration remain platform/owner work.

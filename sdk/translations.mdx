@@ -1,0 +1,56 @@
+---
+title: "Translations"
+description: "Per-locale banner messages and opt-in TCF labels."
+---
+
+`@cookiechimp/translations` ships banner and preferences messages for 33
+locales. Each locale is its own entry, so you only bundle what you import.
+
+```tsx
+import { ConsentProvider } from "@cookiechimp/react";
+import de from "@cookiechimp/translations/de";
+
+<ConsentProvider config={config} translations={de} language="de">
+  ...
+</ConsentProvider>;
+```
+
+In Next.js, pass `languages` and a `translations` resolver to
+`CookieChimpProvider`. The server negotiates the language from
+`Accept-Language`:
+
+```tsx
+import { CookieChimpProvider } from "@cookiechimp/nextjs/server";
+import de from "@cookiechimp/translations/de";
+import en from "@cookiechimp/translations/en";
+
+const messages = { en, de };
+
+<CookieChimpProvider
+  config={config}
+  languages={{ available: ["en", "de"], fallback: "en" }}
+  translations={(locale) => messages[locale as keyof typeof messages]}
+>
+  {children}
+</CookieChimpProvider>;
+```
+
+Locales: en, de, fr, es, it, nl, pt, pt-BR, pl, sv, da, fi, no, cs, sk, hu,
+ro, bg, el, hr, sl, et, lv, lt, ga, mt, tr, ja, zh, ko, ar, he and uk. `ar` and
+`he` are right to left (`rtlLocales`). `localeMeta` records which locales have
+had native-speaker review: currently en, de, fr and es.
+
+## TCF labels
+
+The IAB TCF vendor list has its own labels in opt-in entries, so the banner
+bundles above do not grow:
+
+```tsx
+import { TcfVendorList } from "@cookiechimp/react/tcf";
+import de from "@cookiechimp/translations/tcf/de";
+
+<TcfVendorList controller={tcf} labels={de} />;
+```
+
+Only the English TCF labels are reviewed so far (`tcfReviewedLocales` from
+`@cookiechimp/translations/tcf`). Purpose and vendor names come from the GVL.
