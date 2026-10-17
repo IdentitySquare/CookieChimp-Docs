@@ -90,7 +90,7 @@ Together, these let any Launch rule (a) wait for consent to be available and (b)
 
     `trigger()` is a function Adobe Launch injects into Custom Code events. Calling it tells Launch to evaluate the rule's conditions and run its actions.
 
-    <Info>The `cc:consentStringUpdated` event is dispatched on `window` after CookieChimp has read the visitor's choices and rebuilt the consent string, so it's safe to read `window.cookieChimpConsentString` from inside the listener.</Info>
+    <Info>The `cc:consentStringUpdated` event is dispatched after CookieChimp has read the visitor's choices and rebuilt the consent string, so it's safe to read `window.cookieChimpConsentString` from inside the listener. It's dispatched on `document` and bubbles up to `window`, so a listener on either works.</Info>
   </Step>
 
   <Step title="Add a condition to gate the tag on consent">

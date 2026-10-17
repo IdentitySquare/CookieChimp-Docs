@@ -13,8 +13,9 @@ When the CookieChimp script loads, it exposes a global `CookieChimp` object (als
   The `CookieChimp` object and its properties are populated once the script has
   initialised. If you read them too early — for example, at the very top of the
   page — they may be `undefined`. Read them inside an [event
-  handler](#listening-for-events) such as `cc:onModalReady` or `cc:onConsented`,
-  or after a check for `window.CookieChimp`.
+  handler](#listening-for-events) such as
+  [`CookieChimpReady`](#cookiechimpready) or `cc:onConsented`, or after a check
+  for `window.CookieChimp`.
 </Warning>
 
 ## Reading visitor & banner data
@@ -145,17 +146,92 @@ if (CookieChimp.validConsent()) {
 }
 ```
 
+### `getCookie`
+
+Returns the raw consent object stored in CookieChimp's cookie — the same object passed as `event.detail.cookie` in the [consent events](#consent-events). Pass a field name to read a single field.
+
+For checking what the visitor accepted, prefer [`getUserPreferences`](#getuserpreferences), [`acceptedCategory`](#acceptedcategory), and [`acceptedService`](#acceptedservice). `getCookie` is useful when you need consent metadata, such as the consent ID or timestamps.
+
+```js
+// the full consent object
+CookieChimp.getCookie();
+
+// a single field
+CookieChimp.getCookie("consentId"); // unique ID of this visitor's consent
+CookieChimp.getCookie("consentTimestamp"); // when consent was first given (ISO 8601)
+CookieChimp.getCookie("lastConsentTimestamp"); // when consent was last updated (ISO 8601)
+CookieChimp.getCookie("categories"); // accepted category names
+CookieChimp.getCookie("services"); // accepted services, keyed by category
+```
+
+### `validCookie`
+
+Returns `true` if a cookie with the given name exists on the page and has a non-empty value. It's handy for checking whether a third-party cookie has already been set.
+
+```js
+if (CookieChimp.validCookie("_ga")) {
+  // the Google Analytics cookie exists
+}
+```
+
 ## Listening for events
 
 Every event is a standard DOM event dispatched on `window`. Subscribe with `window.addEventListener` and read the data from `event.detail`.
 
-CookieChimp dispatches three families of events:
+CookieChimp dispatches four families of events:
 
 | Category                                          | Events                                                                                          | When they fire                                              |
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [Lifecycle events](#lifecycle-events)             | `CookieChimpReady`                                                                              | When CookieChimp has finished initialising on the page.     |
 | [Consent events](#consent-events)                 | `cc:onFirstConsent`, `cc:onConsented`, `cc:onUpdate`                                            | When the visitor accepts, rejects, or changes preferences. |
 | [Modal events](#modal-events)                     | `cc:beforeModalShow`, `cc:onModalShow`, `cc:onModalHide`, `cc:onModalReady`                     | At each stage of the banner / preferences modal lifecycle. |
 | [Consent string events](#consent-string-events)   | `cc:consentStringUpdated`                                                                       | When `window.cookieChimpConsentString` is (re)built — used by the [Adobe Launch](/installation/adobe-launch) integration. |
+
+### Lifecycle events
+
+#### `CookieChimpReady`
+
+Dispatched on `window` once CookieChimp has finished initialising on the page: the visitor's stored consent has been loaded, the banner has been set up (and will open if the visitor still needs to make a choice), and every method on this page is available on the `CookieChimp` object.
+
+It fires on every page load for every visitor — including visitors in a location where no banner is shown, and visitors whose [Global Privacy Control](/integrations/global-privacy-control) signal is honoured.
+
+Use it for code that needs the SDK but doesn't depend on a consent change — for example reading the visitor's preferences on every page load, or wiring your own UI to `CookieChimp.showPreferences()`.
+
+```js
+window.addEventListener("CookieChimpReady", function () {
+  var preferences = CookieChimp.getUserPreferences();
+
+  if (preferences.acceptedCategories.includes("analytics")) {
+    // analytics was accepted on this or a previous visit
+  }
+});
+```
+
+`CookieChimpReady` is a plain `Event`, so it carries no `event.detail` — read whatever you need from the `CookieChimp` object inside the listener.
+
+<Tip>
+  Register the listener before the CookieChimp script tag, or in a script that
+  loads before it, so you can't miss the event. In single-page apps it fires
+  again each time CookieChimp re-runs after a client-side navigation (see
+  [`pageview`](#pageview)), so make sure your handler is safe to run more than
+  once.
+</Tip>
+
+If the code that needs CookieChimp may run after the event has already fired — for example, an app bundle that loads after the CookieChimp script — check whether the SDK methods are there before waiting for it. They're only attached once initialisation has finished, so their presence means you can call them straight away:
+
+```js
+function onCookieChimpReady(callback) {
+  if (window.CookieChimp && typeof window.CookieChimp.getUserPreferences === "function") {
+    callback();
+  } else {
+    window.addEventListener("CookieChimpReady", callback, { once: true });
+  }
+}
+
+onCookieChimpReady(function () {
+  // CookieChimp is ready
+});
+```
 
 ### Consent events
 
@@ -307,7 +383,9 @@ The string is rebuilt every time the visitor's consent changes, so reading it in
 
 #### `cc:consentStringUpdated`
 
-Triggered once consent has been granted and again every time the visitor changes their preferences, after `window.cookieChimpConsentString` has been rebuilt.
+Triggered once consent has been granted and again every time the visitor changes their preferences, after `window.cookieChimpConsentString` has been rebuilt. The new string is also available as `event.detail.consentString`.
+
+The event is dispatched on `document` and bubbles up to `window`, so a listener on either receives it.
 
 ```js
 window.addEventListener("cc:consentStringUpdated", function () {
@@ -424,6 +502,53 @@ CookieChimp.reset(true);
 // Reload the page
 window.location.reload();
 ```
+
+## Single-page apps
+
+### `pageview`
+
+Re-runs CookieChimp for the current page: the banner and privacy trigger are rendered again if needed, and [`CookieChimpReady`](#cookiechimpready) is dispatched again when it's done.
+
+```js
+CookieChimp.pageview();
+```
+
+By default, CookieChimp watches for URL changes and calls this for you on every client-side navigation, so most single-page apps never need it. Call it yourself when your app replaces the page content without changing the URL. See the [Single Page Apps](/installation/single-page-applications) guide for framework-specific setup.
+
+## Helpers
+
+### `loadScript`
+
+Loads a script by adding a `<script>` tag to `<head>`, unless a script with the same `src` is already on the page. Pass an optional object as the second argument to set attributes on the tag. Returns a Promise that resolves to `true` once the script has loaded (or if it was already on the page), or `false` if it failed to load.
+
+Combine it with the consent checks above to load a third-party script only after the visitor accepts it:
+
+```js
+function loadExampleWidgetIfAccepted() {
+  if (CookieChimp.acceptedService("Example Widget", "analytics")) {
+    CookieChimp.loadScript("https://cdn.example.com/widget.js", {
+      "data-site-id": "12345",
+    }).then(function (loaded) {
+      if (!loaded) console.warn("Example Widget failed to load");
+    });
+  }
+}
+
+// consent already stored, even if this code runs after CookieChimp has loaded
+onCookieChimpReady(loadExampleWidgetIfAccepted);
+// the visitor's first choice
+window.addEventListener("cc:onConsented", loadExampleWidgetIfAccepted);
+// the visitor enables it later from the preferences modal
+window.addEventListener("cc:onUpdate", loadExampleWidgetIfAccepted);
+```
+
+This uses the [`onCookieChimpReady`](#cookiechimpready) helper from above. Calling `loadExampleWidgetIfAccepted` more than once is safe: `loadScript` skips a `src` that's already on the page.
+
+<Tip>
+  For most scripts you don't need any JavaScript — add the
+  [script attributes](/block-scripts-cookies/script-attributes) to the tag and
+  CookieChimp runs it once the matching category or service is accepted.
+</Tip>
 
 ## Next steps
 
