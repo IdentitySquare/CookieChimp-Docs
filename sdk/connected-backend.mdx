@@ -1,0 +1,103 @@
+---
+title: "Connect to CookieChimp"
+description: "Load dashboard configuration and deliver consent records to CookieChimp."
+---
+
+Use your CookieChimp account to manage consent configuration and receive consent
+records. Backend integration is part of the SDK release requirements, even though
+the SDK also supports local configuration.
+
+## Run the complete React example
+
+The [React/Vite example](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/examples/react-vite/README.md) includes a
+`/connected` page. From a fresh checkout:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm --filter @cookiechimp/example-react-vite... build
+pnpm --filter @cookiechimp/example-react-vite start
+```
+
+1. Open `http://127.0.0.1:3104/connected`.
+2. Enter the public account ID from your CookieChimp installation snippet. This
+   is the account hashid used in the script URL, not an API key. Use a dedicated
+   test account whose domain settings allow your test origin.
+3. Choose **Load CookieChimp configuration**. The example requests the real
+   CookieChimp backend and displays the selected banner ID and config version.
+4. Accept, reject, or customize the banner. The example records the decision,
+   sends it to CookieChimp and displays a matching platform acknowledgement.
+5. Reload. The account's consent cookie restores the visitor's decision, and
+   config revalidation uses the cached ETag. Queued decisions retry when delivery
+   becomes available.
+
+The page shows a connection error if live config cannot be retrieved. It does
+not label local fallback or cached-only config as a verified live connection.
+An empty delivery queue alone is not proof of delivery: the page checks for a
+matching `client_id` in the platform's `synced` receipt.
+
+The example uses English and application-supplied Ireland region context.
+Replace that context with your application's trusted region when integrating;
+the SDK performs no location lookup. Dashboard categories, services, plain-text
+banner messages, cookie name and valid expiry settings feed the runtime. HTML
+in dashboard copy is never injected into the page. The demo includes no vendor
+tags, so accepting consent does not itself enable analytics requests.
+
+## Requests and responsibilities
+
+| Step | SDK API | CookieChimp endpoint |
+|---|---|---|
+| Get dashboard configuration | `createSync` from `@cookiechimp/core/sync` | `GET https://cookiechimp.com/api/v1/mobile-sdk/offline/{accountId}` |
+| Create the visitor's consent runtime | `createConsent` from `@cookiechimp/core` | First-party cookie in your application |
+| Queue each consent decision | `onConsent` calls `createConsentLog(...).record(...)` | Persistent browser retry queue |
+| Deliver and reconcile receipts | `createConsentLog` from `@cookiechimp/core/consent-log` | `POST https://cookiechimp.com/api/v1/mobile-sdk/sync/{accountId}` |
+
+Config and consent logging are separate operations. Fetching config successfully
+does not prove that a consent record was delivered. Use the platform consent-log
+adapter for its `consents[]` payload, stable retry IDs and acknowledgement parsing;
+the generic self-hosted `endpoint` adapter uses a different payload.
+
+Both backend requests omit cookies and use the public account ID. Never put a
+secret API key in client code or a URL. `apiBase` defaults to
+`https://cookiechimp.com`; only change it to your own CookieChimp platform origin.
+
+See the complete [connected source](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/examples/react-vite/src/connected.tsx)
+for loading, errors, config mapping, lifecycle cleanup, receipt handling and
+offline retries. The local-only demo remains at `/` for applications that own
+their configuration and consent storage.
+
+## Next.js server-side configuration
+
+For App Router applications, fetch the same dashboard configuration on the
+server so the initial HTML uses the project's categories and messages:
+
+```tsx
+import { CookieChimpProvider } from "@cookiechimp/nextjs/server";
+
+<CookieChimpProvider
+  projectId="YOUR_PUBLIC_ACCOUNT_ID"
+  config={{ categories: { analytics: false, marketing: false } }}
+>
+  {children}
+</CookieChimpProvider>;
+```
+
+`projectId` enables config retrieval and client revalidation. Consent delivery
+must also be wired explicitly using the platform consent-log adapter, as in
+the complete React example. The provider's `endpoint` prop is for a self-hosted
+receiver and must not be pointed at the platform sync endpoint. See
+[Next.js configuration](/sdk/nextjs#connected-mode-server-side-dashboard-config)
+for cache behavior, defaults, overrides and cookie handling.
+
+## Required live release verification
+
+Before publishing the SDK, verify a real test account against the deployed
+CookieChimp platform. Record the account/test origin, config version and banner,
+the consent record's `client_id`, and the matching server receipt. Confirm the
+record in the platform and exercise accept, reject, custom choices, cookie
+restoration and a failed-delivery retry. Keep secrets and personal visitor data
+out of the release evidence.
+
+CI tests intercept the backend endpoints with a redacted fixture. They verify
+the example's behavior without changing platform data; they do not satisfy the
+live release check. Live backend verification remains required before release;
+record real test-account evidence separately from CI results.

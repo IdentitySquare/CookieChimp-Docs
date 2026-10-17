@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cookiechimp/cookiechimp-sdk",
-  "sourceCommit": "74f20be8c4275a176a357316d424fe4a77b7c19c",
+  "sourceCommit": "a473611ea98babfd744742e584719cd35ef44a5b",
   "dirty": false,
   "pages": [
     {
@@ -10,6 +10,10 @@
     {
       "slug": "getting-started",
       "source": "packages/docs/content/getting-started.md"
+    },
+    {
+      "slug": "connected-backend",
+      "source": "packages/docs/content/connected-backend.md"
     },
     {
       "slug": "reference",
