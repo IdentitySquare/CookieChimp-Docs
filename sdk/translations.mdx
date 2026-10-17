@@ -37,8 +37,9 @@ const messages = { en, de };
 
 Locales: en, de, fr, es, it, nl, pt, pt-BR, pl, sv, da, fi, no, cs, sk, hu,
 ro, bg, el, hr, sl, et, lv, lt, ga, mt, tr, ja, zh, ko, ar, he and uk. `ar` and
-`he` are right to left (`rtlLocales`). `localeMeta` records which locales have
-had native-speaker review: currently en, de, fr and es.
+`he` are right to left (`rtlLocales`). `localeMeta` records editorial review
+status for all 33 locales. `translationReview` from
+`@cookiechimp/translations/meta` records the review method and date.
 
 ## TCF labels
 
@@ -52,5 +53,8 @@ import de from "@cookiechimp/translations/tcf/de";
 <TcfVendorList controller={tcf} labels={de} />;
 ```
 
-Only the English TCF labels are reviewed so far (`tcfReviewedLocales` from
-`@cookiechimp/translations/tcf`). Purpose and vendor names come from the GVL.
+All 33 TCF label sets have completed editorial review (`tcfReviewedLocales`
+from `@cookiechimp/translations/tcf`). Numeric duration labels preserve the
+`{days}` placeholder and use wording that works for singular and plural values.
+Purpose, feature and vendor names come from the GVL; supply it in the same
+language as the interface.

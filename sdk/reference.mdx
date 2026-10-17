@@ -178,9 +178,8 @@ section through `values`, for example
 `values: { usnat: { SaleOptOutNotice: 1, MspaServiceProviderMode: 2 } }`.
 Invalid values encode as 0 (not applicable).
 
-`cmpId` defaults to 0, which the GPP CMP API allows while a CMP has no IAB
-assigned ID. Set it once CookieChimp's IAB CMP registration (M6 item 26) is
-complete. The encoder is tested for byte-identical output against the IAB
+`cmpId` defaults to 0. Set the CMP ID associated with your GPP integration
+when configuring it. The encoder is tested for byte-identical output against the IAB
 reference implementation, `@iabgpp/cmpapi`.
 
 In React, pass `gpp` (`true` or serialisable `GppOptions`) to
@@ -245,8 +244,9 @@ import de from "@cookiechimp/translations/tcf/de";
 <TcfVendorList controller={tcf} labels={de} />;
 ```
 
-Only the English TCF labels have had native-speaker review so far
-(`tcfReviewedLocales`); review the other locales before relying on them.
+All 33 TCF label sets have completed editorial review (`tcfReviewedLocales`).
+The review method and date are recorded in `translationReview` from
+`@cookiechimp/translations/meta`.
 Purpose, feature and vendor names still come from the GVL, so load the GVL
 in the same language.
 
@@ -409,5 +409,5 @@ controller, and unmounting stops subscriptions and ignores late loads.
 In Next.js, render `TcfStub` from `@cookiechimp/nextjs/server` in the head before
 vendor tags, only when opting in. It supports `nonce` and an optional trusted
 `gdprApplies` value. Without the optional provider and stub, no TCF runs.
-The provider does not register CookieChimp, supply a GVL CDN or replace the
-platform's authoritative entitlement checks. Those remain launch prerequisites.
+TCF deployments configure their CMP ID, GVL source and authoritative feature
+access separately from the provider.
