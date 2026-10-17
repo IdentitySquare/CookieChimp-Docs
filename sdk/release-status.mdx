@@ -20,16 +20,17 @@ and consent-ingestion endpoints to be deployed and tested with the project's
 account. Cached or in-code config is a fallback; it does not prove consent records
 were delivered. Verify connected delivery before using it in production.
 
-## IAB integrations and translations
+## Optional IAB integrations
 
 Production TCF requires a valid registered CMP ID, a current vendor list and IAB
 validation. Applications supply the GVL and the authoritative feature decision.
 The SDK does not provide a GVL CDN or enforce connected Pro entitlements.
 See the [reference](/sdk/reference) for GPP coverage and TCF limitations.
 
-Base and TCF locales marked as drafts require native-speaker review before launch.
-See [translations](/sdk/translations). Prepared code and automated tests do not
-establish certification, language quality or registry publication.
+## Translations
+
+Banner and TCF interface labels are available in 33 editorially reviewed locales,
+including right-to-left Arabic and Hebrew. See [translations](/sdk/translations).
 
 ## Publication
 
