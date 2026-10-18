@@ -41,6 +41,15 @@ ro, bg, el, hr, sl, et, lv, lt, ga, mt, tr, ja, zh, ko, ar, he and uk. `ar` and
 status for all 33 locales. `translationReview` from
 `@cookiechimp/translations/meta` records the review method and date.
 
+## Platform JSON content
+
+The [platform UI](/sdk/platform-ui) uses the banner and nested category/vendor
+`translations` from your existing JSON. Pass `locale` explicitly or use configured
+browser/document hints. Region suffixes such as `fr-CA` select configured base
+language `fr`. The selected banner language and RTL settings apply to the UI.
+Translate the consent-ID label through `CookiePreferences`
+`consentIdLabel`; it defaults to “Your consent ID”.
+
 ## TCF labels
 
 The IAB TCF vendor list has its own labels in opt-in entries, so the banner

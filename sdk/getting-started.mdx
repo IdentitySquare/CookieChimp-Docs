@@ -6,6 +6,11 @@ description: "Install the SDK and show a consent banner."
 Registry commands below apply after the first npm release. Until then use the
 workspace examples. See [release status](/sdk/release-status).
 
+For a CookieChimp-managed project, start with
+[Connect to CookieChimp](/sdk/connected-backend). It shows a runnable example of
+dashboard config retrieval and consent delivery to the backend, including receipts
+and retries. The local setup below also works without an account.
+
 The quickest route is the CLI. It detects your framework, installs the right
 packages and writes starter files. It never edits files you already have.
 
@@ -137,3 +142,100 @@ consent.subscribe((state) => console.log(state.categories));
 - Send Google Consent Mode v2 signals and block runtime-added scripts: see the
   [reference](/sdk/reference).
 - Translate the banner: [translations](/sdk/translations).
+
+## Use the platform JSON for category and vendor preferences
+
+See [Banner and vendor preferences](/sdk/platform-ui) for the complete JSON
+contract, consent state, backend delivery, appearance controls and playground.
+
+The opt-in `@cookiechimp/react/platform` UI uses the same offline/config JSON
+bundle as the existing widget. There is no second category or vendor list.
+
+```tsx
+import { PlatformConsentProvider, CookieBanner, CookiePreferences, RecallButton } from "@cookiechimp/react/platform";
+import "@cookiechimp/react/platform.css";
+import bundle from "./cookiechimp.config.json";
+
+export function ConsentUi() {
+  return (
+    <PlatformConsentProvider bundle={bundle} region="IE" locale="en">
+      <CookieBanner />
+      <CookiePreferences />
+      <RecallButton />
+    </PlatformConsentProvider>
+  );
+}
+```
+
+The provider selects `banners`, `translations`, `country_banner_map` and
+`default_banner` from the existing bundle. It consumes `categories[].slug`,
+`name`, `description`, `required`, `services[]` and `storage_items[]`. Vendor
+details keep `id`, `name`, `description`, `company`, `privacy_policy_url`,
+`accepted_by_default` and `storage_items`, including each storage item's `name`,
+`type`, `description`, `duration` and `company`. Nested `translations` supply
+localized names and descriptions. The adapter derives an internal `consent_key`
+to map runtime service keys back to the original platform IDs. Never add that
+field to the input JSON.
+
+`useConsent().services` includes every configured vendor with its effective
+boolean value before and after a decision. It is `{}` when no services are
+configured. Values follow required categories, category defaults, saved vendor
+choices and GPC, without saving consent or sending a log just to display them.
+
+Set the existing `preferences_gui_options.control_level` to
+`category_and_services` for per-vendor controls. `category_only` keeps category
+controls, with vendor details when `show_services` is true. Category switches
+update all vendors; an individual vendor updates the category when any vendor
+is allowed. Changes are staged until Save; Close discards them. Required
+categories and their vendors stay enabled, and GPC cannot be bypassed through
+a vendor override. Button labels, visibility, colors and radii use the existing
+JSON keys. Descriptions preserve safe formatting and links as React elements; executable HTML and arbitrary attributes are discarded.
+
+Supply trusted region context from your application. The SDK performs no
+location lookup. For SSR, pass the server `initialState` as with
+`ConsentProvider`. The platform UI is a separate entry to preserve the default
+banner bundle size.
+
+Run the React/Vite workspace example and open `/platform.html` for a complete
+category/vendor demo. It uses the existing redacted bundle, with the canonical
+`category_and_services` control level, realistic Google Analytics, Microsoft
+Clarity and Meta Pixel disclosures, and a separate demo cookie. It loads no
+tracking tags and sends no consent records. Production logging stays explicit.
+
+### Motion
+
+The platform stylesheet includes short entrance, disclosure and switch animations
+by default. No animation package or additional import is needed. The UI automatically
+disables motion for visitors who request reduced motion in their operating system.
+To disable animations for all visitors, keep the same stylesheet and pass
+`motion={false}` to the provider:
+
+```tsx
+<PlatformConsentProvider bundle={bundle} region="IE" motion={false}>
+  <CookieBanner />
+  <CookiePreferences />
+  <RecallButton />
+</PlatformConsentProvider>
+```
+
+This changes only presentation; consent choices and keyboard behavior are unchanged.
+Collapsed details are inert and excluded from focus navigation, including while
+their closing transition runs. Developers building a custom UI can use
+`@cookiechimp/react/headless` with their own stylesheet instead.
+
+The playground includes 16 presets, an isolated actual-SDK preview, desktop/mobile
+sizes, JSON export, consent state and saved-choice replay. It includes controls
+for all platform layouts, positions, button placements,
+button swapping, equal weight, side panels, color schemes and radii. They modify
+the same JSON consumed by the SDK. See the [JSON compatibility matrix](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/docs/platform-json-compatibility.md)
+for the exact supported presentation fields and runtime integration boundaries.
+
+The example JSON is illustrative, rather than an inventory of tags on a live site.
+Google cookie details follow its [GA4 documentation](https://support.google.com/analytics/answer/11397207?hl=en),
+and Clarity purposes follow its [cookie documentation](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-cookies).
+Durations are example settings and may differ by site or browser. Vendor privacy
+links in the JSON point to the vendors' own policies.
+
+This entry supplies category/vendor consent and presentation. Optional protocol
+integrations, script gating and consent delivery still require their explicit
+SDK integrations; reading their dashboard flags does not activate them.

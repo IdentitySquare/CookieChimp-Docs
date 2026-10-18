@@ -6,11 +6,14 @@ description: "CookieChimp consent for React, Next.js and plain JavaScript."
 Open-source, lightweight consent SDK for React, Next.js and plain JavaScript,
 built by CookieChimp. MIT licensed.
 
+- **Connected mode.** Load a CookieChimp project's scanner categories,
+  dashboard copy and translations with config sync, and send decisions with
+  the platform consent-log adapter. Your code config can remain the fallback.
+- **Category and vendor preferences.** Render banner layouts, vendor details,
+  cookie disclosures, themes and languages from the platform JSON. A complete
+  service consent map and consent ID are available through React hooks.
 - **Local mode, no account.** Consent lives in a first-party `cc_consent`
   cookie. Your code owns the config.
-- **Connected mode.** Pass a CookieChimp `projectId` to sync the consent log,
-  scanner categories, dashboard copy, translations, regional rules and
-  styling. Your code config stays as the fallback.
 - **No banner flash.** The Next.js providers read the consent cookie on the
   server, so the first HTML already matches the visitor's choice.
 - **Blocks before consent.** Script and iframe gating, runtime blocking, a
@@ -24,7 +27,11 @@ their hosting platform's headers.
 
 ## Where to start
 
+- [Connect to CookieChimp](/sdk/connected-backend): dashboard configuration,
+  platform consent delivery and the complete backend-connected example.
 - [Getting started](/sdk/getting-started): install and show a banner.
+- [Banner and vendor preferences](/sdk/platform-ui): shared JSON, appearance,
+  consent state and the full variation playground.
 - [Next.js](/sdk/nextjs) or the [core and React reference](/sdk/reference).
 - [Examples](/sdk/examples) you can run.
 - [AI skills](/sdk/ai-skills) for coding agents and the
