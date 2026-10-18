@@ -43,6 +43,15 @@ SDK makes no location lookup. Do not nest another `ConsentProvider` around these
 components. For Next.js, render this provider in a client component and pass
 serializable JSON from your server loader.
 
+Saved decisions are reused only while their recorded regulation matches the
+selected consent mode. Switching between opt-out and opt-in requires a fresh
+choice and applies the new mode's defaults immediately. Legacy cookies without
+regulation metadata remain supported.
+
+The selected language and `dir` apply only to the banner, preferences and recall
+control. Application content inside the provider keeps its own language and text
+direction.
+
 A server loader can fetch and validate a bundle before rendering:
 
 ```ts
