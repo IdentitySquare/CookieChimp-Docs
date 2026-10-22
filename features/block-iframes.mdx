@@ -29,7 +29,7 @@ Until then, CookieChimp hides the iframe and shows a placeholder with the same w
 - **Accept and load** accepts the iframe's category (or service, see below) and loads the iframe. The visitor's other choices stay as they are, and the consent is recorded like any other.
 - **Manage preferences** opens the preferences modal.
 
-If the visitor later withdraws consent, CookieChimp unloads the iframe and shows the placeholder again.
+The placeholder text is shown in the same language as your banner. If the visitor later withdraws consent, CookieChimp unloads the iframe and shows the placeholder again.
 
 <Note>
   `data-category` takes the category ID, for example `analytics` or `marketing`. You can find the ID of each category in your CookieChimp dashboard.
@@ -59,6 +59,8 @@ Yes. Add `data-service` with the service name exactly as it appears in [vendor m
 - `data-placeholder-preferences`: [String] Custom label for the **Manage preferences** button.
 - `data-placeholder="false"`: Don't show a placeholder. The iframe stays empty until consent is given.
 
+Don't keep a `src` or `srcdoc` attribute on a blocked iframe: the browser loads it as soon as it reads the HTML, before CookieChimp can stop it.
+
 All other iframe attributes (`width`, `height`, `allow`, `title`, `class`, `style` and so on) are kept as they are.
 
 ```html
@@ -84,7 +86,7 @@ The placeholder uses your banner's colours and border radius. You can override i
 
 ### Does it work with iframes added after the page loads?
 
-Yes. CookieChimp watches the page for new iframes with `data-category` and `data-src`, so embeds added by page builders, tag managers or single page app navigation are blocked too.
+Yes. CookieChimp watches the page for new iframes with `data-category` and `data-src` (including iframes that get these attributes after being added), so embeds added by page builders, tag managers or single page app navigation are blocked too.
 
 <Tip>
   Add the CookieChimp script before your embeds, ideally as the first script in the `<head>`. Iframes with `data-src` never load on their own, so they stay blocked even if CookieChimp loads late.
