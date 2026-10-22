@@ -54,3 +54,18 @@ Control your scripts using these attributes:
 ```
 
 </Tip>
+
+## How do I block an iframe?
+
+The same attributes work on iframes. Move the iframe's `src` into `data-src` and add a `data-category` (and optionally `data-service`):
+
+```html
+<iframe
+  data-category="marketing"
+  data-src="https://www.google.com/maps/embed?pb=..."
+  width="600"
+  height="450"
+></iframe>
+```
+
+The iframe stays empty, behind a placeholder, until the visitor accepts the category. See [Block Iframes](/features/block-iframes) for the placeholder options.
