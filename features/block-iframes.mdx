@@ -66,7 +66,9 @@ All other iframe attributes (`width`, `height`, `allow`, `title`, `class`, `styl
 
 ### How do I style the placeholder?
 
-The placeholder uses your banner's colours, font and border radius. You can override its look with [custom CSS](/advanced/custom-css) using these classes:
+The placeholder looks like the embed placeholders for YouTube, Vimeo and the other [popular services](#embed-placeholders-for-popular-services): a dark overlay, a blue **Accept and load** button and the system font. It uses the same `--im-*` CSS variables, such as `--im-bg`, `--im-color`, `--im-btn-bg` and `--im-font-family`, so setting them in your [custom CSS](/advanced/custom-css) restyles both kinds of placeholder together.
+
+You can also target the generic placeholder directly with these classes:
 
 - `.cookiechimp-iframe-placeholder`: the placeholder box.
 - `.cookiechimp-iframe-placeholder p`: the message.
