@@ -5,6 +5,10 @@ description: "Block any third-party iframe from loading before consent and show 
 
 To comply with privacy regulations, you can stop third-party iframes (videos, maps, booking widgets, forms, chat widgets and so on) from loading until the visitor gives consent. CookieChimp can block **any** iframe this way, for any service set up in your banner.
 
+<Note>
+  Generic iframe blocking requires widget version **1.0.71 or newer**. With Debug Mode enabled, the widget logs its version in the browser console when it starts.
+</Note>
+
 ## How do I block any iframe?
 
 Move the iframe's `src` into `data-src` and add the service it belongs to with `data-service`:
@@ -66,7 +70,7 @@ All other iframe attributes (`width`, `height`, `allow`, `title`, `class`, `styl
 
 ### How do I style the placeholder?
 
-The placeholder looks like the embed placeholders for YouTube, Vimeo and the other [popular services](#embed-placeholders-for-popular-services): a dark overlay, an **Accept and Load** button with a play icon, and the system font. It uses the same `--im-*` CSS variables, such as `--im-bg`, `--im-color`, `--im-btn-bg` and `--im-font-family`, so setting them in your [custom CSS](/advanced/custom-css) restyles both kinds of placeholder together.
+The generic placeholder uses your banner theme variables, including `--cc-bg`, `--cc-secondary-color`, `--cc-btn-primary-bg` and `--cc-link-color`, and inherits the page font. Override them in your [custom CSS](/advanced/custom-css) or use the classes below to style this placeholder separately from the [popular-service embed placeholders](#embed-placeholders-for-popular-services).
 
 You can also target the generic placeholder directly with these classes:
 
