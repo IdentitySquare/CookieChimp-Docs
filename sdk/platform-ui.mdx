@@ -20,6 +20,7 @@ load vendor tags or install script blocking automatically.
 ## Render the platform JSON
 
 ```tsx
+import type { ConsentState } from "@cookiechimp/core";
 import {
   PlatformConsentProvider,
   CookieBanner,
@@ -28,9 +29,15 @@ import {
 } from "@cookiechimp/react/platform";
 import "@cookiechimp/react/platform.css";
 
-export function ConsentExperience({ bundle }: { bundle: unknown }) {
+export function ConsentExperience({
+  bundle,
+  initialState,
+}: {
+  bundle: unknown;
+  initialState?: ConsentState | null;
+}) {
   return (
-    <PlatformConsentProvider bundle={bundle} region="IE" locale="en">
+    <PlatformConsentProvider bundle={bundle} region="IE" locale="en" initialState={initialState}>
       <main>Your application</main>
       <CookieBanner />
       <CookiePreferences />
@@ -45,7 +52,11 @@ provider creates the runtime and selects the banner, language, categories and
 vendor disclosures. Supply trusted region context from your application; the
 SDK makes no location lookup. Do not nest another `ConsentProvider` around these
 components. For Next.js, render this provider in a client component and pass
-serializable JSON from your server loader.
+serializable JSON from your server loader. Also pass the consent state read from
+the request cookie as `initialState` (or `null` for a first visit), using the same
+cookie name as the bundle. This lets saved choices match during server rendering
+and hydration without flashing the initial banner. Avoid rendering newly generated
+consent IDs or timestamps directly in the initial server HTML.
 
 Saved decisions are reused only while their recorded regulation matches the
 selected consent mode. Switching between opt-out and opt-in requires a fresh
@@ -82,6 +93,30 @@ application must operate while config is unavailable. `createSync` adds cached
 config, ETag revalidation and update handling for the core/standard providers;
 its `dashboard` result is an adapted configuration, not the raw `bundle` expected
 by `PlatformConsentProvider`.
+
+For an App Router page, pair that loader with the request's consent cookie:
+
+```tsx
+import { CONSENT_COOKIE_NAME } from "@cookiechimp/core";
+import { adaptPlatformConfig } from "@cookiechimp/core/sync";
+import { getServerConsent } from "@cookiechimp/nextjs/server";
+import { ConsentExperience } from "./consent-experience";
+
+export default async function Page() {
+  const bundle = await loadConsentBundle("YOUR_PUBLIC_ACCOUNT_ID");
+  const dashboard = adaptPlatformConfig(bundle, { region: "IE", locale: "en" });
+  if (!dashboard) throw new Error("Invalid CookieChimp configuration");
+  const cookieName = typeof dashboard.cookie.name === "string"
+    ? dashboard.cookie.name
+    : CONSENT_COOKIE_NAME;
+  const initialState = await getServerConsent({ cookieName });
+  return <ConsentExperience bundle={bundle} initialState={initialState} />;
+}
+```
+
+Keep `ConsentExperience` in a `"use client"` module. `loadConsentBundle` is the
+server loader shown above. Do not rewrite a saved record's regulation before
+passing it in: the runtime must invalidate a choice made under a different law.
 
 ## Keep the existing JSON keys
 
