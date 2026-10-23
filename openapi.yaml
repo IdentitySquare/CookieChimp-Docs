@@ -1833,8 +1833,7 @@ components:
         The status of the account, where:
         - `account_created`: The account has been created.
         - `vendors_setup`: Categories, services or TCF vendors have been set up.
-        - `code_installed`: The script has been installed on the user's website.
-        - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
+        - `script_installed`: The script has been installed on the user's website.
         - `live`: The account is live and operational.
 
         Accounts whose status could not be determined are excluded from a
@@ -1843,7 +1842,7 @@ components:
       required: false
       schema:
         type: string
-        enum: [account_created, vendors_setup, code_installed, inactive, live]
+        enum: [account_created, vendors_setup, script_installed, live]
     visitor_stats:
       name: visitor_stats
       in: query
@@ -2993,8 +2992,7 @@ components:
             The status of the account, where:
             - `account_created`: The account has been created.
             - `vendors_setup`: Categories, services or TCF vendors have been set up.
-            - `code_installed`: The script has been installed on the user's website.
-            - `inactive`: Less than 10 visitors to the user's website in the last 30 days.
+            - `script_installed`: The script has been installed on the user's website.
             - `live`: The account is live and operational.
 
             `null` means the status could not be determined — the analytics store

@@ -1,0 +1,139 @@
+---
+title: "Getting started"
+description: "Install the SDK and show a consent banner."
+---
+
+Registry commands below apply after the first npm release. Until then use the
+workspace examples. See [release status](/sdk/release-status).
+
+The quickest route is the CLI. It detects your framework, installs the right
+packages and writes starter files. It never edits files you already have.
+
+```sh
+npx @cookiechimp/cli init
+npx @cookiechimp/cli doctor
+```
+
+The sections below show what it sets up, if you prefer to do it by hand.
+
+## Next.js App Router
+
+```sh
+npm install @cookiechimp/core @cookiechimp/react @cookiechimp/nextjs
+```
+
+```ts
+// cookiechimp.config.ts
+import type { ConsentConfig } from "@cookiechimp/core";
+
+// "necessary" is added automatically and is always on.
+export const consentConfig = {
+  categories: { analytics: false, marketing: false },
+} satisfies ConsentConfig;
+```
+
+```tsx
+// components/cookiechimp-banner.tsx
+"use client";
+
+import { CookieBanner } from "@cookiechimp/react/banner";
+
+export function CookieChimpBanner() {
+  return <CookieBanner />;
+}
+```
+
+```tsx
+// app/layout.tsx
+import "@cookiechimp/react/styles.css";
+import { CookieChimpProvider } from "@cookiechimp/nextjs/server";
+import type { ReactNode } from "react";
+import { CookieChimpBanner } from "../components/cookiechimp-banner";
+import { consentConfig } from "../cookiechimp.config";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <CookieChimpProvider config={consentConfig}>
+          {children}
+          <CookieChimpBanner />
+        </CookieChimpProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+`CookieChimpProvider` is a server component. It reads the consent cookie, so a
+returning visitor never sees the banner flash. See [Next.js](/sdk/nextjs)
+for regions, the Pages Router, connected mode and strict CSP.
+
+## React
+
+```tsx
+"use client";
+
+import "@cookiechimp/react/styles.css";
+import { ConsentProvider } from "@cookiechimp/react";
+import { CookieBanner } from "@cookiechimp/react/banner";
+import type { ReactNode } from "react";
+import { consentConfig } from "./cookiechimp.config";
+
+export function CookieChimp({ children }: { children: ReactNode }) {
+  return (
+    <ConsentProvider config={consentConfig}>
+      {children}
+      <CookieBanner />
+    </ConsentProvider>
+  );
+}
+```
+
+When you server render, pass `initialState` so hydration matches. Read consent
+in components with the hooks:
+
+```tsx
+import { useCategory, usePreferences } from "@cookiechimp/react";
+
+function AnalyticsStatus() {
+  const analytics = useCategory("analytics");
+  const preferences = usePreferences();
+  return (
+    <button type="button" onClick={preferences.show}>
+      Analytics {analytics ? "on" : "off"}
+    </button>
+  );
+}
+```
+
+## Plain JavaScript
+
+```ts
+import { createConsent } from "@cookiechimp/core";
+import { gateScripts } from "@cookiechimp/core/gate";
+
+export const consent = createConsent({
+  categories: { analytics: false, marketing: false },
+});
+gateScripts(consent);
+
+consent.subscribe((state) => console.log(state.categories));
+// Wire your own buttons to consent.acceptAll(), consent.rejectAll() and consent.set().
+```
+
+```html
+<!-- Stays inert until analytics is allowed. -->
+<script
+  type="text/plain"
+  data-cc-category="analytics"
+  data-cc-src="https://www.googletagmanager.com/gtag/js?id=G-EXAMPLE123"
+></script>
+```
+
+## Next steps
+
+- Gate vendor tags with the [script presets](/sdk/scripts).
+- Send Google Consent Mode v2 signals and block runtime-added scripts: see the
+  [reference](/sdk/reference).
+- Translate the banner: [translations](/sdk/translations).
