@@ -79,6 +79,12 @@ more convenient.
 
 ## Connected mode: server-side dashboard config
 
+The [backend-connected guide](/sdk/connected-backend) includes a
+complete runnable config-and-consent-delivery example. The provider below loads
+dashboard configuration; consent delivery is a separate integration using
+`@cookiechimp/core/consent-log`. The self-hosted `endpoint` prop uses a different
+payload and must not be pointed directly at the CookieChimp platform sync API.
+
 ```tsx
 <CookieChimpProvider projectId="acct123" config={{ categories: ["analytics"] }}>
   {children}

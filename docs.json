@@ -147,6 +147,8 @@
             "pages": [
               "sdk/overview",
               "sdk/getting-started",
+              "sdk/platform-ui",
+              "sdk/connected-backend",
               "sdk/examples",
               "sdk/release-status"
             ]

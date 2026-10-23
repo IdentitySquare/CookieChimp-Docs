@@ -1,0 +1,265 @@
+---
+title: "Banner and vendor preferences"
+description: "Platform JSON, category and vendor choices, themes, consent state and the playground."
+---
+
+Requires SDK 1.1.0 or newer. See [versions and deployment](/sdk/release-status).
+
+Use `@cookiechimp/react/platform` to render the CookieChimp banner and preferences
+from the same JSON configuration used by the dashboard. Visitors can choose by
+category or individual vendor, inspect the purpose and provider, and see the
+cookies or storage each vendor uses.
+
+Use the [connected walkthrough](/sdk/connected-backend) for backend configuration
+and consent delivery. The UI also accepts a saved copy of the same JSON, so you
+can run it without a backend request. Rendering the UI does not enable logging,
+load vendor tags or install script blocking automatically.
+
+## Render the platform JSON
+
+```tsx
+import type { ConsentState } from "@cookiechimp/core";
+import {
+  PlatformConsentProvider,
+  CookieBanner,
+  CookiePreferences,
+  RecallButton,
+} from "@cookiechimp/react/platform";
+import "@cookiechimp/react/platform.css";
+
+export function ConsentExperience({
+  bundle,
+  initialState,
+}: {
+  bundle: unknown;
+  initialState?: ConsentState | null;
+}) {
+  return (
+    <PlatformConsentProvider bundle={bundle} region="IE" locale="en" initialState={initialState}>
+      <main>Your application</main>
+      <CookieBanner />
+      <CookiePreferences />
+      <RecallButton />
+    </PlatformConsentProvider>
+  );
+}
+```
+
+`bundle` is the unchanged JSON from the platform offline/config endpoint. The
+provider creates the runtime and selects the banner, language, categories and
+vendor disclosures. Supply trusted region context from your application; the
+SDK makes no location lookup. Do not nest another `ConsentProvider` around these
+components. For Next.js, render this provider in a client component and pass
+serializable JSON from your server loader. Also pass the consent state read from
+the request cookie as `initialState` (or `null` for a first visit), using the same
+cookie name as the bundle. This lets saved choices match during server rendering
+and hydration without flashing the initial banner. Avoid rendering newly generated
+consent IDs or timestamps directly in the initial server HTML.
+
+Saved decisions are reused only while their recorded regulation matches the
+selected consent mode. Switching between opt-out and opt-in requires a fresh
+choice and applies the new mode's defaults immediately. Legacy cookies without
+regulation metadata remain supported.
+
+The selected language and `dir` apply only to the banner, preferences and recall
+control. Application content inside the provider keeps its own language and text
+direction.
+
+A server loader can fetch and validate a bundle before rendering:
+
+```ts
+import { adaptPlatformConfig } from "@cookiechimp/core/sync";
+
+export async function loadConsentBundle(accountId: string) {
+  const response = await fetch(
+    `https://cookiechimp.com/api/v1/mobile-sdk/offline/${encodeURIComponent(accountId)}`,
+    { credentials: "omit" },
+  );
+  if (!response.ok) throw new Error("CookieChimp configuration unavailable");
+  const bundle: unknown = await response.json();
+  if (!adaptPlatformConfig(bundle, { projectId: accountId, region: "IE", locale: "en" })) {
+    throw new Error("Invalid CookieChimp configuration");
+  }
+  return bundle;
+}
+```
+
+Use the public account hashid from your installation snippet, never a secret API
+key. Handle loading and errors in your application. Choose an appropriate server
+cache policy for your framework, and retain a validated local fallback if your
+application must operate while config is unavailable. `createSync` adds cached
+config, ETag revalidation and update handling for the core/standard providers;
+its `dashboard` result is an adapted configuration, not the raw `bundle` expected
+by `PlatformConsentProvider`.
+
+For an App Router page, pair that loader with the request's consent cookie:
+
+```tsx
+import { CONSENT_COOKIE_NAME } from "@cookiechimp/core";
+import { adaptPlatformConfig } from "@cookiechimp/core/sync";
+import { getServerConsent } from "@cookiechimp/nextjs/server";
+import { ConsentExperience } from "./consent-experience";
+
+export default async function Page() {
+  const bundle = await loadConsentBundle("YOUR_PUBLIC_ACCOUNT_ID");
+  const dashboard = adaptPlatformConfig(bundle, { region: "IE", locale: "en" });
+  if (!dashboard) throw new Error("Invalid CookieChimp configuration");
+  const cookieName = typeof dashboard.cookie.name === "string"
+    ? dashboard.cookie.name
+    : CONSENT_COOKIE_NAME;
+  const initialState = await getServerConsent({ cookieName });
+  return <ConsentExperience bundle={bundle} initialState={initialState} />;
+}
+```
+
+Keep `ConsentExperience` in a `"use client"` module. `loadConsentBundle` is the
+server loader shown above. Do not rewrite a saved record's regulation before
+passing it in: the runtime must invalidate a choice made under a different law.
+
+## Keep the existing JSON keys
+
+The provider reads `banners`, `translations`, `country_banner_map` and
+`default_banner`. Each category keeps its `slug`, `name`, `description`,
+`required`, `services` and `storage_items`. Services keep `id`, `name`,
+`description`, `company`, `privacy_policy_url`, `accepted_by_default` and
+`storage_items`. Storage disclosures retain `name`, `type`, `description`,
+`duration` and `company`. Nested `translations` supply localized content.
+
+The SDK derives runtime service keys, such as `google-analytics`, while retaining
+the original platform IDs in the adapter. Do not add `consent_key` or a second
+vendor schema to the JSON. The complete [field compatibility matrix](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/docs/platform-json-compatibility.md)
+describes the supported inputs and integration boundaries.
+
+| JSON settings | Experience |
+|---|---|
+| `gui_options.layout`, `position`, `button_placement` | Box, cloud and bar banners; top, middle or bottom positions; stacked, inline or wide actions where supported by the layout. |
+| `gui_options.swap_buttons`, `equal_weight_buttons`, `buttons` | Banner action order, equal accept/reject styling and individual visibility. |
+| `preferences_gui_options.layout`, `position` | Centered preferences or a full-height left/right panel. A divider separates the fixed header from the scrolling body; actions remain visible. |
+| `preferences_gui_options.control_level`, `show_services` | Category and vendor switches, or category-only choices with optional service disclosures. |
+| `preferences_buttons`, `preferences_gui_options.equal_weight_buttons` | Save, accept and reject visibility and styling. Save stays separate from the accept/reject pair; narrow screens give Save its own row. |
+| `theme` | Light, dark or automatic color scheme, separate palettes, logos, button and modal radii. |
+| `force_consent` | Require interaction with the notice before using the page. |
+| `preferences_gui_options.show_floating_icon`, `floating_icon_position` | Recall control visibility and bottom-left/bottom-right position. |
+| `translations`, `language_autodetect`, `rtl_languages` | Configured copy, language hints and right-to-left layout. |
+| `footer` | Custom footer content and optional attribution. Attribution appears at the lower left of preferences content, below the consent ID. |
+
+Category switches update their vendors. A vendor can be changed individually
+when `control_level` is `category_and_services`. Changes remain staged until
+**Save preferences**; Close discards them. Accept and Reject apply immediately.
+Required categories and their vendors stay enabled, and GPC cannot be bypassed
+by a vendor override. Rich descriptions preserve supported formatting and safe
+links without injecting raw HTML.
+
+## Read categories, services and the consent ID
+
+Use the regular hooks inside `PlatformConsentProvider`:
+
+```tsx
+import { useConsent, usePreferences } from "@cookiechimp/react";
+
+export function PrivacySettings() {
+  const consent = useConsent();
+  const preferences = usePreferences();
+  return (
+    <section>
+      <button type="button" onClick={preferences.show}>Cookie preferences</button>
+      <pre>{JSON.stringify({
+        consentId: consent.consentId,
+        categories: consent.categories,
+        services: consent.services,
+        action: consent.action,
+      }, null, 2)}</pre>
+    </section>
+  );
+}
+```
+
+Runtime snapshots and decision callbacks always include a complete `services`
+object. Each configured vendor has its effective boolean value before and after
+a decision; no configured services means `{}`. For example, an opt-in setup can
+start with:
+
+```json
+{
+  "services": {
+    "session-management": true,
+    "google-analytics": false,
+    "microsoft-clarity": false,
+    "meta-pixel": false
+  }
+}
+```
+
+These values match `hasService()`: required vendors are enabled, and optional
+vendors follow category defaults, saved individual choices and GPC. Displaying
+this state does not save a decision or send a consent log. Older sparse cookies
+are accepted, and inherited defaults remain separate from explicit vendor
+choices in storage so category changes continue to apply.
+
+The preferences modal shows **Your consent ID** above the attribution. This is
+the runtime `consentId`, also serialized as `uuid` by the platform consent-log
+adapter. It persists with saved consent. It is not a backend delivery receipt.
+Translate the label when needed:
+
+```tsx
+<CookiePreferences consentIdLabel="Your consent ID" />
+```
+
+## Motion and accessibility
+
+The platform stylesheet includes entrance, disclosure and switch transitions.
+Animations are enabled by default and automatically respect reduced motion.
+Disable them for the provider without another package:
+
+```tsx
+<PlatformConsentProvider bundle={bundle} region="IE" motion={false}>
+  <CookieBanner />
+  <CookiePreferences />
+  <RecallButton />
+</PlatformConsentProvider>
+```
+
+Preferences trap focus, support Escape and restore focus to the trigger. The
+header and actions stay visible while only the body scrolls. Collapsed vendor
+details are inert and excluded from keyboard navigation. Headless applications
+can use `@cookiechimp/react/headless` and supply their own styling.
+
+## Wire consent delivery separately
+
+Pass an `onConsent` callback to `PlatformConsentProvider` and send decisions with
+`createConsentLog` from `@cookiechimp/core/consent-log` when connecting to
+CookieChimp. Configure the public account ID, selected banner ID and service
+category mapping from `adaptPlatformConfig(bundle, ...)`. Keep the log instance
+stable, call `record(record, language)` for each decision, and destroy it when
+its owning application is torn down. See the [connected example](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/examples/react-vite/src/connected.tsx)
+for receipt reconciliation, retry handling and cleanup.
+
+A successful config request, a displayed consent ID or an empty queue is not
+proof of delivery. Confirm a matching `client_id` in the backend's `synced`
+receipt. Use the generic `endpoint` integration only for your own receiver, not
+for the platform's batch sync endpoint. Google Consent Mode, script/iframe
+blocking, GPP and TCF retain their explicit integrations; platform flags do not
+install them by rendering this UI.
+
+## Try all variations
+
+The React/Vite example includes a playground at `/platform.html`:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm --filter @cookiechimp/example-react-vite... build
+pnpm --filter @cookiechimp/example-react-vite start
+```
+
+Open `http://127.0.0.1:3104/platform.html`. The 16 presets cover all seven
+layout/button combinations plus vendor choices, category-only choices, a dark
+side panel, opt-out, Arabic/RTL, branding, a minimal notice, forced interaction
+and motion off. Fine-tune positions, button visibility, colors, themes, languages,
+logos and recall settings. Desktop/mobile previews render the actual SDK in an
+isolated frame from the same JSON shown by **Inspect the platform JSON**.
+
+**Replay banner** clears only the isolated one-hour demo cookie. **Reload saved
+choices** retains it to test persistence. Open the preview in a full page or copy
+the JSON for inspection. Vendor names and cookie details are illustrative; no
+vendor tags or consent records are sent by this playground. Use `/connected`
+for real backend configuration and delivery testing.
