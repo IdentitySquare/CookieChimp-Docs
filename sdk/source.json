@@ -1,0 +1,55 @@
+{
+  "repository": "https://github.com/cookiechimp/cookiechimp-sdk",
+  "sourceCommit": "74f20be8c4275a176a357316d424fe4a77b7c19c",
+  "dirty": false,
+  "pages": [
+    {
+      "slug": "overview",
+      "source": "packages/docs/content/index.md"
+    },
+    {
+      "slug": "getting-started",
+      "source": "packages/docs/content/getting-started.md"
+    },
+    {
+      "slug": "reference",
+      "source": "README.md"
+    },
+    {
+      "slug": "nextjs",
+      "source": "packages/nextjs/README.md"
+    },
+    {
+      "slug": "scripts",
+      "source": "packages/scripts/README.md"
+    },
+    {
+      "slug": "translations",
+      "source": "packages/docs/content/translations.md"
+    },
+    {
+      "slug": "cli",
+      "source": "packages/cli/README.md"
+    },
+    {
+      "slug": "devtools",
+      "source": "packages/devtools/README.md"
+    },
+    {
+      "slug": "tokens",
+      "source": "packages/tokens/README.md"
+    },
+    {
+      "slug": "release-status",
+      "source": "packages/docs/content/deployment.md"
+    },
+    {
+      "slug": "ai-skills",
+      "source": "packages/docs/content/ai-skills.md"
+    },
+    {
+      "slug": "examples",
+      "source": "packages/docs/content/examples.md"
+    }
+  ]
+}
