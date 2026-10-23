@@ -37,7 +37,7 @@ The placeholder text is shown in the same language as your banner. If the visito
 
 ### Can I block an iframe by service instead of category?
 
-Yes. Add `data-service` with the service name exactly as it appears in [vendor management](vendor-management#what-are-vendors). The iframe then loads only when the visitor accepts that service, and **Accept and load** accepts only that service.
+Yes. Add `data-service` with the service name exactly as it appears in [vendor management](/features/vendor-management#what-are-vendors). The iframe then loads only when the visitor accepts that service, and **Accept and load** accepts only that service.
 
 ```html
 <iframe
@@ -88,9 +88,27 @@ The placeholder uses your banner's colours and border radius. You can override i
 
 Yes. CookieChimp watches the page for new iframes with `data-category` and `data-src` (including iframes that get these attributes after being added), so embeds added by page builders, tag managers or single page app navigation are blocked too.
 
+If the page removes the placeholder, moves the iframe or adds the `hidden` attribute, CookieChimp updates the placeholder to match.
+
 <Tip>
   Add the CookieChimp script before your embeds, ideally as the first script in the `<head>`. Iframes with `data-src` never load on their own, so they stay blocked even if CookieChimp loads late.
 </Tip>
+
+### How do I hide the placeholder for an iframe that isn't shown yet?
+
+Add the `hidden` attribute to the iframe, for example for an embed inside a closed modal or tab. CookieChimp shows no placeholder for a hidden iframe, and shows it once you remove `hidden`. If you hide the iframe some other way (with CSS, or by hiding a parent element), use `data-placeholder="false"`, since CookieChimp can't tell that it's hidden.
+
+### Does accepting from the placeholder count as consent?
+
+Yes. **Accept and load** records the visitor's choice like any other consent, so it appears in your [consent records](/features/consent-records) and the banner closes and doesn't come back on the next page. Only the iframe's category (or service) is added. Everything else the visitor chose stays as it was.
+
+### What happens in regions where no banner is shown?
+
+If your banner isn't shown in the visitor's region, consent isn't needed there, so every blocked iframe loads straight away with no placeholder. This holds even if the visitor rejected cookies earlier in a region that shows the banner.
+
+### How do I check that an iframe is blocked?
+
+Turn on Debug Mode (see the [FAQ](/faq#how-do-i-verify-if-everything-is-working-correctly)). CookieChimp then logs `Loading iframe after consent` in the browser console when it loads an iframe, and `Unloading iframe without consent` when consent is withdrawn. Before consent, the iframe has no `src` attribute in your browser's element inspector.
 
 ## Embed placeholders for popular services
 
@@ -103,7 +121,7 @@ For YouTube, Vimeo, Spotify, SoundCloud and Twitch, CookieChimp can also build t
 ```
 
 <Note>
-  The `data-service` attribute must match exactly how the service is named in [vendor management](vendor-management#what-are-vendors).
+  The `data-service` attribute must match exactly how the service is named in [vendor management](/features/vendor-management#what-are-vendors).
 </Note>
 
 ### How do I customize the embed placeholder?

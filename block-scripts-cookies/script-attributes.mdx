@@ -68,4 +68,16 @@ The same attributes work on iframes. Move the iframe's `src` into `data-src` and
 ></iframe>
 ```
 
-The iframe stays empty, behind a placeholder, until the visitor accepts the category. See [Block Iframes](/features/block-iframes) for the placeholder options.
+The iframe stays empty, behind a placeholder, until the visitor accepts the category. Add `data-service` to block it by vendor instead, exactly as you would for a script:
+
+```html
+<iframe
+  data-category="marketing"
+  data-service="YouTube"
+  data-src="https://www.youtube-nocookie.com/embed/tgbNymZ7vqY"
+  width="560"
+  height="315"
+></iframe>
+```
+
+The iframe then loads only when the visitor accepts YouTube. See [Block Iframes](/features/block-iframes) for the placeholder options.
