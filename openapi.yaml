@@ -4,6 +4,11 @@ info:
   description: |
     API for CookieChimp.com.
 
+    ## Upcoming account configuration endpoints
+
+    Operations marked "Upcoming" are not available in the current public API.
+    Wait for the account configuration API release before integrating them.
+
     ## Request bodies
 
     Resource endpoints expect the resource wrapped under its own key, e.g.
@@ -711,8 +716,10 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     patch:
-      summary: Update account
+      summary: "Upcoming: Update account"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Update an account's settings — the same fields the dashboard's account
         settings screens expose.
 
@@ -723,6 +730,7 @@ paths:
         `account_type` cannot be changed here, as on the web form: mobile app
         accounts are only created through the admin panel.
       operationId: updateAccount
+      x-availability: upcoming
       tags:
         - Accounts
       parameters:
@@ -1025,11 +1033,14 @@ paths:
   # site service endpoints - index, GET, POST, PUT & DELETE
   /services:
     get:
-      summary: List services
+      summary: "Upcoming: List services"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         List the services configured on the current account, in name order.
         Requires an account-scoped API token.
       operationId: listServices
+      x-availability: upcoming
       tags:
         - Services
       parameters:
@@ -1060,11 +1071,14 @@ paths:
     post:
       parameters:
         - $ref: "#/components/parameters/account_id"
-      summary: Create service
+      summary: "Upcoming: Create service"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Create a service under one of the account's categories. `category_id`
         is required and must belong to this account.
       operationId: createService
+      x-availability: upcoming
       tags:
         - Services
       requestBody:
@@ -1100,9 +1114,10 @@ paths:
 
   /services/{id}:
     get:
-      summary: Get service
-      description: Get service by ID
+      summary: "Upcoming: Get service"
+      description: "**Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.\n\nGet service by ID"
       operationId: getService
+      x-availability: upcoming
       tags:
         - Services
       parameters:
@@ -1123,11 +1138,14 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     put:
-      summary: Update service
+      summary: "Upcoming: Update service"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Update a service. Passing `category_id` moves the service to that
         category; omitting it leaves the service where it is.
       operationId: updateService
+      x-availability: upcoming
       tags:
         - Services
       parameters:
@@ -1161,9 +1179,10 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     delete:
-      summary: Delete service
-      description: Delete a service. It is soft-deleted and stops appearing in listings.
+      summary: "Upcoming: Delete service"
+      description: "**Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.\n\nDelete a service. It is soft-deleted and stops appearing in listings."
       operationId: deleteService
+      x-availability: upcoming
       tags:
         - Services
       parameters:
@@ -1192,11 +1211,14 @@ paths:
   # consent banner endpoints - index, GET, POST, PUT, DELETE & duplicate
   /consent-banners:
     get:
-      summary: List consent banners
+      summary: "Upcoming: List consent banners"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         List the account's consent banners, newest first. Requires an
         account-scoped API token.
       operationId: listConsentBanners
+      x-availability: upcoming
       tags:
         - Consent Banners
       parameters:
@@ -1227,8 +1249,10 @@ paths:
     post:
       parameters:
         - $ref: "#/components/parameters/account_id"
-      summary: Create consent banner
+      summary: "Upcoming: Create consent banner"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Create a consent banner. It inherits the design of the account's most
         recently updated banner, the same way the dashboard's new-banner flow
         does, and is always created disabled — enable it once its content and
@@ -1238,6 +1262,7 @@ paths:
         afterwards, which is where the account's language entitlement is
         enforced.
       operationId: createConsentBanner
+      x-availability: upcoming
       tags:
         - Consent Banners
       requestBody:
@@ -1267,9 +1292,10 @@ paths:
 
   /consent-banners/{id}:
     get:
-      summary: Get consent banner
-      description: Get consent banner by ID
+      summary: "Upcoming: Get consent banner"
+      description: "**Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.\n\nGet consent banner by ID"
       operationId: getConsentBanner
+      x-availability: upcoming
       tags:
         - Consent Banners
       parameters:
@@ -1290,11 +1316,14 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     put:
-      summary: Update consent banner
+      summary: "Upcoming: Update consent banner"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Update a consent banner's content, appearance or targeting. Set
         `enabled` to `true` to make it live.
       operationId: updateConsentBanner
+      x-availability: upcoming
       tags:
         - Consent Banners
       parameters:
@@ -1328,9 +1357,10 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     delete:
-      summary: Delete consent banner
-      description: Delete a consent banner. It is soft-deleted and stops appearing in listings.
+      summary: "Upcoming: Delete consent banner"
+      description: "**Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.\n\nDelete a consent banner. It is soft-deleted and stops appearing in listings."
       operationId: deleteConsentBanner
+      x-availability: upcoming
       tags:
         - Consent Banners
       parameters:
@@ -1358,11 +1388,14 @@ paths:
 
   /consent-banners/{id}/duplicate:
     post:
-      summary: Duplicate consent banner
+      summary: "Upcoming: Duplicate consent banner"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Copy a consent banner, including its design and targeting. The copy is
         named after the original and is always created disabled.
       operationId: duplicateConsentBanner
+      x-availability: upcoming
       tags:
         - Consent Banners
       parameters:
@@ -1391,8 +1424,10 @@ paths:
   # integration endpoints - index, GET & PUT
   /integrations:
     get:
-      summary: List integrations
+      summary: "Upcoming: List integrations"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         List every integration available to the account, active and inactive.
         Integrations the account has never opened are created inactive on first
         listing, so the collection is always the full set you can enable.
@@ -1400,6 +1435,7 @@ paths:
         Only integrations the account's platform can run are included — a mobile
         app account does not see the website-only ones.
       operationId: listIntegrations
+      x-availability: upcoming
       tags:
         - Integrations
       parameters:
@@ -1429,9 +1465,10 @@ paths:
 
   /integrations/{id}:
     get:
-      summary: Get integration
-      description: Get integration by ID
+      summary: "Upcoming: Get integration"
+      description: "**Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.\n\nGet integration by ID"
       operationId: getIntegration
+      x-availability: upcoming
       tags:
         - Integrations
       parameters:
@@ -1452,8 +1489,10 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     put:
-      summary: Update integration
+      summary: "Upcoming: Update integration"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Enable, disable or configure an integration. Every integration accepts
         `status`; the rest of the accepted keys depend on which integration it
         is, and anything else is ignored.
@@ -1471,6 +1510,7 @@ paths:
         refused with a `422`. Turning it off always works, so an account that
         downgrades can still disable it.
       operationId: updateIntegration
+      x-availability: upcoming
       tags:
         - Integrations
       parameters:
@@ -1506,11 +1546,14 @@ paths:
   # scan endpoints - index, GET & POST
   /scans:
     get:
-      summary: List scans
+      summary: "Upcoming: List scans"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         List the account's website scans, newest first. Requires an
         account-scoped API token.
       operationId: listScans
+      x-availability: upcoming
       tags:
         - Scans
       parameters:
@@ -1541,8 +1584,10 @@ paths:
     post:
       parameters:
         - $ref: "#/components/parameters/account_id"
-      summary: Start a scan
+      summary: "Upcoming: Start a scan"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Queue a scan of the account's website. Only one scan can run at a time
         per account, and accounts have a daily scan limit — both come back as a
         `422`, as does a mobile app account, which has no website to crawl.
@@ -1550,6 +1595,7 @@ paths:
         Scanning is asynchronous: the scan is created `queued`, and the report
         appears on the scan once its status reaches `completed`.
       operationId: createScan
+      x-availability: upcoming
       tags:
         - Scans
       requestBody:
@@ -1579,11 +1625,14 @@ paths:
 
   /scans/{id}:
     get:
-      summary: Get scan
+      summary: "Upcoming: Get scan"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Get a scan by ID. `report` is only present once the scan has completed;
         poll `status` until then.
       operationId: getScan
+      x-availability: upcoming
       tags:
         - Scans
       parameters:
@@ -1608,8 +1657,10 @@ paths:
     get:
       parameters:
         - $ref: "#/components/parameters/account_id"
-      summary: Get the regional compliance report
+      summary: "Upcoming: Get the regional compliance report"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Evaluate the account's banners against every regulation CookieChimp
         tracks, and report what is outstanding — the same evaluation the
         dashboard's compliance screen renders.
@@ -1620,6 +1671,7 @@ paths:
 
         Requires a plan that includes the compliance report.
       operationId: getComplianceReport
+      x-availability: upcoming
       tags:
         - Compliance
       responses:
@@ -1649,12 +1701,15 @@ paths:
     get:
       parameters:
         - $ref: "#/components/parameters/account_id"
-      summary: List banner templates
+      summary: "Upcoming: List banner templates"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         The jurisdiction templates a banner can be created from, grouped by
         region. Use a template's `id` as the `jurisdiction_id` for
         `POST /consent-banners/from-template`.
       operationId: listBannerTemplates
+      x-availability: upcoming
       tags:
         - Consent Banners
       responses:
@@ -1673,14 +1728,17 @@ paths:
     post:
       parameters:
         - $ref: "#/components/parameters/account_id"
-      summary: Create consent banner from a template
+      summary: "Upcoming: Create consent banner from a template"
       description: |
+        **Upcoming endpoint:** This operation is not available in the current public API. Wait for the account configuration API release before integrating it.
+
         Create a banner preconfigured for a jurisdiction — the consent mode,
         targeting and copy that regulation requires. As with every banner this
         API creates, it starts disabled.
 
         `jurisdiction_id` comes from `GET /banner-templates`.
       operationId: createConsentBannerFromTemplate
+      x-availability: upcoming
       tags:
         - Consent Banners
       requestBody:
