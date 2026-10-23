@@ -54,3 +54,18 @@ Control your scripts using these attributes:
 ```
 
 </Tip>
+
+## How do I block an iframe?
+
+Iframes are blocked by service. Move the iframe's `src` into `data-src` and add `data-service` with the service name, exactly as you would for a script:
+
+```html
+<iframe
+  data-service="YouTube"
+  data-src="https://www.youtube-nocookie.com/embed/tgbNymZ7vqY"
+  width="560"
+  height="315"
+></iframe>
+```
+
+The iframe stays empty, behind a placeholder, until the visitor accepts YouTube. CookieChimp finds the service's category from your banner, so `data-category` isn't needed. See [Block Iframes](/features/block-iframes) for the placeholder options.

@@ -50,3 +50,7 @@ Go to the "Integrations" page and enable the Global Privacy Control integration.
 
 Now if we detect a Global Privacy Control signal from the browser, the opt-out preferences will automatically be set.
 
+
+## How do I block YouTube videos, maps or other embeds until consent?
+
+Move the iframe's `src` into `data-src` and add `data-service` with the service name from vendor management. CookieChimp shows a placeholder until the visitor accepts that service. See [Block Iframes](/features/block-iframes).

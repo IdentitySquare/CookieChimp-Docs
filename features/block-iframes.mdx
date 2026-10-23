@@ -1,23 +1,125 @@
 ---
 title: "Block Iframes"
-description: "Block iframes from loading before consent and show a placeholder notice."
+description: "Block any third-party iframe from loading before consent and show a placeholder notice."
 ---
+
+To comply with privacy regulations, you can stop third-party iframes (videos, maps, booking widgets, forms, chat widgets and so on) from loading until the visitor gives consent. CookieChimp can block **any** iframe this way, for any service set up in your banner.
+
+<Note>
+  Generic iframe blocking requires widget version **1.0.71 or newer**. With Debug Mode enabled, the widget logs its version in the browser console when it starts.
+</Note>
+
+## How do I block any iframe?
+
+Move the iframe's `src` into `data-src` and add the service it belongs to with `data-service`:
+
+```html
+<!-- Before -->
+<iframe src="https://www.google.com/maps/embed?pb=..." width="600" height="450"></iframe>
+
+<!-- After -->
+<iframe
+  data-service="Google Maps"
+  data-src="https://www.google.com/maps/embed?pb=..."
+  width="600"
+  height="450"
+></iframe>
+```
+
+Without a `src`, the browser loads nothing, so no requests are sent to the third party and no cookies are set. When the visitor accepts the service, CookieChimp copies `data-src` into `src` and the iframe loads.
+
+Until then, CookieChimp hides the iframe and shows a placeholder with the same width and height. The placeholder explains that the content is blocked and has two buttons:
+
+- **Accept and Load** accepts the iframe's service and loads the iframe. The visitor's other choices stay as they are, and the consent is recorded like any other.
+- **Manage preferences** opens the preferences modal.
+
+The placeholder text is shown in the same language as your banner. If the visitor later withdraws consent, CookieChimp unloads the iframe and shows the placeholder again.
+
+<Note>
+  `data-service` must match exactly how the service is named in [vendor management](/features/vendor-management#what-are-vendors), for example `YouTube` or `Google Maps`. CookieChimp finds the service's category from your banner, so you don't need to add `data-category`.
+</Note>
+
+### What if the service isn't set up in my banner?
+
+The iframe stays blocked and no placeholder is shown, because the visitor has no way to accept a service the banner doesn't list. With Debug Mode on, CookieChimp logs a warning in the browser console naming the service. Add the service in [vendor management](/features/vendor-management#what-are-vendors) (from the vendor library, or as a custom service) and the iframe is handled as normal.
+
+### What attributes are available?
+
+- `data-service`: [String, Required] Service name, exactly as it appears in vendor management.
+- `data-src`: [String, Required] The iframe URL. Loaded once consent is given.
+- `data-placeholder-text`: [String] Custom placeholder message.
+- `data-placeholder-button`: [String] Custom label for the **Accept and Load** button.
+- `data-placeholder-preferences`: [String] Custom label for the **Manage preferences** button.
+- `data-placeholder="false"`: Don't show a placeholder. The iframe stays empty until consent is given.
+
+Don't keep a `src` or `srcdoc` attribute on a blocked iframe: the browser loads it as soon as it reads the HTML, before CookieChimp can stop it.
+
+All other iframe attributes (`width`, `height`, `allow`, `title`, `class`, `style` and so on) are kept as they are.
+
+```html
+<iframe
+  data-service="YouTube"
+  data-src="https://www.youtube-nocookie.com/embed/tgbNymZ7vqY"
+  data-placeholder-text="This video is hosted by YouTube. Accept YouTube to watch it."
+  data-placeholder-button="Load video"
+  width="560"
+  height="315"
+  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+></iframe>
+```
+
+### How do I style the placeholder?
+
+The generic placeholder uses your banner theme variables, including `--cc-bg`, `--cc-secondary-color`, `--cc-btn-primary-bg` and `--cc-link-color`, and inherits the page font. Override them in your [custom CSS](/advanced/custom-css) or use the classes below to style this placeholder separately from the [popular-service embed placeholders](#embed-placeholders-for-popular-services).
+
+You can also target the generic placeholder directly with these classes:
+
+- `.cookiechimp-iframe-placeholder`: the placeholder box.
+- `.cookiechimp-iframe-placeholder p`: the message.
+- `.cookiechimp-iframe-placeholder button`: the **Accept and Load** button.
+- `.cookiechimp-iframe-placeholder__preferences`: the **Manage preferences** button.
+
+### Does it work with iframes added after the page loads?
+
+Yes. CookieChimp watches the page for new iframes with `data-service` and `data-src` (including iframes that get these attributes after being added), so embeds added by page builders, tag managers or single page app navigation are blocked too.
+
+If the page removes the placeholder, moves the iframe or adds the `hidden` attribute, CookieChimp updates the placeholder to match.
+
+<Tip>
+  Add the CookieChimp script before your embeds, ideally as the first script in the `<head>`. Iframes with `data-src` never load on their own, so they stay blocked even if CookieChimp loads late.
+</Tip>
+
+### How do I hide the placeholder for an iframe that isn't shown yet?
+
+Add the `hidden` attribute to the iframe, for example for an embed inside a closed modal or tab. CookieChimp shows no placeholder for a hidden iframe, and shows it once you remove `hidden`. If you hide the iframe some other way (with CSS, or by hiding a parent element), use `data-placeholder="false"`, since CookieChimp can't tell that it's hidden.
+
+### Does accepting from the placeholder count as consent?
+
+Yes. **Accept and Load** records the visitor's choice like any other consent, so it appears in your [consent records](/features/consent-records) and the banner closes and doesn't come back on the next page. Only the iframe's service is added. Everything else the visitor chose stays as it was.
+
+### What happens in regions where no banner is shown?
+
+If your banner isn't shown in the visitor's region, consent isn't needed there, so every blocked iframe loads straight away with no placeholder. This holds even if the visitor rejected cookies earlier in a region that shows the banner.
+
+### How do I check that an iframe is blocked?
+
+Turn on Debug Mode (see the [FAQ](/faq#how-do-i-verify-if-everything-is-working-correctly)). CookieChimp then logs `Loading iframe after consent` in the browser console when it loads an iframe, and `Unloading iframe without consent` when consent is withdrawn. Before consent, the iframe has no `src` attribute in your browser's element inspector.
+
+## Embed placeholders for popular services
 
 <Snippet file="beta-access.mdx" />
 
-To comply with privacy regulations, you can prevent 3rd party iframes from loading before gaining user consent. Enable this feature in the CookieChimp dashboard, then update your website's embeds.
-
-## How do I block an iframe?
+For YouTube, Vimeo, Spotify, SoundCloud and Twitch, CookieChimp can also build the iframe for you and show a richer placeholder with a thumbnail. Enable this feature in the CookieChimp dashboard, then replace your embeds with a `div`:
 
 ```html
 <div data-service="YouTube" data-id="<video-id>"></div>
 ```
 
 <Note>
-  The `data-service` attribute must match exactly how the service is named in [vendor management](vendor-management#what-are-vendors).
+  The `data-service` attribute must match exactly how the service is named in [vendor management](/features/vendor-management#what-are-vendors).
 </Note>
 
-## How do I customize the iframe placeholder?
+### How do I customize the embed placeholder?
 
 ```html
 <div
@@ -32,7 +134,7 @@ To comply with privacy regulations, you can prevent 3rd party iframes from loadi
 
 ### What configuration options are available?
 
-- `data-service`: [String, Required] Service name (e.g., YouTube, Vimeo, Google Maps).
+- `data-service`: [String, Required] Service name (e.g., YouTube, Vimeo, Spotify).
 - `data-id`: [String, Required] Unique resource ID (e.g., video ID).
 - `data-title`: [String] Notice title.
 - `data-params`: [String] Iframe query parameters.
@@ -41,8 +143,7 @@ To comply with privacy regulations, you can prevent 3rd party iframes from loadi
 - `data-autoscale`: Responsive iframe that fills parent width and scales proportionally.
 - `data-widget`: Use for custom widgets with explicit width and height.
 
-
-## Supported Services
+### Supported Services
 
 Each service expects a different `data-id` format. Use `data-autoscale` for video embeds, and `data-widget` with an explicit width and height for audio widgets.
 
@@ -96,4 +197,4 @@ Each service expects a different `data-id` format. Use `data-autoscale` for vide
 <div data-service="Twitch" data-id="video=992175865" data-autoscale></div>
 ```
 
-Looking for a service that's not listed? [Let us know](mailto:support@cookiechimp.com).
+For any other embed, use [generic iframe blocking](#how-do-i-block-any-iframe) above.
