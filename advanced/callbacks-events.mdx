@@ -18,7 +18,7 @@ When the CookieChimp script loads, it exposes a global `CookieChimp` object (als
   for `window.CookieChimp`.
 </Warning>
 
-## Reading visitor & banner data
+## Reading visitor and banner data
 
 CookieChimp exposes properties on the `CookieChimp` object that tell you about the visitor's location and the banner that was served to them. They're useful when you want to customise behaviour or tags based on country, region, or consent mode — without duplicating banners.
 
@@ -343,7 +343,7 @@ window.addEventListener("cc:onModalHide", function (event) {
 
 #### `cc:onModalReady`
 
-The consent modal is created and appended to the DOM. This is the safest place to read [visitor & banner data](#reading-visitor-banner-data), because those properties are guaranteed to be populated by the time it fires.
+The consent modal is created and appended to the DOM. This is the safest place to read [visitor & banner data](#reading-visitor-and-banner-data), because those properties are guaranteed to be populated by the time it fires.
 
 ```js
 window.addEventListener("cc:onModalReady", function (event) {
