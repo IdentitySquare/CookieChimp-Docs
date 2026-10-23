@@ -3,11 +3,11 @@ title: "Block Iframes"
 description: "Block any third-party iframe from loading before consent and show a placeholder notice."
 ---
 
-To comply with privacy regulations, you can stop third-party iframes (videos, maps, booking widgets, forms, chat widgets and so on) from loading until the visitor gives consent. CookieChimp can block **any** iframe this way, with no dashboard setup.
+To comply with privacy regulations, you can stop third-party iframes (videos, maps, booking widgets, forms, chat widgets and so on) from loading until the visitor gives consent. CookieChimp can block **any** iframe this way, for any service set up in your banner.
 
 ## How do I block any iframe?
 
-Move the iframe's `src` into `data-src` and add the consent category it belongs to with `data-category`:
+Move the iframe's `src` into `data-src` and add the service it belongs to with `data-service`:
 
 ```html
 <!-- Before -->
@@ -15,45 +15,34 @@ Move the iframe's `src` into `data-src` and add the consent category it belongs 
 
 <!-- After -->
 <iframe
-  data-category="marketing"
+  data-service="Google Maps"
   data-src="https://www.google.com/maps/embed?pb=..."
   width="600"
   height="450"
 ></iframe>
 ```
 
-Without a `src`, the browser loads nothing, so no requests are sent to the third party and no cookies are set. When the visitor accepts the category, CookieChimp copies `data-src` into `src` and the iframe loads.
+Without a `src`, the browser loads nothing, so no requests are sent to the third party and no cookies are set. When the visitor accepts the service, CookieChimp copies `data-src` into `src` and the iframe loads.
 
 Until then, CookieChimp hides the iframe and shows a placeholder with the same width and height. The placeholder explains that the content is blocked and has two buttons:
 
-- **Accept and load** accepts the iframe's category (or service, see below) and loads the iframe. The visitor's other choices stay as they are, and the consent is recorded like any other.
+- **Accept and load** accepts the iframe's service and loads the iframe. The visitor's other choices stay as they are, and the consent is recorded like any other.
 - **Manage preferences** opens the preferences modal.
 
 The placeholder text is shown in the same language as your banner. If the visitor later withdraws consent, CookieChimp unloads the iframe and shows the placeholder again.
 
 <Note>
-  `data-category` takes the category ID, for example `analytics` or `marketing`. You can find the ID of each category in your CookieChimp dashboard.
+  `data-service` must match exactly how the service is named in [vendor management](/features/vendor-management#what-are-vendors), for example `YouTube` or `Google Maps`. CookieChimp finds the service's category from your banner, so you don't need to add `data-category`.
 </Note>
 
-### Can I block an iframe by service instead of category?
+### What if the service isn't set up in my banner?
 
-Yes. Add `data-service` with the service name exactly as it appears in [vendor management](/features/vendor-management#what-are-vendors). The iframe then loads only when the visitor accepts that service, and **Accept and load** accepts only that service.
-
-```html
-<iframe
-  data-category="marketing"
-  data-service="Calendly"
-  data-src="https://calendly.com/your-team/30min"
-  width="100%"
-  height="700"
-></iframe>
-```
+The iframe stays blocked and no placeholder is shown, because the visitor has no way to accept a service the banner doesn't list. With Debug Mode on, CookieChimp logs a warning in the browser console naming the service. Add the service in [vendor management](/features/vendor-management#what-are-vendors) (from the vendor library, or as a custom service) and the iframe is handled as normal.
 
 ### What attributes are available?
 
-- `data-category`: [String, Required] Category ID the iframe belongs to.
+- `data-service`: [String, Required] Service name, exactly as it appears in vendor management.
 - `data-src`: [String, Required] The iframe URL. Loaded once consent is given.
-- `data-service`: [String] Service name. Use it to block by service instead of by the whole category.
 - `data-placeholder-text`: [String] Custom placeholder message.
 - `data-placeholder-button`: [String] Custom label for the **Accept and load** button.
 - `data-placeholder-preferences`: [String] Custom label for the **Manage preferences** button.
@@ -65,9 +54,9 @@ All other iframe attributes (`width`, `height`, `allow`, `title`, `class`, `styl
 
 ```html
 <iframe
-  data-category="marketing"
+  data-service="YouTube"
   data-src="https://www.youtube-nocookie.com/embed/tgbNymZ7vqY"
-  data-placeholder-text="This video is hosted by YouTube. Accept marketing cookies to watch it."
+  data-placeholder-text="This video is hosted by YouTube. Accept YouTube to watch it."
   data-placeholder-button="Load video"
   width="560"
   height="315"
@@ -77,7 +66,7 @@ All other iframe attributes (`width`, `height`, `allow`, `title`, `class`, `styl
 
 ### How do I style the placeholder?
 
-The placeholder uses your banner's colours and border radius. You can override its look with [custom CSS](/advanced/custom-css) using these classes:
+The placeholder uses your banner's colours, font and border radius. You can override its look with [custom CSS](/advanced/custom-css) using these classes:
 
 - `.cookiechimp-iframe-placeholder`: the placeholder box.
 - `.cookiechimp-iframe-placeholder p`: the message.
@@ -86,7 +75,7 @@ The placeholder uses your banner's colours and border radius. You can override i
 
 ### Does it work with iframes added after the page loads?
 
-Yes. CookieChimp watches the page for new iframes with `data-category` and `data-src` (including iframes that get these attributes after being added), so embeds added by page builders, tag managers or single page app navigation are blocked too.
+Yes. CookieChimp watches the page for new iframes with `data-service` and `data-src` (including iframes that get these attributes after being added), so embeds added by page builders, tag managers or single page app navigation are blocked too.
 
 If the page removes the placeholder, moves the iframe or adds the `hidden` attribute, CookieChimp updates the placeholder to match.
 
@@ -100,7 +89,7 @@ Add the `hidden` attribute to the iframe, for example for an embed inside a clos
 
 ### Does accepting from the placeholder count as consent?
 
-Yes. **Accept and load** records the visitor's choice like any other consent, so it appears in your [consent records](/features/consent-records) and the banner closes and doesn't come back on the next page. Only the iframe's category (or service) is added. Everything else the visitor chose stays as it was.
+Yes. **Accept and load** records the visitor's choice like any other consent, so it appears in your [consent records](/features/consent-records) and the banner closes and doesn't come back on the next page. Only the iframe's service is added. Everything else the visitor chose stays as it was.
 
 ### What happens in regions where no banner is shown?
 
