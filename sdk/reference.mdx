@@ -1,0 +1,413 @@
+---
+title: "Core and React reference"
+description: "Regions, gating, Consent Mode, headless UI, GPP and TCF."
+---
+
+Open-source, lightweight consent SDK for React, Next.js and plain JavaScript, built by CookieChimp.
+
+- Works with no account (local mode).
+- Connect a CookieChimp project to sync a consent log, scanner categories, dashboard-managed copy, translations, regional rules and styling, plus IAB TCF/GPP and multi-site.
+
+Language negotiation checks each requested locale in preference order. It first
+matches the exact tag, then an available base language, then the first available
+regional variant with the same base, and finally the configured fallback. For
+example, `fr-CA` can select `fr`, or `fr-FR` when only that regional variant is
+available, while `pt` can select `pt-BR`.
+- Small, fast, no banner flash on SSR, strict CSP friendly, Google Consent Mode v2 ready.
+
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
+Status: 1.0.0 candidate, not yet published to npm. See [release status](https://docs.cookiechimp.com/docs/sdk/release-status) and [SPEC.md](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/SPEC.md).
+
+## React server rendering
+
+Pass `initialState` to `ConsentProvider` when server rendering. It is required
+for the server snapshot to match the first hydration render. After hydration,
+hooks read the live runtime state, and `initialState` is no longer used.
+
+License: MIT
+
+## Region and regulation behavior
+
+The SDK never looks up a visitor's location. It does not make geo-IP requests,
+inspect an IP address, or call an external location service. Applications own
+their location policy and pass trusted region context to `createConsent({
+region })`. On a server, an application can instead read geo headers supplied
+by its hosting platform, pass them to `resolveRegion`, and then pass that result
+to the consent runtime or server provider.
+
+Import `resolveRegion`, `regulationFor`, and the server header form of
+`readGpc` from `@cookiechimp/core/regions`. `resolveRegion(headers, options)`
+accepts Web `Headers`, plain records, and
+Node-style incoming header records. The `provider` option is required to trust
+geo headers and must be `"vercel"`, `"cloudflare"`, `"cloudfront"`, or
+`"custom"`. Only that provider's country and subdivision headers are read.
+Vercel supplies `x-vercel-ip-country` and `x-vercel-ip-country-region`.
+Cloudflare supplies `cf-ipcountry`. Custom providers use `header` and optional
+`regionHeader` names. There is no
+generic geo header fallback. Country and subdivision values are normalized to
+uppercase. Unknown and malformed provider values are ignored.
+
+The default rules treat the EU and EEA, the UK, and Switzerland as GDPR.
+California and the other states listed by `US_OPT_OUT_STATES` use a common
+CCPA-style opt-out behavior. This behavior model does not imply that the state
+statutes are identical. Unknown locations use the safe GDPR fallback. Pass the
+result into the default entry as already-resolved context:
+
+```ts
+import { createConsent } from "@cookiechimp/core";
+import { regulationFor, resolveRegion } from "@cookiechimp/core/regions";
+
+const region = resolveRegion(headers, { provider: "vercel" });
+const consent = createConsent({
+  categories: ["analytics", "advertising"],
+  region,
+  resolveRegulation: regulationFor,
+  gpc: true,
+});
+```
+
+`regulation` may also be a resolver function. Prefer `resolveRegulation` when
+passing region context. Without either option, `createConsent` uses
+`fallbackRegulation`, which defaults to `"gdpr"`, and warns in development
+when a region was supplied. `regions` remains available for application-specific
+overrides.
+
+GDPR starts non-required categories disabled and requires a decision. CCPA
+starts them enabled and exposes an opt-out link. GPC disables the configured
+sale/share categories, which default to `advertising` and `marketing`, even
+when a stored decision enabled them. Other parts of an explicit stored user
+decision remain authoritative. Locations with no rule use category defaults
+and require no decision unless `forceDecision` is enabled.
+
+The compact built-in country and state table is available from
+`@cookiechimp/core/regions`. No network lookup occurs. Server applications can
+pass the resolved `region` and `gpc` into `createConsent` so server and browser
+rendering use the same context.
+
+## Script and iframe gating
+
+The opt-in `@cookiechimp/core/gate` subpath provides declarative script and
+iframe gating. Call `gateScripts(consent)` after creating a consent runtime.
+Declarative scripts use `type="text/plain"` with `data-cc-category` and optional
+`data-cc-service`; gated frames use `data-cc-src` instead of `src`. The
+controller scans later DOM additions and exposes `scan()`, `blocked()`, and
+`stop()`.
+
+Use `blockDynamic(consent, { config })` from `@cookiechimp/core/dynamic` to
+block runtime-added resources that match a configured service. This runtime
+entry intercepts source assignments and DOM insertion APIs. Gate alone observes
+declarative markup, but cannot prevent a third-party plain `src` assignment
+before the browser starts it. Revocation cannot undo
+code that has already run. By default it leaves activated resources in place.
+Use `onRevoke` to notify the application, or `reloadOnRevoke: true` when a page
+reload is the desired policy. Core invokes the optional iframe `placeholder`
+hook but deliberately provides no placeholder styling.
+
+## Google Consent Mode v2
+
+The opt-in `@cookiechimp/core/consent-mode` subpath keeps all seven Consent
+Mode v2 storage signals synchronized with CookieChimp categories. Render
+`consentModeInlineScript(options)` first in the document head, before Google or
+other tag scripts, to establish a synchronous denied default without a flash.
+For a strict Content Security Policy, place the returned string inside your
+application's own `<script nonce="...">` element. CookieChimp does not create
+or manage the nonce.
+Call `installConsentMode(consent, options)` in the browser to install the gtag
+shim and publish later consent updates. The returned controller has `stop()`
+for cleanup. Options support regions, `wait_for_update`, ads data redaction,
+URL passthrough, and custom category-to-signal mappings. Set `default: false`
+to suppress the runtime default. Mapping entries set to `null` remove built-in
+categories, while `replace: true` replaces all built-in mappings.
+The inline script is required for correct consent ordering before tag scripts.
+
+## IAB GPP (US sections)
+
+Two opt-in subpaths implement IAB Global Privacy Platform v1.1 for US
+privacy laws. Neither is part of the default `@cookiechimp/core` bundle.
+
+- `@cookiechimp/core/gpp-stub`: render `gppStubScript` in an inline
+  `<script>` before any vendor tag (place it inside your own
+  `<script nonce="...">` under a strict CSP). The stub answers `ping`, registers
+  event listeners, returns `null` for section reads, queues other commands and
+  adds the `__gppLocator` frame so iframed vendors can call it through
+  `postMessage`. It is under 1 KB gzip.
+- `@cookiechimp/core/gpp`: load it lazily in the browser and call
+  `installGpp(consent, options)`. It replaces the stub, adopts its listeners,
+  replays queued calls and keeps the GPP string in sync with consent, firing
+  `signalStatus`, the section event and `signalStatus` again on every change.
+
+Sections cover the US national string plus the 15 state formats in the current
+published IAB reference implementation:
+
+| Section | State | ID |
+|---|---|---:|
+| usnat | National | 7 |
+| usca | California | 8 |
+| usva | Virginia | 9 |
+| usco | Colorado | 10 |
+| usut | Utah | 11 |
+| usct | Connecticut | 12 |
+| usfl | Florida | 13 |
+| usmt | Montana | 14 |
+| usor | Oregon | 15 |
+| ustx | Texas | 16 |
+| usde | Delaware | 17 |
+| usia | Iowa | 18 |
+| usne | Nebraska | 19 |
+| usnh | New Hampshire | 20 |
+| usnj | New Jersey | 21 |
+| ustn | Tennessee | 22 |
+
+With `approach: "state"` (the default), those states get their own section;
+other US regions use `usnat`. `approach: "national"` always uses `usnat`.
+Outside the US no section applies (`applicableSections: [-1]`). The newer
+MN, MD, IN, KY and RI formats (IDs 23 to 27) are not in the current published
+IAB reference library; those states currently use the national fallback.
+Determine which string applies to your processing before enabling a section.
+[Section definitions](https://github.com/InteractiveAdvertisingBureau/Global-Privacy-Platform/blob/main/Sections/Section%20Information.md).
+
+
+Sale, sharing and targeted advertising opt-outs come from consent for
+`optOutCategories` (default `["advertising", "marketing"]`, matching
+`saleShareCategories`). This is fail-closed: no decision yet, a refused
+category, or no matching category configured all count as opted out. Global
+Privacy Control always forces the opt-out and sets the GPC segment. Notices,
+sensitive data and MSPA fields are publisher assertions and are passed per
+section through `values`, for example
+`values: { usnat: { SaleOptOutNotice: 1, MspaServiceProviderMode: 2 } }`.
+Invalid values encode as 0 (not applicable).
+
+`cmpId` defaults to 0. Set the CMP ID associated with your GPP integration
+when configuring it. The encoder is tested for byte-identical output against the IAB
+reference implementation, `@iabgpp/cmpapi`.
+
+In React, pass `gpp` (`true` or serialisable `GppOptions`) to
+`ConsentProvider` instead of calling `installGpp` yourself: the module is
+imported lazily after hydration only when the prop is set, and removed on
+unmount. In Next.js, use the same prop on `CookieChimpProvider` or
+`PagesConsentProvider` and render `GppStub` in the head.
+
+## IAB TCF (EU)
+
+Two opt-in subpaths implement the IAB TCF CMP API (apiVersion 2.2) and TC
+strings to the current TCF v2.3 format, with the mandatory Disclosed Vendors
+segment. Neither is part of the default bundle.
+
+- `@cookiechimp/core/tcf-stub`: render `tcfStubScript(gdprApplies)` in an
+  inline `<script>` before vendor tags. It answers `ping`, queues other
+  commands and adds the `__tcfapiLocator` frame and postMessage bridge.
+- `@cookiechimp/core/tcf`: load it lazily and call
+  `installTcf(consent, { cmpId, gvl, publisherCC })`. `gvl` is a validated
+  vendor list object or a loader for the untrusted GVL JSON. The API answers
+  `ping`, `addEventListener` and `removeEventListener`; the deprecated
+  `getTCData` returns `success: false`. Listeners receive `cmpuishown` before a
+  decision (legitimate interest transparency only, no consents),
+  `useractioncomplete` after one, or `tcloaded` when a stored decision exists.
+
+`cmpId` is required. In development a missing `cmpId` falls back to 0 with a
+console warning (0 is not a valid IAB ID; vendors reject it). In production a
+missing, 0 or invalid `cmpId` disables TCF: `__tcfapi` answers only `ping`
+with `cmpStatus: "error"` and the reason is logged with `console.error`. An
+invalid `cmpId` throws in development. A missing or invalid GVL also fails
+closed. Purposes come from categories through `DEFAULT_PURPOSES` (override
+with `purposes`), a vendor gets consent only when every one of its consent
+purposes is granted, and special features are opt-in through
+`specialFeatures`. TC strings are tested against the IAB reference decoder
+`@iabtcf/core`.
+
+### TCF vendor list UI
+
+`TcfVendorList` from `@cookiechimp/react/tcf` (styles in
+`@cookiechimp/react/tcf.css`) shows purposes with consent and legitimate
+interest (right to object) toggles, special features, and a searchable,
+windowed vendor list that stays fast with the full GVL. Render it as a child of
+`CookiePreferences`:
+
+```tsx
+<CookiePreferences categories={categories}>
+  <TcfVendorList controller={tcf} />
+</CookiePreferences>
+```
+
+Saving calls `controller.setChoices()`, which records a consent decision if
+none exists and emits `useractioncomplete`. Choices persist in localStorage as
+IDs only, tied to that decision, and are dropped when the user makes a new
+decision through the banner. Vendor and purpose names come from the GVL and are
+rendered as text. Labels default to English; pass `labels` to translate.
+Translated labels for every core locale ship as opt-in entries, so the core
+per-locale bundles do not grow:
+
+```tsx
+import de from "@cookiechimp/translations/tcf/de";
+
+<TcfVendorList controller={tcf} labels={de} />;
+```
+
+All 33 TCF label sets have completed editorial review (`tcfReviewedLocales`).
+The review method and date are recorded in `translationReview` from
+`@cookiechimp/translations/meta`.
+Purpose, feature and vendor names still come from the GVL, so load the GVL
+in the same language.
+
+Each vendor's name is a button (labelled `Details: <name>`) that opens a panel with the disclosures
+TCF policy requires: consent and legitimate interest purposes, special
+purposes, features, special features, data categories, retention periods,
+privacy policy and legitimate interest claim links, and device storage (cookie
+use and maximum age, refresh, other storage access, and the storage disclosure
+URL). Links from the GVL are accepted only as https and open with
+`rel="noopener noreferrer"`. Escape or Close returns focus to the Details
+button. A focused row stays mounted while it scrolls out of the window, so
+keyboard focus is never lost.
+
+### Current GVL disclosures
+
+`parseGvl` preserves descriptions and illustrations for purposes, special
+purposes, ordinary features, special features and data categories. It also
+preserves `standardTexts.features`, added by the TCF v2.4 specifications.
+`TcfVendorList` displays these as text in keyboard-accessible disclosure sections,
+including the standard explanation alongside ordinary features. Ordinary features
+have no consent toggle; special-feature opt-ins keep their supplied GVL names.
+
+Applications must supply the current GVL and its official language-specific
+terms, including the updated Special Feature 2 name. The SDK does not invent
+translations or fetch a GVL service automatically. These UI additions do not
+change the TC string encoding or the CMP API version. See [disclosure validation
+and launch checks](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/docs/tcf-disclosures.md).
+
+## React headless primitives
+
+Import `Banner`, `Preferences`, and `OptOut` from
+`@cookiechimp/react/headless` for unstyled, accessible consent controls. The
+preferences dialog traps focus, closes on Escape, and restores focus to its
+trigger. Applications may add background inertness or `aria-hidden`; the
+headless primitives deliberately do not alter content outside the provider.
+
+### Install order for runtime blocking
+
+`blockDynamic` only protects requests that start after it is installed.
+Interceptors are active as soon as `blockDynamic` returns. Module scripts are
+deferred: putting one first in `<head>` does not make later parser-loaded
+scripts wait for its imports. Installing it from a React effect or after
+hydration also leaves a window in which a request can start.
+
+Load vendor scripts programmatically from the same bootstrap module, after
+installing the blocker, as below. Do not also include those vendors in ordinary
+`<script src>` tags, preload hints, or independent entry points. This explicit
+sequence waits for the SDK imports and installs interception before assigning
+the vendor URL or inserting its script. A matching vendor stays blocked until
+its service has consent.
+
+```html
+<head>
+  <script type="module">
+    import { createConsent } from "/vendor/cookiechimp/core/index.mjs";
+    import { blockDynamic } from "/vendor/cookiechimp/core/dynamic.mjs";
+    const config = {
+      categories: ["analytics"],
+      services: [{
+        id: "analytics-vendor",
+        category: "analytics",
+        domains: ["vendor.example"],
+      }],
+    };
+    const consent = createConsent(config);
+    blockDynamic(consent, { config });
+
+    const vendor = document.createElement("script");
+    vendor.src = "https://vendor.example/tracker.js";
+    document.head.appendChild(vendor);
+  </script>
+</head>
+```
+
+Use inert consent-gated markup for vendors declared in HTML. Runtime
+interception cannot prevent parser or preload requests that have already
+started. Match every vendor URL in your configuration; unmatched URLs pass
+through. The network blocker below is separately required for matching
+`fetch`, XMLHttpRequest and beacon calls.
+
+## Network blocking
+
+The opt-in `@cookiechimp/core/network` subpath blocks `fetch`, XMLHttpRequest,
+and `navigator.sendBeacon` calls whose URL or host matches a configured service
+without consent. Install `blockNetwork(consent, { config })` before tracker code
+runs. Consent is checked for every request, so later grants take effect and
+later revocations block again. Relative URLs resolve against `document.baseURI`.
+Non-HTTP URLs and URLs that cannot be parsed are left alone.
+
+Blocked requests are dropped, not queued or replayed. This is the safer privacy default: a request made before consent may carry data the visitor never agreed to share, and replaying it later would send that data anyway. Code that needs the request after consent should make it again from a consent subscriber.
+
+Blocked fetch calls reject with `ConsentBlockedError`. Blocked XHR sends behave like a network error: `readyState` is 4, status is 0,
+and `readystatechange`, `error`, and `loadend` fire asynchronously as
+ProgressEvents. `ConsentBlockedError` extends `TypeError`, like a native fetch
+network failure. Blocked beacons return `false`. Requests are
+dropped and are never queued or replayed. The returned controller provides
+`blocked()` reports and `stop()` to release its shared, reference-counted
+patches.
+
+Matching fails closed. If matching itself throws for a request or element (for
+example because of a hostile pattern), CookieChimp treats it as blocked: the
+request is dropped and reported, and a blocked script or iframe stays blocked
+with no category or service attached. Because it has no category or service,
+it is not restored by later consent, even after accept-all. Only an
+unresolvable or non-HTTP URL, or an error in the patching code itself, falls
+back to native behaviour.
+
+Limitations of `./network`:
+
+- `fetch` or XMLHttpRequest references captured before `blockNetwork` runs are
+  not covered. Install it before any third-party code.
+- Code running in iframes or workers is not covered, since each has its own
+  globals.
+- Image pixels, WebSocket, and EventSource requests are not covered. An image
+  pixel handler for `./dynamic` is on the backlog.
+
+
+### Opt-in React TCF provider
+
+`TcfProvider` from `@cookiechimp/react/tcf-provider` binds the TCF controller to
+an existing `ConsentProvider` or Next.js provider. It defaults to disabled and
+loads the core only after hydration when `enabled` is exactly `true`. Applications
+must supply their real registered CMP ID, valid GVL and server-owned connected/Pro
+feature decision. The boolean is not client-side entitlement enforcement.
+
+```tsx
+"use client";
+import type { TcfOptions } from "@cookiechimp/core/tcf";
+import { TcfProvider } from "@cookiechimp/react/tcf-provider";
+import { TcfVendorList } from "@cookiechimp/react/tcf";
+import { CookiePreferences } from "@cookiechimp/react/ui";
+
+export function VendorPreferences({ enabled, options }: {
+  enabled: boolean;
+  options: TcfOptions;
+}) {
+  return (
+    <TcfProvider enabled={enabled} options={options}>
+      {({ controller }) => (
+        <CookiePreferences categories={[{ id: "analytics", label: "Analytics" }]}>
+          {controller ? <TcfVendorList controller={controller} /> : null}
+        </CookiePreferences>
+      )}
+    </TcfProvider>
+  );
+}
+```
+
+Construct `options` in a client module (or memoize it), with either a GVL object
+or the existing asynchronous loader API. A changed options object reinstalls
+TCF, so keep it stable. A loader should bound its response and timeout and use
+only the intended trusted vendor-list source; the provider never picks a URL.
+Do not pass a loader function through a Server Component boundary.
+
+The render callback receives `status` (`disabled`, `loading`, `ready`, `error`)
+and a nullable `controller`. Invalid CMP/GVL data fails closed; the ordinary
+consent runtime keeps working. Replacing options immediately hides the old
+controller, and unmounting stops subscriptions and ignores late loads.
+
+In Next.js, render `TcfStub` from `@cookiechimp/nextjs/server` in the head before
+vendor tags, only when opting in. It supports `nonce` and an optional trusted
+`gdprApplies` value. Without the optional provider and stub, no TCF runs.
+TCF deployments configure their CMP ID, GVL source and authoritative feature
+access separately from the provider.

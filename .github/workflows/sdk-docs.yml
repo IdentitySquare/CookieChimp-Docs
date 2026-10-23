@@ -1,0 +1,26 @@
+name: SDK documentation
+on:
+  pull_request:
+    paths:
+      - 'sdk/**'
+      - 'overview.mdx'
+      - 'installation/react.mdx'
+      - 'installation/nextjs.mdx'
+      - 'scripts/import-sdk-docs.mjs'
+      - 'docs.json'
+      - '.github/workflows/sdk-docs.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate Mintlify configuration and MDX
+        run: npx --yes mint@4.2.1028 validate --telemetry=false
+      - name: Check SDK guides and inbound links and anchors
+        run: npx --yes mint@4.2.1028 broken-links --files 'sdk/**/*.mdx' overview.mdx installation/react.mdx installation/nextjs.mdx --check-anchors --telemetry=false

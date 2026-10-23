@@ -1,0 +1,70 @@
+---
+title: "CLI"
+description: "init, link, pull and doctor."
+---
+
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
+Set up and check CookieChimp in an existing project.
+
+```sh
+npx @cookiechimp/cli init
+npx @cookiechimp/cli doctor
+```
+
+## init
+
+Detects the framework (Next.js App Router, Next.js Pages Router, React, or vanilla) and the package manager, installs the matching CookieChimp packages, and writes starter files:
+
+- Next.js App Router: `cookiechimp.config.ts` and `components/cookiechimp-banner.tsx`
+- React and Next.js Pages Router: `components/cookiechimp-provider.tsx`
+- Vanilla: `cookiechimp.ts`
+
+`init` never edits files you already have. It skips existing files unless you pass `--force`, and it prints the one manual step left, such as wrapping your root layout.
+
+Options:
+
+- `--cwd <dir>`: project root (default: the current directory)
+- `--pm <npm|pnpm|yarn|bun>`: package manager override
+- `--framework <next-app|next-pages|react|vanilla>`: framework override
+- `--no-install`: write files only and print the install command
+- `--force`: overwrite generated files
+- `--dry-run`: show what would happen without installing or writing
+
+## doctor
+
+Runs static checks and exits with 1 when any check fails:
+
+- CookieChimp packages are installed and on matching versions
+- React and Next.js meet the supported minimums
+- A config file exists
+- The provider or `createConsent` is wired into an entry file
+- No known tracking script tag is loaded without consent gating
+
+Pass `--json` for machine-readable output.
+
+## link
+
+```sh
+COOKIECHIMP_API_TOKEN=... npx @cookiechimp/cli link
+echo "$TOKEN" | npx @cookiechimp/cli link --token-stdin --project acct123
+```
+
+Uses a dashboard API token to list your sites and writes the chosen project id to `.env.local` (`NEXT_PUBLIC_COOKIECHIMP_PROJECT_ID`, `VITE_COOKIECHIMP_PROJECT_ID` or `COOKIECHIMP_PROJECT_ID`, picked from your dependencies). The token is read only from the environment or stdin, never from arguments, and is never written to disk or printed. Pass `--project` to skip the prompt and `--env-file` to pick another file.
+
+## pull
+
+```sh
+npx @cookiechimp/cli pull
+```
+
+Downloads the public dashboard config for the linked project (or `--project`) to `cookiechimp.config.json` (`--out` to change it) for offline builds. No token is sent. The bundle must match the project and schema version 1, and is capped at 2 MB.
+
+Both commands accept `--api` for another API origin (https only, or http on localhost). `link` and `pull` make HTTP requests directly. `doctor` performs local static checks. `init` scaffolds locally, but its package-manager install can access the network; use `--no-install` or `--dry-run` to skip that install.
+
+## Safety
+
+- `init` and `doctor` make no HTTP requests themselves. `init` runs the chosen package manager without a shell and with fixed arguments; that manager may download dependencies and run their install scripts. `link` authenticates to the dashboard API, and `pull` downloads public config without sending a token.
+- Running the CLI through `npx` may download the CLI package before any command starts, including `doctor` and `init --no-install`.
+- Writes stay inside the project: absolute paths, `..`, and symlinks that leave the root are refused.
+- On Windows, the install command is printed for you to run instead of being spawned.

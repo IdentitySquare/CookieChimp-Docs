@@ -1,32 +1,51 @@
-# Mintlify Starter Kit
+# CookieChimp documentation
 
-Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
+Mintlify documentation for the hosted CookieChimp widget, Consent SDK and API.
+Production is served at https://docs.cookiechimp.com/docs/overview.
 
-- Guide pages
-- Navigation
-- Customizations
-- API Reference pages
-- Use of popular components
+## Preview and validate
 
-### 👩‍💻 Development
+Use Node 22 or newer from this repository root (`docs.json`):
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the documentation changes locally. To install, use the following command
-
-```
-npm i -g mintlify
+```sh
+npx --yes mint@4.2.1028 dev --port 3115 --no-open --telemetry=false
+npx --yes mint@4.2.1028 validate --telemetry=false
+npx --yes mint@4.2.1028 broken-links --files 'sdk/**/*.mdx' overview.mdx installation/react.mdx installation/nextjs.mdx --check-anchors --telemetry=false
 ```
 
-Run the following command at the root of your documentation (where mint.json is)
+The local SDK overview is http://localhost:3115/sdk/overview. The public SDK
+section is https://docs.cookiechimp.com/docs/sdk/overview after deployment.
+Mintlify provides search, page Markdown views and llms indexes.
 
+## Update SDK guides
+
+The `sdk/*.mdx` pages are generated from the SDK's guide sources and package
+READMEs. Edit those sources in `cookiechimp/cookiechimp-sdk`, commit the changes,
+then build the export from that clean checkout:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm --filter @cookiechimp/docs build
 ```
-mintlify dev
+
+CI saves the same output as the `mintlify-sdk-docs` artifact. From this docs
+repository, import the export directory (containing `sdk/`, `navigation.json`
+and `source.json`):
+
+```sh
+node scripts/import-sdk-docs.mjs /path/to/cookiechimp-sdk/packages/docs/dist
 ```
 
-### 😎 Publishing Changes
+The importer updates only the SDK pages, their revision record and the Consent
+SDK navigation group. Existing widget and API documentation stays intact. It
+requires clean committed source and records the full source SHA in
+`sdk/source.json`. If a source page is retired, remove its old generated MDX in
+the same reviewed update. Validate and open a PR; do not edit generated pages
+by hand or deploy from the SDK repository.
 
-Install our Github App to autopropagate changes from youre repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard. 
+## Publishing
 
-#### Troubleshooting
-
-- Mintlify dev isn't running - Run `mintlify install` it'll re-install dependencies.
-- Page loads as a 404 - Make sure you are running in a folder with `mint.json`
+The existing Mintlify GitHub integration deploys documentation after a reviewed
+PR is merged into this repository's default branch. Verify the resulting public
+pages before merging SDK changes that direct users to newly added routes.
+SDK npm publication and platform deployment are separate actions.

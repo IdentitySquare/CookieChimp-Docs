@@ -14,7 +14,12 @@
     "library": "lucide"
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "favicon": "/favicon.png",
   "navigation": {
@@ -128,6 +133,35 @@
               "advanced/callbacks-events",
               "advanced/banner-overrides",
               "advanced/content-security-policy"
+            ]
+          }
+        ]
+      },
+      {
+        "dropdown": "Consent SDK",
+        "icon": "code",
+        "description": "React, Next.js and JavaScript consent SDK",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "sdk/overview",
+              "sdk/getting-started",
+              "sdk/examples",
+              "sdk/release-status"
+            ]
+          },
+          {
+            "group": "SDK reference",
+            "pages": [
+              "sdk/reference",
+              "sdk/nextjs",
+              "sdk/scripts",
+              "sdk/translations",
+              "sdk/cli",
+              "sdk/devtools",
+              "sdk/tokens",
+              "sdk/ai-skills"
             ]
           }
         ]
