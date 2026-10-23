@@ -26,7 +26,7 @@ Without a `src`, the browser loads nothing, so no requests are sent to the third
 
 Until then, CookieChimp hides the iframe and shows a placeholder with the same width and height. The placeholder explains that the content is blocked and has two buttons:
 
-- **Accept and load** accepts the iframe's service and loads the iframe. The visitor's other choices stay as they are, and the consent is recorded like any other.
+- **Accept and Load** accepts the iframe's service and loads the iframe. The visitor's other choices stay as they are, and the consent is recorded like any other.
 - **Manage preferences** opens the preferences modal.
 
 The placeholder text is shown in the same language as your banner. If the visitor later withdraws consent, CookieChimp unloads the iframe and shows the placeholder again.
@@ -44,7 +44,7 @@ The iframe stays blocked and no placeholder is shown, because the visitor has no
 - `data-service`: [String, Required] Service name, exactly as it appears in vendor management.
 - `data-src`: [String, Required] The iframe URL. Loaded once consent is given.
 - `data-placeholder-text`: [String] Custom placeholder message.
-- `data-placeholder-button`: [String] Custom label for the **Accept and load** button.
+- `data-placeholder-button`: [String] Custom label for the **Accept and Load** button.
 - `data-placeholder-preferences`: [String] Custom label for the **Manage preferences** button.
 - `data-placeholder="false"`: Don't show a placeholder. The iframe stays empty until consent is given.
 
@@ -66,13 +66,13 @@ All other iframe attributes (`width`, `height`, `allow`, `title`, `class`, `styl
 
 ### How do I style the placeholder?
 
-The placeholder looks like the embed placeholders for YouTube, Vimeo and the other [popular services](#embed-placeholders-for-popular-services): a dark overlay, an **Accept and load** button with a play icon, and the system font. It uses the same `--im-*` CSS variables, such as `--im-bg`, `--im-color`, `--im-btn-bg` and `--im-font-family`, so setting them in your [custom CSS](/advanced/custom-css) restyles both kinds of placeholder together.
+The placeholder looks like the embed placeholders for YouTube, Vimeo and the other [popular services](#embed-placeholders-for-popular-services): a dark overlay, an **Accept and Load** button with a play icon, and the system font. It uses the same `--im-*` CSS variables, such as `--im-bg`, `--im-color`, `--im-btn-bg` and `--im-font-family`, so setting them in your [custom CSS](/advanced/custom-css) restyles both kinds of placeholder together.
 
 You can also target the generic placeholder directly with these classes:
 
 - `.cookiechimp-iframe-placeholder`: the placeholder box.
 - `.cookiechimp-iframe-placeholder p`: the message.
-- `.cookiechimp-iframe-placeholder button`: the **Accept and load** button.
+- `.cookiechimp-iframe-placeholder button`: the **Accept and Load** button.
 - `.cookiechimp-iframe-placeholder__preferences`: the **Manage preferences** button.
 
 ### Does it work with iframes added after the page loads?
@@ -91,7 +91,7 @@ Add the `hidden` attribute to the iframe, for example for an embed inside a clos
 
 ### Does accepting from the placeholder count as consent?
 
-Yes. **Accept and load** records the visitor's choice like any other consent, so it appears in your [consent records](/features/consent-records) and the banner closes and doesn't come back on the next page. Only the iframe's service is added. Everything else the visitor chose stays as it was.
+Yes. **Accept and Load** records the visitor's choice like any other consent, so it appears in your [consent records](/features/consent-records) and the banner closes and doesn't come back on the next page. Only the iframe's service is added. Everything else the visitor chose stays as it was.
 
 ### What happens in regions where no banner is shown?
 
