@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cookiechimp/cookiechimp-sdk",
-  "sourceCommit": "5b07c453b1404ea325b71acd5eeb1fe9e194e529",
+  "sourceCommit": "f820a9628b23725262194974fbf1be2432e4832b",
   "dirty": false,
   "pages": [
     {
@@ -54,6 +54,10 @@
     {
       "slug": "ai-skills",
       "source": "packages/docs/content/ai-skills.md"
+    },
+    {
+      "slug": "react-native",
+      "source": "packages/react-native/README.md"
     },
     {
       "slug": "examples",

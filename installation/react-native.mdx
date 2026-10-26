@@ -1,0 +1,138 @@
+---
+title: "React Native"
+description: "Add the CookieChimp consent banner and preferences to a React Native or Expo app."
+icon: "mobile"
+---
+
+<Info>
+  This page walks through setting up a mobile app. For every prop, hook and method, see the [React Native SDK reference](/sdk/react-native).
+</Info>
+
+The CookieChimp React Native SDK shows the banner and preferences you design in the dashboard as native screens. It records each decision on the device and in your [Consent Log](/features/consent-records), and it starts and stops your analytics and advertising SDKs as people change their choices. It works in Expo Go, Expo development builds and bare React Native apps.
+
+## What you need
+
+- A **Mobile App** account in CookieChimp. To set one up, choose **Mobile App** when you add an account, and our team will help you get started.
+- Your **Account ID**, shown on the **SDK Setup** page of that account.
+- React Native 0.80 or newer (Expo SDK 54 or newer) and React 18 or newer.
+
+---
+
+## Install the SDK
+
+```bash
+npm install @cookiechimp/react-native @react-native-async-storage/async-storage
+```
+
+With Expo:
+
+```bash
+npx expo install @cookiechimp/react-native @react-native-async-storage/async-storage
+```
+
+In a bare React Native app, run `npx pod-install` afterwards.
+
+## Add the provider
+
+Wrap your app with `CookieChimpProvider` and pass your Account ID:
+
+```tsx
+import { CookieChimpProvider } from "@cookiechimp/react-native";
+
+export default function App() {
+  return (
+    <CookieChimpProvider accountId="YOUR_ACCOUNT_ID">
+      <RootNavigator />
+    </CookieChimpProvider>
+  );
+}
+```
+
+Your app renders immediately. The banner appears once the stored decision and your dashboard settings have loaded, and only when the user still needs to choose. Dashboard changes reach your users without an app release.
+
+<Tip>
+  To keep the banner clear of the notch and home indicator, pass safe-area insets from `react-native-safe-area-context`: `insets={useSafeAreaInsets()}`.
+</Tip>
+
+## Let users change their choice
+
+Apps don't show a floating cookie icon. Instead, add a **Privacy settings** row to your app's settings screen and open the preferences from it:
+
+```tsx
+import { CookieChimp } from "@cookiechimp/react-native";
+
+<SettingsRow title="Privacy settings" onPress={() => CookieChimp.showPreferences()} />;
+```
+
+## Choose which banner applies
+
+CookieChimp picks the banner for the user's region, so GDPR (opt-in) and CCPA (opt-out) rules apply in the right places. Tell the SDK the region in one of two ways:
+
+- Pass `country` (such as `"DE"` or `"US-CA"`) when your app already knows where the user is.
+- Set `geolocation` to `true` to let CookieChimp look up the country.
+
+When neither is set, the SDK uses the GDPR banner, which is the safest default.
+
+```tsx
+<CookieChimpProvider accountId="YOUR_ACCOUNT_ID" geolocation>
+```
+
+---
+
+## Design the banner
+
+Everything in the [Banner Designer](/features/banner-designer) applies to your app: layout, position, button placement, colors, dark mode, corner radius, logos, copy and translations. Banners and preferences animate in and out, and the animations are skipped when the device asks for reduced motion.
+
+Mobile App accounts also get a **Full Screen** layout. It covers the whole screen with your logo, title and copy, with the buttons pinned to the bottom. When the banner uses Full Screen, the preferences open full screen too.
+
+## Describe your SDKs
+
+Mobile SDKs don't set cookies, so instead of a cookie list each vendor in your preferences shows what the SDK collects. These labels follow Apple's App Privacy details and Google Play's Data safety section, so you can reuse the answers you gave the app stores:
+
+| Label | Example |
+| --- | --- |
+| Data collected | Device ID, App interactions, Crash data |
+| Used for | Analytics, App functionality |
+| Tracks users across other apps | No |
+| Kept for | 14 months |
+| SDK packages | iOS `FirebaseAnalytics`, Android `com.google.firebase:firebase-analytics` |
+
+In **Vendor Management**, choose **Add from library** to add common SDKs such as Firebase, Amplitude, AppsFlyer, Sentry and Google AdMob with these labels already filled in. Edit any SDK to review its labels under **App data**.
+
+## Start and stop SDKs with consent
+
+Register each vendor once. CookieChimp calls `onStart` when the user allows it and `onStop` when they withdraw consent:
+
+```tsx
+import analytics from "@react-native-firebase/analytics";
+import { CookieChimp } from "@cookiechimp/react-native";
+
+CookieChimp.registerVendor("Firebase Analytics", "analytics", {
+  onStart: () => analytics().setAnalyticsCollectionEnabled(true),
+  onStop: () => analytics().setAnalyticsCollectionEnabled(false),
+});
+```
+
+Use the vendor's name exactly as it appears in Vendor Management. To read consent in a component, use the `useCategory("analytics")` hook. See [the SDK reference](/sdk/react-native#controlling-vendor-sdks) for more.
+
+## Consent records
+
+Each decision is stored on the device and then sent to CookieChimp. Records are queued and retried while the device is offline. They appear in your **Consent Log** marked as iOS or Android, so you can prove consent for app users the same way as for website visitors.
+
+## Ship your settings inside the app (optional)
+
+If your app must not download its settings, go to **SDK Setup**, choose offline mode, download the configuration JSON and pass it as `config`:
+
+```tsx
+import config from "./cookiechimp-config.json";
+
+<CookieChimpProvider config={config}>{children}</CookieChimpProvider>;
+```
+
+You will need to download the file again and ship an app update whenever you change your banner, categories or vendors.
+
+## Next steps
+
+- [React Native SDK reference](/sdk/react-native): every provider prop, hook and method.
+- [Banner Designer](/features/banner-designer): design the banner and preferences.
+- [Consent Log](/features/consent-records): see the records your app sends.

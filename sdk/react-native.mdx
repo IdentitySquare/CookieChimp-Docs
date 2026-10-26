@@ -1,0 +1,258 @@
+---
+title: "React Native"
+description: "Consent banner, preferences, consent records and vendor control for React Native and Expo apps."
+---
+
+Documentation: [React Native SDK](https://docs.cookiechimp.com/docs/sdk/react-native).
+
+Consent banner, preferences screen, consent records and vendor control for
+React Native and Expo apps, built on the same `@cookiechimp/core` consent engine
+as the CookieChimp web SDK.
+
+This package is in development and is not yet published to npm. See
+[release status](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/docs/remaining-work.md).
+
+## What it does
+
+- Shows the banner and preferences you design in the CookieChimp dashboard as
+  native screens, with your copy, translations, colors and button settings.
+- Picks the right banner for the user's country or US state and applies GDPR
+  (opt-in) or CCPA (opt-out) rules from the banner's consent mode.
+- Stores the decision on the device and asks again when it expires or when you
+  require re-consent in the dashboard.
+- Sends consent records to CookieChimp, queued and retried while offline.
+- Starts and stops your analytics and advertising SDKs as consent changes.
+- Needs no custom native code beyond AsyncStorage, so it works in Expo Go,
+  development builds and bare React Native apps.
+
+## Install
+
+```bash
+npm install @cookiechimp/react-native @react-native-async-storage/async-storage
+```
+
+With Expo, use `npx expo install @cookiechimp/react-native @react-native-async-storage/async-storage`.
+In a bare app, run `npx pod-install` afterwards. React Native 0.80 or newer
+(Expo SDK 54 or newer) and React 18 or newer are supported. Older React Native
+versions ship an incomplete `URL` implementation: install
+`react-native-url-polyfill` and import `react-native-url-polyfill/auto` first.
+
+## Quick start
+
+Wrap your app with `CookieChimpProvider` and your account ID from the dashboard.
+
+```tsx
+import { CookieChimpProvider } from "@cookiechimp/react-native";
+
+export default function App() {
+  return (
+    <CookieChimpProvider accountId="YOUR_ACCOUNT_ID">
+      <RootNavigator />
+    </CookieChimpProvider>
+  );
+}
+```
+
+Your app renders immediately. The banner slides in once the stored decision and
+the dashboard config are loaded, and only when the user still needs to choose.
+
+## Connected and offline modes
+
+**Connected mode** (`accountId`) downloads the dashboard config, caches it on the
+device and renders from the cache on later launches. It revalidates with an ETag
+in the background and again when the app returns to the foreground after five
+minutes, so dashboard changes reach users without an app release.
+
+**Offline mode** (`config`) uses a config file you download from the dashboard
+(Setup, Download Config) and ship inside the app. No config requests are made.
+Consent records are still delivered when the device is online.
+
+```tsx
+import config from "./cookiechimp-config.json";
+
+<CookieChimpProvider config={config}>{children}</CookieChimpProvider>;
+```
+
+To update an offline config, download the file again and ship an app update.
+
+## Region and language
+
+The region selects which dashboard banner applies and whether its opt-out
+(CCPA) rules can be used. By default the SDK never looks up the user's location.
+
+1. `country="DE"` or `country="US-CA"` always wins. Pass it when your app
+   already knows the user's country, for example from your own backend.
+2. Otherwise, with `geolocation` and an `accountId`, the SDK asks CookieChimp's
+   own first-party endpoint for the connection's country (one small IP-based
+   request on launch). No third-party location service is contacted and device
+   location permissions are never used. This is off unless you opt in.
+3. Without a region, the dashboard's default banner is shown with the safe GDPR
+   fallback: optional categories stay off until the user chooses, even when the
+   default banner is an opt-out banner.
+
+Device locale (for example `en-US`) is a language setting, not a location, and
+is never used to choose the region.
+
+The language defaults to the device language and falls back to the first
+language the banner has. Override it with `language="fr"`.
+
+## Provider props
+
+| Prop | Description |
+| --- | --- |
+| `accountId` | Your CookieChimp account ID (connected mode). |
+| `config` | The downloaded config JSON (offline mode). |
+| `country` | `DE`, `US-CA` and so on. Overrides region detection. |
+| `language` | Banner language. Defaults to the device language. |
+| `geolocation` | Opt in to asking CookieChimp for the country when `country` is not set. Default `false`. |
+| `syncConsents` | Send consent records to CookieChimp. Default `true`. |
+| `ui` | Render the built-in banner and preferences. Set `false` for your own UI. |
+| `insets` | Safe-area insets for the consent UI, for example from `react-native-safe-area-context`. |
+| `storage` | An AsyncStorage-compatible store, for example an MMKV adapter. |
+| `debug` | Log SDK activity to the console. |
+| `onFirstConsent` | Called after the first decision on this install. |
+| `onAccept` | Called after every decision, and on launch when a valid decision is stored. |
+| `onChange` | Called after a later decision, with the changed category and service ids. |
+
+## Reading and changing consent
+
+Use hooks inside the provider:
+
+```tsx
+import { useCategory, usePreferences } from "@cookiechimp/react-native";
+
+function Settings() {
+  const analytics = useCategory("analytics");
+  const preferences = usePreferences();
+  return (
+    <Button title="Privacy settings" onPress={preferences.show} />
+  );
+}
+```
+
+| Hook | Returns |
+| --- | --- |
+| `useConsent()` | The consent state (`categories`, `services`, `consentId`, `ts`, `action`), or `null` while loading. |
+| `useCategory(id)` | `true` when the category is allowed. |
+| `useCategories()` | Categories with labels, descriptions, `required` and `enabled`. |
+| `useConsentActions()` | `acceptAll`, `rejectAll`, `save({ categories, services })`, `reset`. |
+| `useBanner()` / `usePreferences()` | `{ open, show, hide }`. |
+| `useOnConsentChange(fn)` | Calls `fn` after each new decision. |
+| `useRegion()` | `{ region, regulation }`. |
+| `useCookieChimp()` | The full SDK state, including `status` and the dashboard config. |
+
+Or use the `CookieChimp` object anywhere, including outside React:
+
+```ts
+import { CookieChimp } from "@cookiechimp/react-native";
+
+CookieChimp.show();
+CookieChimp.showPreferences();
+CookieChimp.acceptCategory("all");
+CookieChimp.acceptCategory([]); // necessary only
+CookieChimp.acceptCategory(["analytics"]);
+CookieChimp.acceptService(["Firebase Analytics"], "analytics");
+CookieChimp.acceptedCategory("analytics"); // boolean
+CookieChimp.acceptedService("Firebase Analytics", "analytics"); // boolean
+CookieChimp.getUserPreferences();
+const stop = CookieChimp.onChange((preferences, categories, services) => {});
+CookieChimp.reset(); // forget the decision and show the banner again
+```
+
+`CookieChimp.run(options)` starts the SDK without the provider, for example in
+`index.js` before React mounts. Render `<CookieChimpProvider>` without
+`accountId` or `config` to show the built-in UI for an SDK started this way.
+
+## Controlling vendor SDKs
+
+Register each analytics or advertising SDK with the category it belongs to. The
+SDK calls `onStart` when consent allows it and `onStop` when consent is
+withdrawn. Nothing starts before consent where consent is required.
+
+```ts
+import analytics from "@react-native-firebase/analytics";
+import { CookieChimp } from "@cookiechimp/react-native";
+
+CookieChimp.registerVendor("Firebase Analytics", "analytics", {
+  onStart: () => analytics().setAnalyticsCollectionEnabled(true),
+  onStop: () => analytics().setAnalyticsCollectionEnabled(false),
+});
+```
+
+When the name matches a service in your dashboard, the user's choice for that
+service applies; otherwise the category's choice applies. Disable each SDK's
+automatic collection in its native configuration so nothing is sent before
+`onStart`. `getVendors()`, `isVendorRunning(name)`, `startVendor(name)`,
+`stopVendor(name)` and `unregisterVendor(name)` are also available.
+
+## Design settings
+
+The built-in screens follow the banner design you set in the dashboard:
+
+| Dashboard setting | In the app |
+| --- | --- |
+| Layout: Box, Cloud, Bar | A floating card, a wider card or an edge-to-edge bar. |
+| Layout: Full Screen (mobile apps) | A full-screen consent page with the buttons pinned at the bottom. |
+| Banner position | Top, middle or bottom of the screen; left and right on tablets. |
+| Button placement | Stacked, inline, or inline wide. |
+| Equal weight buttons, swap buttons | Reject uses the primary style; button order follows the dashboard. |
+| Show accept, reject, preferences and close buttons | Each button is shown or hidden. |
+| Force consent | The app is dimmed and the banner cannot be dismissed. |
+| Colors, dark mode colors, dark mode (auto, light, dark) | Every color, following the device's appearance in auto. |
+| Banner and button corner radius | Corner radius of the cards and buttons (`px`, `rem` and `em`). |
+| Light and dark logo | Shown at the top of the banner and preferences. |
+| Footer content, powered by | Links in the footer, and a "Powered by CookieChimp" line at the foot of the banner and preferences on plans that show it. |
+| Preferences layout: Box or Bar, left or right | A centered card or a full-height panel that slides in from the side. With the Full Screen banner layout, the preferences open as a full screen page too. |
+| Consent at category level only, show services | Vendor switches, or vendor details without switches. |
+| Floating preferences icon | Not shown in apps. Open the preferences from your own settings screen with `CookieChimp.showPreferences()`. |
+
+Categories and vendors expand with an animation to show their purpose, the
+company and the privacy policy. Banners and preferences animate in and out, and
+animations are skipped when the device asks for reduced motion.
+
+### Vendor data labels
+
+Mobile SDKs do not set cookies, so each vendor shows its data labels from the
+dashboard instead, in the same shape as Apple's App Privacy details and Google
+Play's Data safety section:
+
+| Label | Example |
+| --- | --- |
+| Data collected | Device ID, App interactions, Crash data |
+| Used for | Analytics, App functionality |
+| Tracks you across other apps | No |
+| Kept for | 14 months |
+| SDK packages | iOS `FirebaseAnalytics`, Android `com.google.firebase:firebase-analytics` |
+
+SDKs added from the dashboard's library come with these filled in, and you can
+edit them per SDK. For a custom UI, `appData(service.app_data)` validates a
+vendor's labels, and `DATA_TYPES` and `PURPOSES` hold their English names.
+
+## Custom UI
+
+Set `ui={false}` and build your own screens with the hooks, or render
+`<ConsentBanner />` and `<ConsentPreferences />` yourself where you want them.
+
+## Consent records
+
+Each decision is stored on the device first and then sent to CookieChimp
+(`POST /api/v1/mobile-sdk/sync/{accountId}`) with the platform (`ios` or
+`android`), banner, language, accepted and rejected categories and services,
+and the decision time. Device identifiers, user IDs and advertising IDs are
+never sent. Records wait in a queue of up to 50 while the device is offline,
+retry with backoff and are sent again when the app returns to the foreground.
+Delivery is idempotent, so a retry never creates a duplicate.
+
+## Storage
+
+The decision, the cached config and queued records are stored in AsyncStorage
+under keys starting with `@cookiechimp:`. Pass `storage` to use another store
+with the same `getItem`, `setItem`, `removeItem` and `getAllKeys` methods.
+
+## Debugging
+
+`debug` logs the selected banner, region, language, regulation and every
+decision. `CookieChimp.reset()` clears the stored decision so you can test the
+first-launch flow again.
+
+MIT licensed.
