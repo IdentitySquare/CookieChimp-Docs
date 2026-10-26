@@ -113,6 +113,18 @@ CookieChimp.registerVendor("Firebase Analytics", "analytics", {
 });
 ```
 
+<Warning>
+  Most SDKs start collecting as soon as the app launches, before any JavaScript runs. Turn off their automatic collection so they stay off until `onStart` is called. For Firebase Analytics, add this to `firebase.json` in your project root and rebuild the app:
+
+  ```json
+  {
+    "react-native": {
+      "analytics_auto_collection_enabled": false
+    }
+  }
+  ```
+</Warning>
+
 Use the vendor's name exactly as it appears in Vendor Management. To read consent in a component, use the `useCategory("analytics")` hook. See [the SDK reference](/sdk/react-native#controlling-vendor-sdks) for more.
 
 ## Consent records
