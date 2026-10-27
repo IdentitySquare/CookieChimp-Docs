@@ -3,9 +3,10 @@ title: "Core and React reference"
 description: "Regions, gating, Consent Mode, headless UI, GPP and TCF."
 ---
 
-Open-source, lightweight consent SDK for React, Next.js and plain JavaScript, built by CookieChimp.
+Open-source, lightweight consent SDK for React, Next.js, React Native and plain JavaScript, built by CookieChimp.
 
 - Works with no account (local mode).
+- React Native and Expo support includes native banners, preferences, consent records and vendor controls.
 - Connect a CookieChimp project to sync a consent log, scanner categories, dashboard-managed copy, translations, regional rules and styling, plus IAB TCF/GPP and multi-site.
 
 Language negotiation checks each requested locale in preference order. It first
@@ -143,8 +144,7 @@ privacy laws. Neither is part of the default `@cookiechimp/core` bundle.
   replays queued calls and keeps the GPP string in sync with consent, firing
   `signalStatus`, the section event and `signalStatus` again on every change.
 
-Sections cover the US national string plus the 15 state formats in the current
-published IAB reference implementation:
+Sections cover the US national string plus 20 state formats:
 
 | Section | State | ID |
 |---|---|---:|
@@ -164,12 +164,18 @@ published IAB reference implementation:
 | usnh | New Hampshire | 20 |
 | usnj | New Jersey | 21 |
 | ustn | Tennessee | 22 |
+| usmn | Minnesota | 23 |
+| usmd | Maryland | 24 |
+| usin | Indiana | 25 |
+| usky | Kentucky | 26 |
+| usri | Rhode Island | 27 |
 
 With `approach: "state"` (the default), those states get their own section;
 other US regions use `usnat`. `approach: "national"` always uses `usnat`.
-Outside the US no section applies (`applicableSections: [-1]`). The newer
-MN, MD, IN, KY and RI formats (IDs 23 to 27) are not in the current published
-IAB reference library; those states currently use the national fallback.
+Outside the US no section applies (`applicableSections: [-1]`). Minnesota uses
+the established core/GPC format. Maryland, Indiana, Kentucky and Rhode Island
+include their required section header and separate subsections, following the
+April 2026 specifications. See [conformance and coverage](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/docs/gpp-conformance.md).
 Determine which string applies to your processing before enabling a section.
 [Section definitions](https://github.com/InteractiveAdvertisingBureau/Global-Privacy-Platform/blob/main/Sections/Section%20Information.md).
 
@@ -366,8 +372,18 @@ Limitations of `./network`:
   not covered. Install it before any third-party code.
 - Code running in iframes or workers is not covered, since each has its own
   globals.
-- Image pixels, WebSocket, and EventSource requests are not covered. An image
-  pixel handler for `./dynamic` is on the backlog.
+- Image requests use `blockDynamic`, including detached `new Image()`, image
+  `src`/`srcset` and picture source `srcset`. WebSocket and EventSource requests
+  are not intercepted.
+
+`blockDynamic` defers a matching image URL until all its candidate services have
+consent, and reports `kind: "image"`. Detached images are retained until their
+blocked URLs are released, replaced, removed or the controller stops. Withdrawal
+blocks future assignments; it cannot undo requests already sent. Install the
+blocker before assigning image URLs. Parser-loaded images, preload hints, CSS
+backgrounds, HTML string sinks other than `insertAdjacentHTML`, other realms
+and native setters captured before installation are
+outside this protection. Scanning existing markup cannot undo a prior request.
 
 
 ### Opt-in React TCF provider
