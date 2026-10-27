@@ -30,12 +30,18 @@ from the dashboard library follows the user's choice for that service.
 import { CookieChimp, presets } from "@cookiechimp/react-native";
 import { Mixpanel } from "mixpanel-react-native";
 import appsFlyer from "react-native-appsflyer";
+import { Adjust, AdjustConfig } from "react-native-adjust";
 
 const mixpanel = new Mixpanel("YOUR_TOKEN", true);
 await mixpanel.init(true); // optOutTrackingDefault: nothing is sent before consent
 
 CookieChimp.registerVendor(presets.mixpanel(mixpanel));
 CookieChimp.registerVendor(presets.appsFlyer(appsFlyer));
+// Adjust sends data as soon as it is initialized, so the preset initializes
+// it on the first consent instead of at launch.
+CookieChimp.registerVendor(
+  presets.adjust(Adjust, new AdjustConfig("YOUR_APP_TOKEN", AdjustConfig.EnvironmentProduction)),
+);
 ```
 
 | Preset | Pass | Dashboard name and category | Turn off before consent |
@@ -44,7 +50,7 @@ CookieChimp.registerVendor(presets.appsFlyer(appsFlyer));
 | `firebaseCrashlytics` | `crashlytics()` | Firebase Crashlytics, essential | `crashlytics_auto_collection_enabled: false` if you treat it as optional |
 | `firebasePerformance` | `perf()` | Firebase Performance Monitoring, analytics | `perf_auto_collection_enabled: false` |
 | `appsFlyer` | the `react-native-appsflyer` export | AppsFlyer, marketing | `initSdk({ manualStart: true, ... })`; the first consent calls `startSdk()` |
-| `adjust` | `Adjust` | Adjust, marketing | Initialize, then let the preset call `enable()`/`disable()` (or `setEnabled` on v4) |
+| `adjust` | `Adjust` and your `AdjustConfig` | Adjust, marketing | Do not call `Adjust.initSdk()` yourself; the first consent calls it with your config |
 | `meta` | `Settings` from `react-native-fbsdk-next` | Facebook SDK, marketing | `FacebookAutoInitEnabled` and `FacebookAutoLogAppEventsEnabled` false; the first consent calls `initializeSDK()` |
 | `amplitude` | the Amplitude client | Amplitude, analytics | `init(apiKey, undefined, { optOut: true })` |
 | `mixpanel` | a `Mixpanel` instance | Mixpanel, analytics | `optOutTrackingDefault` true |
