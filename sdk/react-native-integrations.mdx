@@ -19,6 +19,9 @@ asks for opt-in consent.
 Turn off each vendor SDK's automatic collection in its own setup (native
 config, `Info.plist`, `AndroidManifest.xml` or its init options) so it collects
 nothing before `onStart`. The preset notes below say how for each SDK.
+An SDK that starts in native code (`AppDelegate` or `MainApplication`) runs
+before any JavaScript, so a JavaScript call at launch is too late to stop it:
+turn it off natively or delay its initialization until consent.
 
 ## Presets
 
@@ -55,7 +58,7 @@ CookieChimp.registerVendor(
 | `amplitude` | the Amplitude client | Amplitude, analytics | `init(apiKey, undefined, { optOut: true })` |
 | `mixpanel` | a `Mixpanel` instance | Mixpanel, analytics | `optOutTrackingDefault` true |
 | `branch` | the `react-native-branch` export | Branch, marketing | Disable tracking in native code before the session starts in `AppDelegate` and `MainApplication` (see Branch's "Remove Tracking" guide); JavaScript runs too late |
-| `braze` | the Braze export | Braze, marketing | Call `Braze.disableSDK()` before consent is known |
+| `braze` | the Braze export | Braze, marketing | Use Braze's delayed initialization, or disable the SDK in native startup code; JavaScript runs too late |
 | `oneSignal` | `OneSignal` | OneSignal, marketing | `OneSignal.setConsentRequired(true)` before `initialize` |
 
 Change a preset's name or category to match your dashboard:
