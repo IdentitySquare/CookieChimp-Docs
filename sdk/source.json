@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cookiechimp/cookiechimp-sdk",
-  "sourceCommit": "f820a9628b23725262194974fbf1be2432e4832b",
+  "sourceCommit": "5fe9bac6d72c84a9fbab8b77d55ad038fb3c5661",
   "dirty": false,
   "pages": [
     {
@@ -58,6 +58,10 @@
     {
       "slug": "react-native",
       "source": "packages/react-native/README.md"
+    },
+    {
+      "slug": "react-native-integrations",
+      "source": "packages/docs/content/react-native-integrations.md"
     },
     {
       "slug": "examples",

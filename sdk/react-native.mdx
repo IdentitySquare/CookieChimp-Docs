@@ -9,7 +9,8 @@ Consent banner, preferences screen, consent records and vendor control for
 React Native and Expo apps, built on the same `@cookiechimp/core` consent engine
 as the CookieChimp web SDK.
 
-This package is in development and is not yet published to npm. See
+This package is part of the coordinated CookieChimp SDK release. Keep any
+CookieChimp packages you use on matching versions. See
 [release status](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/docs/remaining-work.md).
 
 ## What it does
@@ -94,7 +95,8 @@ Device locale (for example `en-US`) is a language setting, not a location, and
 is never used to choose the region.
 
 The language defaults to the device language and falls back to the first
-language the banner has. Override it with `language="fr"`.
+language the banner has. Override it with `language="fr"`. See
+[Translations](#translations) for how missing copy is filled in.
 
 ## Provider props
 
@@ -106,10 +108,12 @@ language the banner has. Override it with `language="fr"`.
 | `language` | Banner language. Defaults to the device language. |
 | `geolocation` | Opt in to asking CookieChimp for the country when `country` is not set. Default `false`. |
 | `syncConsents` | Send consent records to CookieChimp. Default `true`. |
-| `ui` | Render the built-in banner and preferences. Set `false` for your own UI. |
+| `ui` | Render the built-in banner and preferences. Set `false` for [headless mode](#headless-mode). |
 | `insets` | Safe-area insets for the consent UI, for example from `react-native-safe-area-context`. |
 | `storage` | An AsyncStorage-compatible store, for example an MMKV adapter. |
-| `debug` | Log SDK activity to the console. |
+| `debug` | Log SDK activity to the console and show the [debug panel](#debugging). Use `debug={__DEV__}`. |
+| `debugPanel` | Show or hide the debug panel independently of `debug`. |
+| `translations` | Your own copy for the SDK's built-in text, by language. See [Translations](#translations). |
 | `onFirstConsent` | Called after the first decision on this install. |
 | `onAccept` | Called after every decision, and on launch when a valid decision is stored. |
 | `onChange` | Called after a later decision, with the changed category and service ids. |
@@ -134,7 +138,9 @@ function Settings() {
 | --- | --- |
 | `useConsent()` | The consent state (`categories`, `services`, `consentId`, `ts`, `action`), or `null` while loading. |
 | `useCategory(id)` | `true` when the category is allowed. |
-| `useCategories()` | Categories with labels, descriptions, `required` and `enabled`. |
+| `useCategories()` | Categories with labels, descriptions, `required`, `enabled` and their `services` (name, company, privacy policy, data labels, `enabled`). |
+| `useConsentText()` | All banner and preferences copy with translated fallbacks, or `null` while loading. |
+| `useConsentDraft()` | Pending choices for your own preferences screen: `categories`, `toggleCategory`, `toggleService`, `save`, `discard`. |
 | `useConsentActions()` | `acceptAll`, `rejectAll`, `save({ categories, services })`, `reset`. |
 | `useBanner()` / `usePreferences()` | `{ open, show, hide }`. |
 | `useOnConsentChange(fn)` | Calls `fn` after each new decision. |
@@ -185,6 +191,25 @@ automatic collection in its native configuration so nothing is sent before
 `onStart`. `getVendors()`, `isVendorRunning(name)`, `startVendor(name)`,
 `stopVendor(name)` and `unregisterVendor(name)` are also available.
 
+Presets do this for Firebase, AppsFlyer, Adjust, Meta, Amplitude, Mixpanel,
+Branch, Braze and OneSignal, using the names from CookieChimp's mobile SDK
+library:
+
+```ts
+import { CookieChimp, connectFirebase, presets } from "@cookiechimp/react-native";
+
+CookieChimp.registerVendor(presets.mixpanel(mixpanel));
+CookieChimp.registerVendor(presets.appsFlyer(appsFlyer));
+
+// Analytics, Crashlytics and Performance collection, plus Consent Mode v2.
+connectFirebase({ analytics: analytics(), crashlytics: crashlytics() });
+```
+
+On iOS, `requestTrackingAfterConsent` shows the App Tracking Transparency
+prompt after the user accepts marketing. See
+[vendor SDKs, Firebase and App Tracking Transparency](https://docs.cookiechimp.com/docs/sdk/react-native-integrations)
+for every preset, the Firebase setup and ATT guidance.
+
 ## Design settings
 
 The built-in screens follow the banner design you set in the dashboard:
@@ -225,13 +250,107 @@ Play's Data safety section:
 | SDK packages | iOS `FirebaseAnalytics`, Android `com.google.firebase:firebase-analytics` |
 
 SDKs added from the dashboard's library come with these filled in, and you can
-edit them per SDK. For a custom UI, `appData(service.app_data)` validates a
-vendor's labels, and `DATA_TYPES` and `PURPOSES` hold their English names.
+edit them per SDK. The labels are shown in the banner's language.
 
-## Custom UI
+## Headless mode
 
-Set `ui={false}` and build your own screens with the hooks, or render
-`<ConsentBanner />` and `<ConsentPreferences />` yourself where you want them.
+Set `ui={false}` to draw the banner and preferences yourself. The SDK still
+loads the config, picks the banner and regulation, stores decisions, sends
+consent records and starts and stops vendors; your screens read and change
+consent with hooks.
+
+```tsx
+import {
+  CookieChimp,
+  useBanner,
+  useConsentDraft,
+  useConsentText,
+  usePreferences,
+} from "@cookiechimp/react-native";
+
+function MyBanner() {
+  const { open } = useBanner();
+  const text = useConsentText();
+  if (!open || !text) return null;
+  return (
+    <Sheet title={text.banner.title} body={text.banner.description}>
+      <Button title={text.banner.acceptAll} onPress={() => CookieChimp.acceptCategory("all")} />
+      <Button title={text.banner.rejectAll} onPress={() => CookieChimp.acceptCategory([])} />
+      <Button title={text.banner.customize} onPress={CookieChimp.showPreferences} />
+    </Sheet>
+  );
+}
+
+function MyPreferences() {
+  const { open, hide } = usePreferences();
+  const text = useConsentText();
+  const draft = useConsentDraft();
+  if (!open || !text) return null;
+  return (
+    <Sheet title={text.preferences.title} onClose={hide}>
+      {draft.categories.map((category) => (
+        <Row
+          key={category.id}
+          label={category.label}
+          value={category.enabled}
+          disabled={category.required}
+          onChange={(on) => draft.toggleCategory(category.id, on)}
+        />
+      ))}
+      <Button title={text.preferences.save} onPress={draft.save} />
+    </Sheet>
+  );
+}
+```
+
+- `useBanner()` opens when the user still needs to decide, exactly as the
+  built-in banner would. Keep your banner on screen until a decision.
+- `useConsentText()` gives every string from the dashboard with translated
+  fallbacks, the privacy policy URL, `rtl`, and whether the banner should
+  show "Powered by CookieChimp" (`banner.poweredBy`). The preferences screen
+  always shows it.
+- Descriptions are dashboard rich text. `richText(html)` returns paragraphs of
+  spans with `bold`, `italic` and safe `href` values; `plainText(html)` strips
+  the markup.
+- `useConsentDraft()` keeps changes local until `save()`. Switching a category
+  switches its services; required categories cannot be switched off. Each
+  category has `services` with `appData` labels; `text.messages.dataType(key)`
+  and `text.messages.purpose(key)` name them in the user's language.
+
+You can also render the built-in `<ConsentBanner />` and
+`<ConsentPreferences />` yourself and replace only one of them.
+
+## Translations
+
+Every piece of text comes from your dashboard first, in the selected
+language. When a field is empty, or for text the SDK draws itself (data
+labels, "Privacy policy", "Your consent ID", "Powered by"), the SDK uses its
+own copy in the same language, then the copy in the banner's default
+language, then English. Optional copy such as the additional description is
+never borrowed from another language.
+
+Built-in copy is included for the 33 languages of the web SDK: Arabic,
+Bulgarian, Chinese, Croatian, Czech, Danish, Dutch, English, Estonian,
+Finnish, French, German, Greek, Hebrew, Hungarian, Irish, Italian, Japanese,
+Korean, Latvian, Lithuanian, Maltese, Norwegian, Polish, Portuguese
+(Portugal and Brazil), Romanian, Slovak, Slovenian, Spanish, Swedish,
+Turkish and Ukrainian. A device locale refines the dashboard language, so a
+`pt-BR` device sees Brazilian Portuguese with a `pt` banner.
+
+Replace any built-in string with `translations`. Define it outside your
+component, since a new object restarts the SDK:
+
+```tsx
+const translations = {
+  de: { ui: { poweredBy: "Mit {name}" }, data: { device_id: "Gerätekennung" } },
+  is: { ui: { acceptAll: "Samþykkja allt", rejectAll: "Hafna valfrjálsu" } },
+};
+
+<CookieChimpProvider accountId="YOUR_ACCOUNT_ID" translations={translations} />;
+```
+
+`messages(language)` returns the SDK copy for any language, and
+`SDK_LANGUAGES` lists the built-in ones.
 
 ## Consent records
 
@@ -252,7 +371,23 @@ with the same `getItem`, `setItem`, `removeItem` and `getAllKeys` methods.
 ## Debugging
 
 `debug` logs the selected banner, region, language, regulation and every
-decision. `CookieChimp.reset()` clears the stored decision so you can test the
-first-launch flow again.
+decision to the console, and shows a small "CC debug" tab at the top of the
+screen. Tap it to open the debug panel:
+
+- SDK status, where the config came from (bundled file, device cache or
+  network), config version, account, banner, language, region, regulation
+  and the number of consent records waiting to be sent.
+- The stored decision: action, consent ID, time, and every category and
+  service.
+- Registered vendors and whether each is running.
+- Recent activity: config loads, decisions, re-consent, vendor starts and
+  stops, and record delivery.
+- Buttons to show the banner or preferences, accept all, reject all, reset
+  consent and send records now.
+
+Turn it off in release builds with `debug={__DEV__}`. `useDebugEvents()`
+returns the same activity log, and `<DebugPanel />` renders the panel
+yourself (for example with `CookieChimp.run`). `CookieChimp.reset()` clears
+the stored decision so you can test the first-launch flow again.
 
 MIT licensed.
