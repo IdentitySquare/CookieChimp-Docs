@@ -4,7 +4,7 @@ description: "Runnable Next.js and plain React/Vite apps."
 ---
 
 Runnable apps live in [`examples/`](https://github.com/cookiechimp/cookiechimp-sdk/blob/main/examples/nextjs-app-router/README.md).
-All three are built and tested end to end in CI on every pull request.
+The three web apps are built and tested end to end in CI on every pull request.
 
 Start with the [backend-connected walkthrough](/sdk/connected-backend) when using
 a CookieChimp account. The React/Vite app's `/connected` page retrieves real
@@ -15,6 +15,7 @@ dashboard config and delivers consent records with matching receipt status.
 | `examples/nextjs-app-router` | `CookieChimpProvider` (server), banner, preferences, recall button, a gated GA4 tag, `useCategory`. |
 | `examples/react-vite` | `/connected`: CookieChimp backend config, categories, copy, cookie settings, consent delivery, receipts and retries. `/platform.html`: 16 actual-SDK presets, category/vendor details, desktop/mobile previews, JSON export, complete service state and saved-choice replay. `/`: local runtime, script gating, persistence, preferences and recall. |
 | `examples/nextjs-pages-router` | `withConsent` and `PagesConsentProvider` with the same UI. |
+| `examples/react-native-expo` | The React Native SDK in Expo: native banner and preferences, consent state, vendor callbacks, offline sample config or a live account. Outside the pnpm workspace and not run in CI; see its README. |
 
 ```sh
 pnpm install

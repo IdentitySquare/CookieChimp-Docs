@@ -50,6 +50,7 @@
               "installation/shopify",
               "installation/nextjs",
               "installation/react",
+              "installation/react-native",
               {
                 "group": "JavaScript Frameworks",
                 "pages": [
@@ -140,7 +141,7 @@
       {
         "dropdown": "Consent SDK",
         "icon": "code",
-        "description": "React, Next.js and JavaScript consent SDK",
+        "description": "React, Next.js, React Native and JavaScript consent SDK",
         "groups": [
           {
             "group": "Get started",
@@ -151,6 +152,12 @@
               "sdk/connected-backend",
               "sdk/examples",
               "sdk/release-status"
+            ]
+          },
+          {
+            "group": "Mobile",
+            "pages": [
+              "sdk/react-native"
             ]
           },
           {
