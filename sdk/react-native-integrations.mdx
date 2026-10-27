@@ -54,7 +54,7 @@ CookieChimp.registerVendor(
 | `meta` | `Settings` from `react-native-fbsdk-next` | Facebook SDK, marketing | `FacebookAutoInitEnabled` and `FacebookAutoLogAppEventsEnabled` false; the first consent calls `initializeSDK()` |
 | `amplitude` | the Amplitude client | Amplitude, analytics | `init(apiKey, undefined, { optOut: true })` |
 | `mixpanel` | a `Mixpanel` instance | Mixpanel, analytics | `optOutTrackingDefault` true |
-| `branch` | the `react-native-branch` export | Branch, marketing | Call `branch.disableTracking(true)` at launch |
+| `branch` | the `react-native-branch` export | Branch, marketing | Disable tracking in native code before the session starts in `AppDelegate` and `MainApplication` (see Branch's "Remove Tracking" guide); JavaScript runs too late |
 | `braze` | the Braze export | Braze, marketing | Call `Braze.disableSDK()` before consent is known |
 | `oneSignal` | `OneSignal` | OneSignal, marketing | `OneSignal.setConsentRequired(true)` before `initialize` |
 
