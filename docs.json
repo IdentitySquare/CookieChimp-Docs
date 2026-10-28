@@ -50,7 +50,6 @@
               "installation/shopify",
               "installation/nextjs",
               "installation/react",
-              "installation/react-native",
               {
                 "group": "JavaScript Frameworks",
                 "pages": [
@@ -83,6 +82,12 @@
                   "installation/adobe-launch"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Mobile Apps",
+            "pages": [
+              "installation/react-native"
             ]
           },
           {
