@@ -3,25 +3,35 @@ title: "Versions and deployment"
 description: "Package versions, connected deployment and optional integrations."
 ---
 
-SDK **1.1.0** is published on npm. All eight packages use the same version and
+SDK **1.2.0** is published on npm. All nine packages use the same version and
 include verified provenance from the CookieChimp GitHub release workflow. See
-[the release notes](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.1.0).
+[the release notes](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.2.0).
 
 For a React application:
 
 ```sh
-npm install @cookiechimp/core@1.1.0 @cookiechimp/react@1.1.0
+npm install @cookiechimp/core@1.2.0 @cookiechimp/react@1.2.0
 ```
 
 For Next.js, also install the server integration:
 
 ```sh
-npm install @cookiechimp/nextjs@1.1.0
+npm install @cookiechimp/nextjs@1.2.0
 ```
 
-Keep the CookieChimp packages you use on matching versions. SDK 1.1.0 includes
-the platform JSON banner, category and vendor preferences, the variation
-playground, consent restoration across regulations and consent UI locale isolation.
+For React Native or Expo:
+
+```sh
+npm install @cookiechimp/react-native@1.2.0 @react-native-async-storage/async-storage
+```
+
+Follow the [React Native guide](/sdk/react-native) for connected
+configuration, native preferences and control of analytics or advertising SDKs.
+
+Keep the CookieChimp packages you use on matching versions. SDK 1.2.0 adds React
+Native support, tracking-image blocking, smaller connected sync and additional
+US state privacy formats. It includes the platform JSON banner, category/vendor
+preferences and consent UI locale isolation introduced in 1.1.0.
 The `@cookiechimp/react/platform` and `@cookiechimp/react/platform.css` entries
 require 1.1.0 or newer. The 1.0.0 package cohort supports the standard consent
 integrations.
