@@ -10,6 +10,8 @@ icon: "mobile"
 
 The CookieChimp React Native SDK shows the banner and preferences you design in the dashboard as native screens. It records each decision on the device and in your [Consent Log](/features/consent-records), and it starts and stops your analytics and advertising SDKs as people change their choices. It works in Expo Go, Expo development builds and bare React Native apps.
 
+SDK **1.2.0** is published on npm. Keep the CookieChimp packages you use on matching versions. See [versions and deployment](/sdk/release-status) for the coordinated release.
+
 ## What you need
 
 - A **Mobile App** account in CookieChimp. To set one up, choose **Mobile App** when you add an account, and our team will help you get started.
@@ -21,13 +23,13 @@ The CookieChimp React Native SDK shows the banner and preferences you design in 
 ## Install the SDK
 
 ```bash
-npm install @cookiechimp/react-native @react-native-async-storage/async-storage
+npm install @cookiechimp/react-native@1.2.0 @react-native-async-storage/async-storage
 ```
 
 With Expo:
 
 ```bash
-npx expo install @cookiechimp/react-native @react-native-async-storage/async-storage
+npx expo install @cookiechimp/react-native@1.2.0 @react-native-async-storage/async-storage
 ```
 
 In a bare React Native app, run `npx pod-install` afterwards.
@@ -71,7 +73,7 @@ CookieChimp picks the banner for the user's region, so GDPR (opt-in) and CCPA (o
 - Pass `country` (such as `"DE"` or `"US-CA"`) when your app already knows where the user is.
 - Set `geolocation` to `true` to let CookieChimp look up the country.
 
-When neither is set, the SDK uses the GDPR banner, which is the safest default.
+When neither is set, the SDK shows the dashboard's default banner with the GDPR fallback: optional categories stay off until the user chooses, even if that banner normally uses opt-out rules. The device language does not determine the user's region.
 
 ```tsx
 <CookieChimpProvider accountId="YOUR_ACCOUNT_ID" geolocation>
@@ -141,7 +143,21 @@ import config from "./cookiechimp-config.json";
 <CookieChimpProvider config={config}>{children}</CookieChimpProvider>;
 ```
 
+This skips config downloads; consent records are still delivered when the device is online. Set `syncConsents={false}` if you also want to disable record delivery.
+
 You will need to download the file again and ship an app update whenever you change your banner, categories or vendors.
+
+## Verify your integration
+
+Before shipping, check both iOS and Android with your own Account ID:
+
+1. On a fresh install, confirm the banner matches your dashboard settings and optional SDKs stay disabled until consent allows them.
+2. Accept, reject and save custom choices. Restart the app and confirm those choices persist.
+3. Open **Privacy settings**, withdraw consent and confirm your vendor callbacks disable collection.
+4. Make a decision while offline, reconnect or return the app to the foreground, and confirm the queued record reaches your CookieChimp **Consent Log** with the correct iOS or Android platform.
+5. Check that retries produce one stored record per decision and that an offline configuration update is included in your app build.
+
+An Expo bundle export checks packaging. Run the app on devices and confirm stored consent records before treating connected delivery as verified.
 
 ## Next steps
 
