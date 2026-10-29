@@ -1,0 +1,199 @@
+---
+title: "React Native vendor SDKs"
+description: "Presets for common mobile SDKs, Firebase Consent Mode and App Tracking Transparency."
+---
+
+Connect the analytics, attribution and advertising SDKs in your app to the
+user's consent with `@cookiechimp/react-native`. See the
+[React Native guide](/sdk/react-native) to install the SDK first.
+
+## How vendors follow consent
+
+Each vendor has a name and a category. When the name matches a service in your
+dashboard, the user's choice for that service applies; otherwise the
+category's choice applies. `onStart` runs when consent allows the vendor and
+`onStop` when consent is withdrawn. Nothing starts before the SDK has loaded
+the stored decision, and nothing starts before a decision where the banner
+asks for opt-in consent.
+
+Turn off each vendor SDK's automatic collection in its own setup (native
+config, `Info.plist`, `AndroidManifest.xml` or its init options) so it collects
+nothing before `onStart`. The preset notes below say how for each SDK.
+An SDK that starts in native code (`AppDelegate` or `MainApplication`) runs
+before any JavaScript, so a JavaScript call at launch is too late to stop it:
+turn it off natively or delay its initialization until consent.
+
+## Presets
+
+Presets switch common mobile SDKs on and off for you. They use the service
+names and categories from CookieChimp's mobile SDK library, so a vendor added
+from the dashboard library follows the user's choice for that service.
+
+```ts
+import { CookieChimp, presets } from "@cookiechimp/react-native";
+import { Mixpanel } from "mixpanel-react-native";
+import appsFlyer from "react-native-appsflyer";
+import { Adjust, AdjustConfig } from "react-native-adjust";
+
+const mixpanel = new Mixpanel("YOUR_TOKEN", true);
+await mixpanel.init(true); // optOutTrackingDefault: nothing is sent before consent
+
+CookieChimp.registerVendor(presets.mixpanel(mixpanel));
+CookieChimp.registerVendor(presets.appsFlyer(appsFlyer));
+// Adjust sends data as soon as it is initialized, so the preset initializes
+// it on the first consent instead of at launch.
+CookieChimp.registerVendor(
+  presets.adjust(Adjust, new AdjustConfig("YOUR_APP_TOKEN", AdjustConfig.EnvironmentProduction)),
+);
+```
+
+| Preset | Pass | Dashboard name and category | Turn off before consent |
+| --- | --- | --- | --- |
+| `firebaseAnalytics` | `analytics()` | Firebase Analytics, analytics | `analytics_auto_collection_enabled: false` in `firebase.json` |
+| `firebaseCrashlytics` | `crashlytics()` | Firebase Crashlytics, essential | `crashlytics_auto_collection_enabled: false` if you treat it as optional |
+| `firebasePerformance` | `perf()` | Firebase Performance Monitoring, analytics | `perf_auto_collection_enabled: false` |
+| `appsFlyer` | the `react-native-appsflyer` export | AppsFlyer, marketing | `initSdk({ manualStart: true, ... })`; the first consent calls `startSdk()` |
+| `adjust` | `Adjust` and your `AdjustConfig` | Adjust, marketing | Do not call `Adjust.initSdk()` yourself; the first consent calls it with your config |
+| `meta` | `Settings` from `react-native-fbsdk-next` | Facebook SDK, marketing | `FacebookAutoInitEnabled` and `FacebookAutoLogAppEventsEnabled` false; the first consent calls `initializeSDK()` |
+| `amplitude` | the Amplitude client | Amplitude, analytics | `init(apiKey, undefined, { optOut: true })` |
+| `mixpanel` | a `Mixpanel` instance | Mixpanel, analytics | `optOutTrackingDefault` true |
+| `branch` | the `react-native-branch` export | Branch, marketing | Disable tracking in native code before the session starts in `AppDelegate` and `MainApplication` (see Branch's "Remove Tracking" guide); JavaScript runs too late |
+| `braze` | the Braze export | Braze, marketing | Use Braze's delayed initialization, or disable the SDK in native startup code; JavaScript runs too late |
+| `oneSignal` | `OneSignal` | OneSignal, marketing | `OneSignal.setConsentRequired(true)` before `initialize` |
+
+Change a preset's name or category to match your dashboard:
+
+```ts
+CookieChimp.registerVendor(presets.amplitude(amplitude), {
+  name: "Product analytics",
+  category: "analytics",
+});
+```
+
+For any other SDK, register it with your own callbacks:
+
+```ts
+CookieChimp.registerVendor("Product tours", "personalization", {
+  onStart: () => tours.enable(),
+  onStop: () => tours.disable(),
+});
+```
+
+## Firebase
+
+`connectFirebase` registers the Firebase presets you pass and sends Google
+Consent Mode v2 signals to Firebase Analytics on launch and after every
+decision.
+
+```ts
+import analytics from "@react-native-firebase/analytics";
+import crashlytics from "@react-native-firebase/crashlytics";
+import perf from "@react-native-firebase/perf";
+import { connectFirebase } from "@cookiechimp/react-native";
+
+connectFirebase({
+  analytics: analytics(),
+  crashlytics: crashlytics(),
+  performance: perf(),
+});
+```
+
+Signals follow the same category mapping as the web SDK:
+
+| Category | Consent Mode signals |
+| --- | --- |
+| `analytics` | `analytics_storage` |
+| `marketing` or `advertising` | `ad_storage`, `ad_user_data`, `ad_personalization` |
+
+Under GDPR every signal is denied until the user chooses. Under an opt-out
+(CCPA) banner the signals start granted. Set the native defaults to denied as
+well, so the first events of a launch are covered before the SDK has loaded.
+In `firebase.json` at the root of your app:
+
+```json
+{
+  "react-native": {
+    "analytics_auto_collection_enabled": false,
+    "analytics_default_allow_analytics_storage": false,
+    "analytics_default_allow_ad_storage": false,
+    "analytics_default_allow_ad_user_data": false,
+    "analytics_default_allow_ad_personalization_signals": false
+  }
+}
+```
+
+Options:
+
+| Option | Description |
+| --- | --- |
+| `analytics`, `crashlytics`, `performance` | The Firebase modules to control. Pass only the ones you use. |
+| `consentMode` | `false` to skip Consent Mode, or a mapping such as `{ ads: ["ad_storage"] }`. Default `true`. |
+| `categories` | Move a product to another category, for example `{ crashlytics: "analytics" }`. |
+
+`connectFirebase` returns a function that disconnects Firebase.
+`firebaseConsent(categories, mapping?)` returns the signals for a decision if
+you call `setConsent` yourself.
+
+## App Tracking Transparency (iOS)
+
+Apple requires the App Tracking Transparency (ATT) prompt before an app
+tracks users across other companies' apps and websites, including any use of
+the advertising identifier (IDFA). A consent banner does not replace it, and
+a banner choice cannot override the user's ATT answer. The two answer
+different questions, so many apps show both:
+
+1. The CookieChimp banner asks for consent under GDPR, ePrivacy or US state
+   laws, by category and vendor.
+2. When the user accepts the category that tracks (usually `marketing`), the
+   ATT prompt asks iOS for permission to track.
+
+`requestTrackingAfterConsent` does step 2. It never shows the prompt while the
+category is rejected or undecided, which means users who already said no are
+not asked again. It does nothing on Android.
+
+```ts
+import { requestTrackingPermissionsAsync } from "expo-tracking-transparency";
+import { Settings } from "react-native-fbsdk-next";
+import { requestTrackingAfterConsent } from "@cookiechimp/react-native";
+
+requestTrackingAfterConsent({
+  request: requestTrackingPermissionsAsync,
+  onStatus: (status) => {
+    // Only use the advertising identifier when iOS says so.
+    Settings.setAdvertiserTrackingEnabled(status === "authorized");
+  },
+});
+```
+
+| Option | Description |
+| --- | --- |
+| `request` | Shows the iOS prompt. `requestTrackingPermissionsAsync` (Expo) or `requestTrackingPermission` (`react-native-tracking-transparency`). |
+| `category` | The category that must be accepted first. Default `marketing`. |
+| `service` | Require one dashboard service instead, for example `"Facebook SDK"`. |
+| `onStatus` | Called with `authorized`, `denied`, `restricted`, `not-determined` or `unavailable`. |
+
+iOS shows the prompt only once per install and only while the app is active;
+the helper waits for the app to be active. On later launches `request`
+resolves with the stored answer without a prompt, so `onStatus` keeps your
+SDKs in sync. Add `NSUserTrackingUsageDescription` to `Info.plist` (with Expo,
+the `expo-tracking-transparency` config plugin's `userTrackingPermission`).
+
+Keep these rules in mind:
+
+- If ATT is denied, do not track, even if the user accepted marketing in the
+  banner. Vendor SDKs read the ATT status themselves for the IDFA; pass the
+  status on where an SDK asks for it.
+- Do not show your own screen that imitates the system prompt, or offer
+  rewards for allowing tracking.
+- Banner consent still applies when ATT is authorized: a user can withdraw
+  marketing consent at any time and presets stop the vendors.
+
+This is guidance, not legal advice. Check your setup with your privacy
+counsel and Apple's [App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage)
+and [User Privacy and Data Use](https://developer.apple.com/app-store/user-privacy-and-data-use/) pages.
+
+## Google Play
+
+Android has no system tracking prompt. Your banner decision is the consent
+signal; describe each vendor's data in your Google Play Data safety form. The
+data labels you set for each vendor in the dashboard use the same data types.

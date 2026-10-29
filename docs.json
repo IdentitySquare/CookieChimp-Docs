@@ -162,7 +162,8 @@
           {
             "group": "Mobile",
             "pages": [
-              "sdk/react-native"
+              "sdk/react-native",
+              "sdk/react-native-integrations"
             ]
           },
           {
