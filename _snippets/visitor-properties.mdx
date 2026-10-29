@@ -22,6 +22,16 @@ CookieChimp.visitorRegion; // 'NY'
 CookieChimp.visitorNeedsConsent; // true
 ```
 
+### `CookieChimp.isBotVisitor`
+
+`true` if CookieChimp identifies the visitor as a bot: a verified bot reported by Cloudflare, a known crawler user agent, or an automated browser (`navigator.webdriver`). `false` otherwise. CookieChimp doesn't record visitor or consent events for bots.
+
+This property is set as soon as the CookieChimp script starts running, before the banner initialises, so tags that fire early on the page can read it.
+
+```js
+CookieChimp.isBotVisitor; // false
+```
+
 ### `CookieChimp.getConfig()['mode']`
 
 Returns the consent mode that was applied to the visitor based on your geolocation rules:
