@@ -141,11 +141,12 @@ paths:
   /categories:
     get:
       summary: List categories
-      description: List all categories for the current account. Requires an account-scoped API token.
+      description: List all categories for the account. A user API key that can reach several accounts can pass `account_id` to choose one.
       operationId: listCategories
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -170,6 +171,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create category
       description: Create a new category for the current account.
       operationId: createCategory
@@ -189,8 +192,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "422":
           $ref: "#/components/responses/ValidationError"
         "429":
@@ -204,6 +211,7 @@ paths:
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -226,6 +234,7 @@ paths:
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Category to update
@@ -241,8 +250,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CategoryResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -257,6 +270,7 @@ paths:
       tags:
         - Categories
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -267,8 +281,12 @@ paths:
                 $ref: "#/components/schemas/DeletedMessage"
               example:
                 message: "Category was deleted successfully"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "429":
@@ -283,6 +301,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/per_page"
         - $ref: "#/components/parameters/page"
       responses:
@@ -307,6 +326,8 @@ paths:
           $ref: "#/components/responses/RateLimited"
 
     post:
+      parameters:
+        - $ref: "#/components/parameters/account_id"
       summary: Create storage item
       description: Create a new storage item for the current account.
       operationId: createStorageItem
@@ -326,8 +347,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StorageItemResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           description: The referenced `category_id` or `site_service_id` does not belong to this account
           content:
@@ -347,6 +372,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -369,6 +395,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       requestBody:
         description: Storage item to update
@@ -384,8 +411,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StorageItemResponse"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -400,6 +431,7 @@ paths:
       tags:
         - Storage Items
       parameters:
+        - $ref: "#/components/parameters/account_id"
         - $ref: "#/components/parameters/id"
       responses:
         "200":
@@ -410,8 +442,12 @@ paths:
                 $ref: "#/components/schemas/DeletedMessage"
               example:
                 message: "Storage item was deleted successfully"
+        "400":
+          $ref: "#/components/responses/AmbiguousAccount"
         "401":
           $ref: "#/components/responses/AccountTokenRequired"
+        "403":
+          $ref: "#/components/responses/AccountAdminRequired"
         "404":
           $ref: "#/components/responses/NotFound"
         "429":
