@@ -28,12 +28,14 @@ There are two ways to get an API token:
 1. **Via the Dashboard**: Go to your [API Tokens](https://cookiechimp.com/api_tokens) settings page to create and manage tokens.
 2. **Via the API**: Use the [Login endpoint](/api-reference/auth/login) with your email and password to receive a token.
 
+Both give you a **user token**: it acts as you, on every account you can access.
+
 ### Token Types
 
 API tokens can belong to different bearer types:
 - **User tokens** — Access resources on behalf of a user across their accounts.
 - **Partner tokens** — Access partner-level resources like groups.
-- **Account tokens** — Access resources scoped to a specific account.
+- **Account tokens** — Access resources scoped to a specific account. These are not created from the dashboard; [contact support](mailto:support@cookiechimp.com) if you need one. A user token with `account_id` covers the same ground.
 
 Most endpoints are scoped to a single account. These accept an **account token**, or a **user token** whose user belongs to an account. A **partner token** does not resolve to one account, so those endpoints reject it with:
 
@@ -111,6 +113,10 @@ Two endpoints take their body unwrapped: [Log in](/api-reference/auth/login), wh
 ## Choosing an account
 
 An account API key identifies exactly one account, so there is nothing to choose. A user API key can reach several, and the endpoints that declare an `account_id` query parameter — the account's API id — let you say which one you mean. Endpoints that don't declare it act on the account the key resolves to on its own.
+
+<Warning>
+When a user key that can reach several accounts sends no `account_id`, the request falls back to one of those accounts, and which one is not guaranteed — it can change when you gain access to another account. Always pass `account_id` if your key can reach more than one account.
+</Warning>
 
 Where an endpoint accepts it, reads treat it as optional — it just narrows the request — while writes require it whenever the key can reach more than one account: without it the request would act on an account it picked rather than one you named, so it is refused with a `400`. Endpoints that don't accept the parameter are unaffected either way.
 
