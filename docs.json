@@ -94,6 +94,7 @@
             "group": "Features",
             "pages": [
               "features/consent-records",
+              "features/config-rewind",
               "features/vendor-scanning",
               "features/vendor-management",
               "features/banner-designer",
