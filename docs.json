@@ -138,7 +138,8 @@
               "advanced/custom-css",
               "advanced/callbacks-events",
               "advanced/banner-overrides",
-              "advanced/content-security-policy"
+              "advanced/content-security-policy",
+              "advanced/preload-preferences-modal"
             ]
           }
         ]

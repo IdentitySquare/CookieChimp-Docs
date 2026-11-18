@@ -1,0 +1,26 @@
+---
+title: "Preload Preferences Modal"
+description: "Choose whether the preferences modal loads in the background or only when a visitor opens it."
+---
+
+The preferences modal, where visitors choose which categories and services to allow, is loaded in a separate frame. By default CookieChimp loads it in the background after your page has finished loading, so it opens instantly when a visitor clicks **Manage preferences**, the floating icon, or one of your own [update consent buttons](/advanced/custom-update-consent-button).
+
+The modal is cached by the browser, so it is only downloaded again after you change your banner.
+
+## When to turn preloading off
+
+Page speed tools such as Lighthouse and PageSpeed Insights report every request made while they measure your page, including the background preload. If you'd rather your page made no requests for the modal until it is needed, turn preloading off.
+
+With preloading off, the modal starts loading when a visitor points at or focuses something that opens it, so most of the loading happens before the click. On a slow connection it can take a moment to appear the first time it is opened in a visit.
+
+## Change the setting
+
+1. In your dashboard, go to **Settings** → **Consent Features**.
+2. Under **Performance**, switch **Preload Preferences Modal** on or off.
+3. Click **Update**.
+
+Your banner updates on your website within a few minutes. No change to your installation code is needed.
+
+## How preloading works
+
+When preloading is on, CookieChimp waits for the page's `load` event and then for the browser to be idle before it loads the modal. This keeps it out of the way of your own page loading. If the CookieChimp script is added after the page has loaded, for example through a tag manager, the preload starts as soon as the browser is idle.
